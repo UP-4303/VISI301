@@ -3,5 +3,5 @@
 Idées :
 - Jeu au tour par tour
 - Prévision des mouvements ennemis (style Into the Breach)
-- Au début vision étroite puis déblocage de la vue
+- Points de vies = Carrés visible autour de soi, perte de vie => disparition des carrés en spirale
 - Accélération avec une vague qui tue ?
