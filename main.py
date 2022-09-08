@@ -1,6 +1,6 @@
 class Game():
     def __init__(self):
-        quote = "Hello World !"
+        self.quote = "Hello World !"
     def printQuote(self):
         print(self.quote)
 
