@@ -1,8 +1,8 @@
-from data.Board import Board as Board
-from data.Vector import Vector as Vector
-from data.Vector import Position as Position
+from classes.Board import Board as Board
+from classes.Position import Position as Position
+from classes.Vector import Vector as Vector
 
-# Classe abstraite parente de tout objet suceptible de bouger
+# Classe abstraite parente de tout objet suceptible de bouger (joueur, monstre, PNJ, projectile...)
 class MovableObject():
     def __init__(self, spawnCoordinates:Position, board:Board):
         self.coordinates = spawnCoordinates
@@ -13,7 +13,7 @@ class MovableObject():
             self.board.Update(self.coordinates, self)
     
     def __del__(self):
-        print('Succesfully deleted')
+        print('MovableObject succesfully deleted')
 
     def MoveUp(self):
         if not self.board.IsCaseOccupied(Position(self.coordinates.x-1,self.coordinates.y)):

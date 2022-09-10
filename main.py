@@ -1,10 +1,13 @@
 import pygame
-from data.MovableObject import MovableObject as MovableObject
-from data.Board import Board as Board
-from data.Vector import Position as Position
-from data.Vector import Vector as Vector
+
+from classes.Board import Board as Board
+from classes.MovableObject import MovableObject as MovableObject
+from classes.Position import Position as Position
+from classes.UnmovableObject import UnmovableObject as UnmovableObject
+from classes.Vector import Vector as Vector
 
 if __name__ == '__main__':
+    # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
     board = Board((2,10))
     player = MovableObject(Position(1,1), board)
     print(board.all)
