@@ -1,7 +1,7 @@
 from classes.Board import Board as Board
 from classes.Position import Position as Position
 
-# Classe abstaite parente de tout les objets immobiles (murs, coffres, portes...)
+# I will change this to a mountain or something like that
 class UnmovableObject():
     def __init__(self, coordinates:Position, board:Board):
         self.coordinates = coordinates
