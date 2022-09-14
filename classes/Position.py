@@ -8,3 +8,6 @@ class Position(Vector):
     def Move(self, movement:Vector):
         self.x += movement.x
         self.y += movement.y
+    
+    def MovePreview(self, movement:Vector):
+        return Position(self.x + movement.x, self.y + movement.y)

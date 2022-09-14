@@ -7,8 +7,13 @@ class Board():
         self.size = size
         self.all = [[None for i in range(self.size[0])] for j in range(self.size[1])]
 
-    def Update(self, coordinates:Position, newObject):
+    def NewObject(self, coordinates:Position, newObject):
         self.all[coordinates.x][coordinates.y] = newObject
+
+    def Move(self, oldCoordinates:Position, newCoordinates:Position):
+        movedObject = self.all[oldCoordinates.x][oldCoordinates.y]
+        self.all[oldCoordinates.x][oldCoordinates.y] = None
+        self.all[newCoordinates.x][newCoordinates.y] = movedObject
 
     def IsCaseOccupied(self, coordinates:Position):
         return self.all[coordinates.x][coordinates.y] != None
