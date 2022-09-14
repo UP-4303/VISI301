@@ -19,7 +19,7 @@ class Board():
         self.all[newCoordinates.x][newCoordinates.y] = movedObject
 
     def DeleteObject(self, coordinates:Position):
-        self.all[coordinates.x][coordinates.y]
+        self.all[coordinates.x][coordinates.y] = None
 
     # Checking has to be down before movement for preventing unwanted deletion
     def IsCaseOccupied(self, coordinates:Position):

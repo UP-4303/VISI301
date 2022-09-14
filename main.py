@@ -8,7 +8,7 @@ from classes.Vector import Vector as Vector
 
 if __name__ == '__main__':
     # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
-    board = Board((2,10))
+    board = Board((5,5))
     player = Player(Position(1,1), board)
     print(board.all)
     player.Move(Vector(1,0))

@@ -26,8 +26,8 @@ class Player():
 
     # Just move the player. USE IT CAUTIOUSLY
     def Move(self, vector:Vector):
-        self.coordinates.Move(vector)
         self.board.MoveObject(self.coordinates, self.coordinates.MovePreview(vector))
+        self.coordinates.Move(vector)
     
     # Check if the destination case is occupied and move only if possible
     def CheckAndMove(self, vector:Vector):
@@ -46,4 +46,4 @@ class Player():
     def PlayTurn(self):
         # Check health. If the player is dead, it will be deleted
         if self.healthPoints <= 0:
-            self.__del__('PLAYER IS DEAD')
+            self.DelFromBoard('PLAYER IS DEAD')
