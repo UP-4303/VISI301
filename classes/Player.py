@@ -34,7 +34,36 @@ class Player():
     def CheckAndMove(self, vector:Vector):
         if not self.board.IsCaseOccupied(self.coordinates.MovePreview(vector)):
             self.Move(vector)
+            didItMove = True
+        else:
+            didItMove = False
+        return didItMove
+
     
+    # Request the real player where to move
+    def RequestMove(self):
+        requestedCoordinates = Vector(input(f'Actual position : ({self.coordinates.x},{self.coordinates.y}).\n Where do you want to move ? '))
+        validMove, caseOccupied = self.ValidMove(requestedCoordinates)
+        while not(validMove):
+            if caseOccupied:
+                print('Case is already occupied.')
+            else:
+                print(f'You only have {self.movePoints} movement points.')
+            requestedCoordinates = Vector(input('Where do you want to go ? '))
+            validMove, caseOccupied = self.ValidMove()
+        print('Movement done !')
+
+
+    # Return two booleans "This move is valid" and "Case already occupied"
+    def ValidMove(self, vector:Vector):
+        if abs(vector.x) + abs(vector.y) < self.movePoints:
+            caseOccupied = not(self.CheckAndMove(vector))
+            validMove = not(caseOccupied)
+        else:
+            validMove = False
+        return validMove, caseOccupied
+        
+
     # Decrease health
     def TakeDamage(self, amount:int):
         self.healthPoints -= amount
@@ -45,6 +74,8 @@ class Player():
     
     # The main code of the player, that will be called every turn (actually just check the health)
     def PlayTurn(self):
-        # Check health. If the player is dead, it will be deleted
+        # Check health. If the player is dead, it will be deleted. Else, play normally
         if self.healthPoints <= 0:
             self.DelFromBoard('PLAYER IS DEAD')
+        else:
+            self.RequestMove()
