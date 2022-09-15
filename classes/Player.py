@@ -63,6 +63,7 @@ class Player():
             caseOccupied = not(self.CheckAndMove(vector))
             validMove = not(caseOccupied)
         else:
+            caseOccupied = False
             validMove = False
         return validMove, caseOccupied
         
