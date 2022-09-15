@@ -3,7 +3,7 @@ import pygame
 from classes.Board import Board as Board
 from classes.Player import Player as Player
 from classes.Position import Position as Position
-from classes.UnmovableObject import UnmovableObject as UnmovableObject
+from classes.Bloc import Bloc as Bloc
 from classes.Vector import Vector as Vector
 
 if __name__ == '__main__':

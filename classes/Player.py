@@ -20,6 +20,7 @@ class Player():
     def __del__(self, reason:str="Player deleted"):
         print(reason)
 
+    # Delete the player and it's board self. Don't call this method if the player is not on the board
     def DelFromBoard(self,reason:str):
         self.board.DeleteObject(self.coordinates)
         self.__del__(reason)
