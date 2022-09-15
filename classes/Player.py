@@ -53,13 +53,13 @@ class Player():
             print('Where do you want to go ? ')
             requestedCoordinates.x = int(input('Axe X : '))
             requestedCoordinates.y = int(input('Axe Y : '))
-            validMove, caseOccupied = self.ValidMove()
+            validMove, caseOccupied = self.ValidMove(requestedCoordinates)
         print('Movement done !')
 
 
     # Return two booleans "This move is valid" and "Case already occupied"
     def ValidMove(self, vector:Vector):
-        if abs(vector.x) + abs(vector.y) < self.movePoints:
+        if abs(vector.x) + abs(vector.y) <= self.movePoints:
             caseOccupied = not(self.CheckAndMove(vector))
             validMove = not(caseOccupied)
         else:
