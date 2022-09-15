@@ -10,17 +10,17 @@ class Board():
 
     # Set a new object on the board
     def NewObject(self, coordinates:Position, newObject):
-        self.all[coordinates.x][coordinates.y] = newObject
+        self.all[coordinates.y][coordinates.x] = newObject
 
     # Move selected object
     def MoveObject(self, oldCoordinates:Position, newCoordinates:Position):
-        movedObject = self.all[oldCoordinates.x][oldCoordinates.y]
-        self.all[oldCoordinates.x][oldCoordinates.y] = None
-        self.all[newCoordinates.x][newCoordinates.y] = movedObject
+        movedObject = self.all[oldCoordinates.y][oldCoordinates.x]
+        self.all[oldCoordinates.y][oldCoordinates.x] = None
+        self.all[newCoordinates.y][newCoordinates.x] = movedObject
 
     def DeleteObject(self, coordinates:Position):
-        self.all[coordinates.x][coordinates.y] = None
+        self.all[coordinates.y][coordinates.x] = None
 
     # Checking has to be down before movement for preventing unwanted deletion
     def IsCaseOccupied(self, coordinates:Position):
-        return self.all[coordinates.x][coordinates.y] != None
+        return self.all[coordinates.y][coordinates.x] != None

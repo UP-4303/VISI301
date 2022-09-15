@@ -15,3 +15,7 @@ if __name__ == '__main__':
     mountain = Bloc(Position(1,2), board)
     toUpdate.append(mountain)
     print(board.all)
+
+    for i in range(3):
+        for updatingObject in toUpdate:
+            updatingObject.PlayTurn()
