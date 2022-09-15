@@ -42,14 +42,19 @@ class Player():
     
     # Request the real player where to move
     def RequestMove(self):
-        requestedCoordinates = Vector(input(f'Actual position : ({self.coordinates.x},{self.coordinates.y}).\n Where do you want to move ? '))
+        requestedCoordinates:Vector
+        print(f'Actual position : ({self.coordinates.x},{self.coordinates.y}).\n Where do you want to move ?')
+        requestedCoordinates.x = int(input('Axe X : '))
+        requestedCoordinates.y = int(input('Axe Y : '))
         validMove, caseOccupied = self.ValidMove(requestedCoordinates)
         while not(validMove):
             if caseOccupied:
                 print('Case is already occupied.')
             else:
                 print(f'You only have {self.movePoints} movement points.')
-            requestedCoordinates = Vector(input('Where do you want to go ? '))
+            print('Where do you want to go ? ')
+            requestedCoordinates.x = int(input('Axe X : '))
+            requestedCoordinates.y = int(input('Axe Y : '))
             validMove, caseOccupied = self.ValidMove()
         print('Movement done !')
 
