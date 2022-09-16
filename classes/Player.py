@@ -25,7 +25,7 @@ class Player():
         self.board.DeleteObject(self.coordinates)
         self.__del__(reason)
 
-    # Just move the player. USE IT CAUTIOUSLY
+    # Just move the player. USE IT CAUTIOUSLY (it can delete another object on the board)
     def Move(self, vector:Vector):
         self.board.MoveObject(self.coordinates, self.coordinates.MovePreview(vector))
         self.coordinates.Move(vector)

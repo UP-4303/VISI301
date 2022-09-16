@@ -18,6 +18,7 @@ class Board():
         self.all[oldCoordinates.y][oldCoordinates.x] = None
         self.all[newCoordinates.y][newCoordinates.x] = movedObject
 
+    # Delete the object at targeted position
     def DeleteObject(self, coordinates:Position):
         self.all[coordinates.y][coordinates.x] = None
 
