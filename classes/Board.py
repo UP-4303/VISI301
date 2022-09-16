@@ -1,4 +1,4 @@
-from classes.Position import Position as Position
+from classes.Position import Position
 
 # Class for a board
 class Board():

@@ -1,7 +1,8 @@
-from classes.Board import Board as Board
-from classes.Position import Position as Position
-from classes.Vector import Vector as Vector
-from utils.Pathfinder import Pathfinder as Pathfinder
+from classes.Board import Board
+from classes.Position import Position
+from classes.Vector import Vector
+
+from utils.Pathfinder import PathfinderMonster as Pathfinder
 
 class Monster():
     def __init__(self, spawnCoordinates:Position, board:Board):

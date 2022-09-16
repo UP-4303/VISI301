@@ -1,5 +1,5 @@
-from classes.Board import Board as Board
-from classes.Position import Position as Position
+from classes.Board import Board
+from classes.Position import Position
 
 # A bloc can't move, but can be destroyed
 class Bloc():

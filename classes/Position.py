@@ -1,4 +1,4 @@
-from classes.Vector import Vector as Vector
+from classes.Vector import Vector
 
 # A vector (from the origin) with some usefull methods
 class Position(Vector):

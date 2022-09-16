@@ -1,6 +1,6 @@
-from classes.Board import Board as Board
-from classes.Position import Position as Position
-from classes.Vector import Vector as Vector
+from classes.Board import Board
+from classes.Position import Position
+from classes.Vector import Vector
 
 class Player():
     def __init__(self, spawnCoordinates:Position, board:Board):
