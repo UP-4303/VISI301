@@ -23,18 +23,18 @@ class Monster():
         print(reason)
 
     # Delete the monster and it's board self. Don't call this method if the monster is not on the board
-    def DelFromBoard(self,reason:str):
+    def DelFromBoard(self, reason:str):
         self.board.DeleteObject(self.coordinates)
         self.__del__(reason)
 
     # Just move the monster. USE IT CAUTIOUSLY (it can delete another object on the board)
     def Move(self, vector:Vector):
-        self.board.MoveObject(self.coordinates, self.coordinates.MovePreview(vector))
+        self.board.MoveObject(self.coordinates, self.coordinates + vector)
         self.coordinates.Move(vector)
     
     # Check if the destination case is occupied and move only if possible
     def CheckAndMove(self, vector:Vector):
-        if not self.board.IsCaseOccupied(self.coordinates.MovePreview(vector)):
+        if not self.board.IsCaseOccupied(self.coordinates + vector):
             self.Move(vector)
             didItMove = True
         else:

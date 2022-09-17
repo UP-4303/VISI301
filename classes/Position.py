@@ -12,5 +12,9 @@ class Position(Vector):
         self.y += movement.y
     
     # DO NOT MOVE but return a preview of the coordinates
-    def MovePreview(self, movement:Vector):
+    def __add__(self, movement:Vector):
         return Position(self.x + movement.x, self.y + movement.y)
+    
+    # Vector from position to self
+    def __sub__(self, position:Position):
+        return Vector(self.x - position.x, self.y - position.y)
