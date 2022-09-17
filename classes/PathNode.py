@@ -1,8 +1,7 @@
 from classes.Position import Position
 
 class PathNode():
-    def __init__(self, coordinates:Position, gCost, hCost):
-        self.coordinates = coordinates
+    def __init__(self, gCost, hCost):
         self.gCost = gCost
         self.hCost = hCost
     
