@@ -6,7 +6,8 @@ class PathNode():
         self.hCost = hCost
     
     def Update(self, gCost, hCost):
-        self.gCost = gCost
+        if gCost < self.gCost:
+            self.gCost = gCost
         self.hCost = hCost
     
     def Cost(self):

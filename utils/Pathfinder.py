@@ -11,12 +11,13 @@ from classes.Vector import Vector
 # For the pathfinder, we will use an adapted A* algorithm for cardinal neighborhood
 def PathfinderMonster(board:Board, monster:Monster):
     targets = []
+    nodeList = [[None for i in range(board.size[0])] for j in range(board.size[1])]
     for x in range(board.size[0]):
         for y in range(board.size[1]):
             if ValidTargetMonster(board, board.SelectPosition(Position(x,y))):
                 targets.append(Position(x,y))
     
-    nodeList = [[None for i in range(board.size[0])] for j in range(board.size[1])]
+    
     nodeList[monster.coordinates.x][monster.coordinates.y] = PathNode(0, HeuristicCost(targets, monster.coordinates))
 
 # Find the lowest heuristic cost
