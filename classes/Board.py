@@ -6,7 +6,7 @@ class Board():
         # size[0] is the width and size[1] is height
         self.size = size
         # Contain all the elelments
-        self.all = [[None for i in range(self.size[0])] for j in range(self.size[1])]
+        self.all = [[None for x in range(self.size[0])] for y in range(self.size[1])]
 
     # Set a new object on the board
     def NewObject(self, coordinates:Position, newObject):
