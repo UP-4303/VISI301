@@ -32,7 +32,7 @@ class Monster():
 
     # Just move the monster. USE IT CAUTIOUSLY (it can delete another object on the board)
     def Move(self):
-        path = Pathfinder(self.board, self, self.Targets())
+        path = Pathfinder(self.board, self, self.Targets(), self.uncrossableTypes)
 
     # Decrease health
     def TakeDamage(self, amount:int):

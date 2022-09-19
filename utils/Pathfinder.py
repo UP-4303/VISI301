@@ -2,21 +2,16 @@ from math import inf
 
 from classes.Board import Board
 from classes.Bloc import Bloc
-from classes.PathNode import PathNode
+from classes.Node import Node
+from classes.NodeList import NodeList
 from classes.Player import Player
 from classes.Position import Position
 from classes.Vector import Vector
 
 # For the pathfinder, we will use an adapted A* algorithm for cardinal neighborhood
-def PathfinderMonster(board:Board, monster):
-    targets = []
-    nodeList = [[PathNode() for x in range(board.size[0])] for y in range(board.size[1])]
-    for y in range(board.size[0]):
-        for x in range(board.size[1]):
-            if type(board.SelectPosition(Position(x,y))) in [Bloc, Player]:
-                nodeList[y][x].Update(inf,inf, Position(x,y))
-            if ValidTargetMonster(board, Position(x,y)):
-                targets.append(Position(x,y))
+# This function return a path object (which is a list of positions)
+def Pathfinder(board:Board, object, targets:list, uncrossableTypes:list):
+    nodeList = NodeList(board, uncrossableTypes, object.coordinates)
 
     nodeList[monster.coordinates.y][monster.coordinates.x].Update(0, HeuristicCost(targets, monster.coordinates), monster.coordinates, True)
     nodeList[monster.coordinates.y][monster.coordinates.x].Explore()
@@ -77,16 +72,3 @@ def HeuristicCost(targets:list, position:Position):
     for target in targets:
         hCosts.append(abs(target - position))
     return min(hCosts)
-
-# Define if a position is a valid target
-def ValidTargetMonster(board:Board, coordinates:Position):
-    check = []
-    if coordinates.x > 0:
-        check.append(type(board.SelectPosition(coordinates + Vector(-1,0))))
-    if coordinates.x < board.size[0]-1:
-        check.append(type(board.SelectPosition(coordinates + Vector(1,0))))
-    if coordinates.y > 0:
-        check.append(type(board.SelectPosition(coordinates + Vector(0,-1))))
-    if coordinates.y < board.size[1]-1:
-        check.append(type(board.SelectPosition(coordinates + Vector(0,1))))
-    return Player in check
