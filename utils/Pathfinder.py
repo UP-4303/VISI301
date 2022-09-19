@@ -41,8 +41,6 @@ def PathfinderMonster(board:Board, monster:Monster):
             nodeToExplore.append(monster.coordinates + Vector(0,1))
     
     while not(pathFound):
-        if nodeToExplore == []:
-            
         currentNode = NextNode(nodeList, nodeToExplore)
         nodeToExplore.remove(currentNode)
         nodeList[currentNode.y][currentNode.x].Explore()
@@ -50,16 +48,16 @@ def PathfinderMonster(board:Board, monster:Monster):
             pathFound = True
         else:
             if currentNode.x > 0:
-                nodeList[currentNode.y][currentNode.x-1].Update(1, HeuristicCost(targets, currentNode + Vector(-1,0)), currentNode)
+                nodeList[currentNode.y][currentNode.x-1].Update(nodeList[currentNode.y][currentNode.x].gCost + 1, HeuristicCost(targets, currentNode + Vector(-1,0)), currentNode)
                 nodeToExplore.append(currentNode + Vector(-1,0))
             if currentNode.x < board.size[0]:
-                nodeList[currentNode.y][currentNode.x+1].Update(1, HeuristicCost(targets, currentNode + Vector(1,0)), currentNode)
+                nodeList[currentNode.y][currentNode.x+1].Update(nodeList[currentNode.y][currentNode.x].gCost + 1, HeuristicCost(targets, currentNode + Vector(1,0)), currentNode)
                 nodeToExplore.append(currentNode + Vector(1,0))
             if currentNode.y > 0:
-                nodeList[currentNode.y-1][currentNode.x].Update(1, HeuristicCost(targets, currentNode + Vector(0,-1)), currentNode)
+                nodeList[currentNode.y-1][currentNode.x].Update(nodeList[currentNode.y][currentNode.x].gCost + 1, HeuristicCost(targets, currentNode + Vector(0,-1)), currentNode)
                 nodeToExplore.append(currentNode + Vector(0,-1))
             if currentNode.y < board.size[1]:
-                nodeList[currentNode.y+1][currentNode.x].Update(1, HeuristicCost(targets, currentNode + Vector(0, 1)), currentNode)
+                nodeList[currentNode.y+1][currentNode.x].Update(nodeList[currentNode.y][currentNode.x].gCost + 1, HeuristicCost(targets, currentNode + Vector(0, 1)), currentNode)
                 nodeToExplore.append(currentNode + Vector(0,1))
     
 
