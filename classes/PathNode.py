@@ -7,14 +7,17 @@ class PathNode():
         self.explored = explored
         self.gCost = gCost
         self.hCost = hCost
+        self.pointToNode:Position()
 
     def Explore(self):
         self.explored = True
     
-    def Update(self, gCost:int, hCost:int):
+    def Update(self, gCost:int, hCost:int, pointToNode:Position(), start:bool=False):
         if gCost < self.gCost:
             self.gCost = gCost
         self.hCost = hCost
+        self.pointToNode = pointToNode
+        self.start = start
     
     def Cost(self):
         return self.gCost + self.hCost
