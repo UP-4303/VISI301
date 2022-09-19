@@ -3,7 +3,8 @@ from math import nan
 from classes.Position import Position
 
 class Node():
-    def __init__(self, explored:bool=False, gCost:int=nan, hCost:int=nan):
+    def __init__(self, coordinates:Position, crossable:bool, explored:bool=False, gCost:int=nan, hCost:int=nan):
+        self.coordinates = Position()
         self.explored = explored
         self.gCost = gCost
         self.hCost = hCost

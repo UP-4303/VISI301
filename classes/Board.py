@@ -27,5 +27,8 @@ class Board():
         return self.all[coordinates.y][coordinates.x] != None
     
     # Return the object in targeted position
-    def SelectPosition(self,coordinates:Position):
+    def get(self,coordinates:Position):
         return self.all[coordinates.y][coordinates.x]
+    
+    def set(self, coordinates:Position, newValue):
+        self.all[coordinates.y][coordinates.x] = newValue
