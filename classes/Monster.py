@@ -28,7 +28,7 @@ class Monster():
         self.__del__(reason)
 
     # Just move the monster. USE IT CAUTIOUSLY (it can delete another object on the board)
-    def Move(self, vector:Vector):
+    def Move(self):
         moveTo = Pathfinder(self.board, self)
         self.board.MoveObject(self.coordinates, moveTo)
         self.coordinates.Move(moveTo - self.coordinates)

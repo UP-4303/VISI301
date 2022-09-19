@@ -16,5 +16,5 @@ class Position(Vector):
         return Position(self.x + movement.x, self.y + movement.y)
     
     # Vector from position to self
-    def __sub__(self, position:Position):
+    def __sub__(self, position):
         return Vector(self.x - position.x, self.y - position.y)
