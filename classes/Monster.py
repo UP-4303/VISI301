@@ -46,19 +46,19 @@ class Monster():
     def Targets(self):
         targets = []
         # For every cell
-        for y in range(self.board.size[0]):
-            for x in range(self.board.size[1]):
+        for y in range(self.board.size[1]):
+            for x in range(self.board.size[0]):
                 # If the cell is empty
                 if type(self.board.get(Position(x,y))) == None:
                     # Check if this cell is a valid target.
                     # Current rule for valid target : If a cell next to the checking cell contains a player, the checking cell is valid. 
                     if x > 0 and type(self.board.get(Position(x-1,y))) == Player:
                         targets.append(Position(x-1,y))
-                    elif x < type(self.board.size[0]-1 and self.board.get(Position(x+1,y))) == Player:
+                    elif x < self.board.size[0] and type(self.board.size[0]-1 and self.board.get(Position(x+1,y))) == Player:
                         targets.append(Position(x+1,y))
                     elif y > 0 and type(self.board.get(Position(x,y-1))) == Player:
                         targets.append(Position(x,y-1))
-                    elif y < type(self.board.size[1]-1 and self.board.get(Position(x,y+1))) == Player:
+                    elif y < self.board.size[1] and type(self.board.size[1]-1 and self.board.get(Position(x,y+1))) == Player:
                         targets.append(Position(x,y+1))
         return targets
 
