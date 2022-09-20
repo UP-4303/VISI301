@@ -12,7 +12,7 @@ from classes.Vector import Vector
 # For the pathfinder, we will use an adapted A* algorithm for cardinal neighborhood
 # This function return a path object (which is a list of positions)
 def Pathfinder(board:Board, object, targets:list, uncrossableTypes:list):
-    nodeList = NodeList(board, uncrossableTypes, object.coordinates)
+    nodeList = NodeList(board, targets, uncrossableTypes, object.coordinates)
     nodeList.all[object.coordinates.y][object.coordinates.x].Update(0, object.coordinates)
     nodeList.AddToExplore(nodeList.get(object.coordinates))
 
