@@ -49,7 +49,7 @@ class Monster():
         for y in range(self.board.size[1]):
             for x in range(self.board.size[0]):
                 # If the cell is empty
-                if type(self.board.get(Position(x,y))) == None:
+                if self.board.get(Position(x,y)) == None:
                     # Check if this cell is a valid target.
                     # Current rule for valid target : If a cell next to the checking cell contains a player, the checking cell is valid. 
                     if x > 0 and type(self.board.get(Position(x-1,y))) == Player:
