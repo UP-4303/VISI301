@@ -33,6 +33,9 @@ class Monster():
     # Just move the monster. USE IT CAUTIOUSLY (it can delete another object on the board)
     def Move(self):
         path = Pathfinder(self.board, self, self.Targets(), self.uncrossableTypes)
+        newCoordinates = path.value[min(self.movePoints, len(path.value)-1)].coordinates
+        self.board.MoveObject(self, self.coordinates, newCoordinates)
+        self.coordinates = newCoordinates
 
     # Decrease health
     def TakeDamage(self, amount:int):
