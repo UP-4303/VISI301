@@ -9,13 +9,13 @@ class Node():
         self.explored = explored
         self.gCost = gCost
         self.hCost = hCost
-        self.pointToNode:Position
+        self.pointToNode:Node
         self.start = start
 
     def Explore(self):
         self.explored = True
     
-    def Update(self, gCost:int, pointToNode:Position):
+    def Update(self, gCost:int, pointToNode):
         if gCost < self.gCost:
             self.gCost = gCost
         self.pointToNode = pointToNode
