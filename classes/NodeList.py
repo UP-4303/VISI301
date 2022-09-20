@@ -7,11 +7,11 @@ from classes.Vector import Vector
 class NodeList():
     def __init__(self, board:Board, targets:list, uncrossableTypes:list, objectCoordinates:Position):
         self.size = board.size
-        # Create the node list
-        self.all = [[Node(Position(x,y), type(board.get(Position(x,y))) in uncrossableTypes, objectCoordinates == Position(x,y), self.HeuristicCost(Position(x,y))) for x in range(board.size[0])] for y in range(board.size[1])]
-        # An other list that contains all nodes that can be explored
+        # This list contains all explorable nodes
         self.toExplore = []
         self.targets = targets
+        # Create the node list
+        self.all = [[Node(Position(x,y), type(board.get(Position(x,y))) in uncrossableTypes, objectCoordinates == Position(x,y), self.HeuristicCost(Position(x,y))) for x in range(board.size[0])] for y in range(board.size[1])]
 
     # Calculate distance to nearest target
     def HeuristicCost(self, position:Position):
