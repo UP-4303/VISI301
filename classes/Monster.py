@@ -54,11 +54,11 @@ class Monster():
                     # Current rule for valid target : If a cell next to the checking cell contains a player, the checking cell is valid. 
                     if x > 0 and type(self.board.get(Position(x-1,y))) == Player:
                         targets.append(Position(x-1,y))
-                    elif x < self.board.size[0] and type(self.board.get(Position(x+1,y))) == Player:
+                    elif x < self.board.size[0]-1 and type(self.board.get(Position(x+1,y))) == Player:
                         targets.append(Position(x+1,y))
                     elif y > 0 and type(self.board.get(Position(x,y-1))) == Player:
                         targets.append(Position(x,y-1))
-                    elif y < self.board.size[1] and type(self.board.get(Position(x,y+1))) == Player:
+                    elif y < self.board.size[1]-1 and type(self.board.get(Position(x,y+1))) == Player:
                         targets.append(Position(x,y+1))
         return targets
 
