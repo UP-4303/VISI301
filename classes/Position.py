@@ -21,12 +21,3 @@ class Position(Vector):
             return Vector(self.x - other.x, self.y - other.y)
         else:
             raise TypeError(f'{type(other)} is not a Position')
-    
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.x == other.x and self.y == other.y
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)

@@ -47,26 +47,31 @@ class NodeList():
     def Explore(self):
         node = self.NextNode()
         node.Explore()
+
         # For each adjacent node, check if it exist and if it is crossable and if it is unexplored
         if node.coordinates.x > 0:
             nodeBottom = self.get(node.coordinates + Vector(-1,0))
             if not(nodeBottom.uncrossable) and not(nodeBottom.explored):
                 # If everything is ok, update it and add it to the toExplore list
                 nodeBottom.Update(node.gCost + 1, node)
-                self.AddToExplore(nodeBottom)
+                if not(nodeBottom in self.toExplore):
+                    self.AddToExplore(nodeBottom)
         if node.coordinates.x < self.size[0]-1:
             nodeTop = self.get(node.coordinates + Vector(1,0))
             if not(nodeTop.uncrossable) and not(nodeTop.explored):
                 nodeTop.Update(node.gCost + 1, node)
-                self.AddToExplore(nodeTop)
+                if not(nodeTop in self.toExplore):
+                    self.AddToExplore(nodeTop)
         if node.coordinates.y > 0:
             nodeLeft = self.get(node.coordinates + Vector(0,-1))
             if not(nodeLeft.uncrossable) and not(nodeLeft.explored):
                 nodeLeft.Update(node.gCost + 1, node)
-                self.AddToExplore(nodeLeft)
+                if not(nodeLeft in self.toExplore):
+                            self.AddToExplore(nodeLeft)
         if node.coordinates.y < self.size[1]-1:
             nodeRight = self.get(node.coordinates + Vector(0,1))
             if not(nodeRight.uncrossable) and not(nodeRight.explored):
                 nodeRight.Update(node.gCost + 1, node)
-                self.AddToExplore(nodeRight)
+                if not(nodeRight in self.toExplore):
+                    self.AddToExplore(nodeRight)
         return node

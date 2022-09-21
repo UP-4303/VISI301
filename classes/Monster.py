@@ -34,7 +34,6 @@ class Monster():
     def Move(self):
         path = Pathfinder(self.board, self, self.Targets(), self.uncrossableTypes)
         newCoordinates = path.value[min(self.movePoints, len(path.value)-1)].coordinates
-        print(path.value)
         self.board.MoveObject(self.coordinates, newCoordinates)
         self.coordinates = newCoordinates
 
@@ -57,13 +56,13 @@ class Monster():
                     # Check if this cell is a valid target.
                     # Current rule for valid target : If a cell next to the checking cell contains a player, the checking cell is valid. 
                     if x > 0 and type(self.board.get(Position(x-1,y))) == Player:
-                        targets.append(Position(x-1,y))
+                        targets.append(Position(x,y))
                     elif x < self.board.size[0]-1 and type(self.board.get(Position(x+1,y))) == Player:
-                        targets.append(Position(x+1,y))
+                        targets.append(Position(x,y))
                     elif y > 0 and type(self.board.get(Position(x,y-1))) == Player:
-                        targets.append(Position(x,y-1))
+                        targets.append(Position(x,y))
                     elif y < self.board.size[1]-1 and type(self.board.get(Position(x,y+1))) == Player:
-                        targets.append(Position(x,y+1))
+                        targets.append(Position(x,y))
         return targets
 
     # The main code of the monster, that will be called every turn (actually just check the health)

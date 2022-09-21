@@ -32,7 +32,7 @@ class Player():
     
     # Check if the destination case is occupied and move only if possible
     def CheckAndMove(self, vector:Vector):
-        if not self.board.IsCaseOccupied(self.coordinates + vector):
+        if not self.board.IsCaseOccupied(self.coordinates + vector) or vector == Vector(0,0):
             self.Move(vector)
             didItMove = True
         else:
