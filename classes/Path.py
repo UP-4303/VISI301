@@ -2,7 +2,7 @@ from classes.Node import Node
 from classes.NodeList import NodeList
 
 class Path():
-    def __init__(self, nodeList:NodeList, endNode:Node):
+    def __init__(self, endNode:Node):
         self.value = []
         node = endNode
         while not(node.start):

@@ -13,11 +13,19 @@ from classes.Vector import Vector
 # This function return a path object (which is a list of positions)
 def Pathfinder(board:Board, object, targets:list, uncrossableTypes:list):
     nodeList = NodeList(board, targets, uncrossableTypes, object.coordinates)
-    nodeList.all[object.coordinates.y][object.coordinates.x].Update(0, object.coordinates)
+    nodeList.get(object.coordinates).Update(0, nodeList.get(object.coordinates))
     nodeList.AddToExplore(nodeList.get(object.coordinates))
 
     currentNode = nodeList.Explore()
-    while not(currentNode in targets) and len(nodeList.toExplore) > 0:
+    while not(currentNode.coordinates in targets) and len(nodeList.toExplore) > 0:
         currentNode = nodeList.Explore()
-    if currentNode in targets:
-        path = Path(nodeList, currentNode)
+
+    for x in range(nodeList.size[0]):
+        for y in range(nodeList.size[1]):
+            print(nodeList.get(Position(x,y)).explored)
+
+    if currentNode.coordinates in targets:
+        path = Path(currentNode)
+    else:
+        path = Path(nodeList.get(object.coordinates))
+    return path

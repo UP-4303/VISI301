@@ -16,5 +16,17 @@ class Position(Vector):
         return Position(self.x + movement.x, self.y + movement.y)
     
     # Vector from position to self
-    def __sub__(self, position):
-        return Vector(self.x - position.x, self.y - position.y)
+    def __sub__(self, other):
+        if isinstance(other, self.__class__):
+            return Vector(self.x - other.x, self.y - other.y)
+        else:
+            raise TypeError(f'{type(other)} is not a Position')
+    
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.x == other.x and self.y == other.y
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

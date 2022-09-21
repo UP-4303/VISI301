@@ -7,11 +7,12 @@ from classes.Vector import Vector
 class NodeList():
     def __init__(self, board:Board, targets:list, uncrossableTypes:list, objectCoordinates:Position):
         self.size = board.size
-        # This list contains all explorable nodes
-        self.toExplore = []
         self.targets = targets
         # Create the node list
-        self.all = [[Node(Position(x,y), type(board.get(Position(x,y))) in uncrossableTypes, objectCoordinates == Position(x,y), self.HeuristicCost(Position(x,y))) for x in range(board.size[0])] for y in range(board.size[1])]
+        self.all = [[Node(Position(x,y), type(board.get(Position(x,y))) in uncrossableTypes, Position(x,y) == objectCoordinates, hCost=self.HeuristicCost(Position(x,y))) for x in range(self.size[0])] for y in range(self.size[1])]
+        # This list contains all explorable nodes
+        self.toExplore = [self.get(objectCoordinates)]
+        
 
     # Calculate distance to nearest target
     def HeuristicCost(self, position:Position):
@@ -47,20 +48,25 @@ class NodeList():
         node = self.NextNode()
         node.Explore()
         # For each adjacent node, check if it exist and if it is crossable and if it is unexplored
-        nodeBottom = self.get(node.coordinates + Vector(-1,0))
-        if node.coordinates.x > 0 and not(nodeBottom.uncrossable) and not(nodeBottom.explored):
-            # If everything is ok, update it and add it to the toExplore list
-            nodeBottom.Update(node.gCost + 1, node)
-            self.AddToExplore(nodeBottom)
-        nodeTop = self.get(node.coordinates + Vector(1,0))
-        if node.coordinates.x < self.size[0] and not(nodeTop.uncrossable) and not(nodeTop.explored):
-            nodeTop.Update(node.gCost + 1, node)
-            self.AddToExplore(nodeTop)
-        nodeLeft = self.get(node.coordinates + Vector(0,-1))
-        if node.coordinates.y > 0 and not(nodeLeft.uncrossable) and not(nodeLeft.explored):
-            nodeLeft.Update(node.gCost + 1, node)
-            self.AddToExplore(nodeLeft)
-        nodeRight = self.get(node.coordinates + Vector(0,1))
-        if node.coordinates.y < self.size[1] and not(nodeRight.uncrossable) and not(nodeRight.explored):
-            nodeRight.Update(node.gCost + 1, node)
-            self.AddToExplore(nodeRight)
+        if node.coordinates.x > 0:
+            nodeBottom = self.get(node.coordinates + Vector(-1,0))
+            if not(nodeBottom.uncrossable) and not(nodeBottom.explored):
+                # If everything is ok, update it and add it to the toExplore list
+                nodeBottom.Update(node.gCost + 1, node)
+                self.AddToExplore(nodeBottom)
+        if node.coordinates.x < self.size[0]-1:
+            nodeTop = self.get(node.coordinates + Vector(1,0))
+            if not(nodeTop.uncrossable) and not(nodeTop.explored):
+                nodeTop.Update(node.gCost + 1, node)
+                self.AddToExplore(nodeTop)
+        if node.coordinates.y > 0:
+            nodeLeft = self.get(node.coordinates + Vector(0,-1))
+            if not(nodeLeft.uncrossable) and not(nodeLeft.explored):
+                nodeLeft.Update(node.gCost + 1, node)
+                self.AddToExplore(nodeLeft)
+        if node.coordinates.y < self.size[1]-1:
+            nodeRight = self.get(node.coordinates + Vector(0,1))
+            if not(nodeRight.uncrossable) and not(nodeRight.explored):
+                nodeRight.Update(node.gCost + 1, node)
+                self.AddToExplore(nodeRight)
+        return node
