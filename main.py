@@ -1,8 +1,10 @@
-class Game():
-    def __init__(self):
-        self.quote = "Hello World !"
-    def printQuote(self):
-        print(self.quote)
+import pygame
+
+from classes.Board import Board as Board
+from classes.MovableObject import MovableObject as MovableObject
+from classes.Position import Position as Position
+from classes.UnmovableObject import UnmovableObject as UnmovableObject
+from classes.Vector import Vector as Vector
 
 if __name__ == '__main__':
     game = Game()
@@ -62,4 +64,14 @@ while game_on:
     show_grid()
     pygame.display.update()  # met a jour la fenetre et redessine les elements
     timer.tick(60)  # duree du game loop
+
+
+    # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
+    board = Board((2,10))
+    player = MovableObject(Position(1,1), board)
+    print(board.all)
+    player.MoveDown()
+    print(board.all)
+    player.MoveLeft()
+    print(board.all)
 
