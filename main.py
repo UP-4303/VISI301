@@ -1,25 +1,39 @@
-import pygame
-
-from classes.Board import Board as Board
-from classes.MovableObject import MovableObject as MovableObject
-from classes.Position import Position as Position
-from classes.UnmovableObject import UnmovableObject as UnmovableObject
-from classes.Vector import Vector as Vector
-
-if __name__ == '__main__':
-    game = Game()
-    game.printQuote()
-
-
-
-#------------------ Premier test de grille----------------#
-
 #     INIT     #
 import pygame
 import sys
 import random
 pygame.init()
 game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
+
+from classes.Board import Board
+from classes.Monster import Monster
+from classes.Player import Player
+from classes.Position import Position
+from classes.Bloc import Bloc
+from classes.Vector import Vector
+
+if __name__ == '__main__':
+    # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
+    board = Board((10,10))
+    toUpdate = []
+    player = Player(Position(1,1), board)
+    toUpdate.append(player)
+    monster = Monster(Position(1,6), board)
+    toUpdate.append(monster)
+    monster2 = Monster(Position(1,3), board)
+    toUpdate.append(monster2)
+
+    print(board.all)
+
+    for i in range(3):
+        for updatingObject in toUpdate:
+            updatingObject.PlayTurn()
+        print(board.all)
+
+
+#------------------ Premier test de grille----------------#
+
+
 
 #   CST   #
 
@@ -64,14 +78,3 @@ while game_on:
     show_grid()
     pygame.display.update()  # met a jour la fenetre et redessine les elements
     timer.tick(60)  # duree du game loop
-
-
-    # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
-    board = Board((2,10))
-    player = MovableObject(Position(1,1), board)
-    print(board.all)
-    player.MoveDown()
-    print(board.all)
-    player.MoveLeft()
-    print(board.all)
-
