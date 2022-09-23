@@ -15,9 +15,6 @@ def Pathfinder(board:Board, object, targets:list, uncrossableTypes:list):
     nodeList = NodeList(board, targets, uncrossableTypes, object.coordinates)
     nodeList.get(object.coordinates).Update(0, nodeList.get(object.coordinates))
 
-    for i in targets:
-        print(i.x, i.y)
-
     currentNode = nodeList.Explore()
     while not(currentNode.coordinates in targets) and len(nodeList.toExplore) > 0:
         currentNode = nodeList.Explore()

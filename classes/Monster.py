@@ -12,7 +12,7 @@ class Monster():
         self.coordinates = spawnCoordinates
         self.board = board
         self.healthPoints = 9
-        self.movePoints = 90
+        self.movePoints = 3
         self.uncrossableTypes = [Player, Bloc]
 
         # Treating creation on board
@@ -33,7 +33,11 @@ class Monster():
     # Just move the monster. USE IT CAUTIOUSLY (it can delete another object on the board)
     def Move(self):
         path = Pathfinder(self.board, self, self.Targets(), self.uncrossableTypes)
-        newCoordinates = path.value[min(self.movePoints, len(path.value)-1)].coordinates
+        movePoints = self.movePoints
+        newCoordinates = path.value[min(movePoints, len(path.value)-1)].coordinates
+        while self.board.get(newCoordinates) != None and self.board.get(newCoordinates) != self:
+            movePoints -= 1
+            newCoordinates = path.value[min(movePoints, len(path.value)-1)].coordinates
         self.board.MoveObject(self.coordinates, newCoordinates)
         self.coordinates = newCoordinates
 

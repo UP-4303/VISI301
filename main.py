@@ -13,8 +13,13 @@ if __name__ == '__main__':
     toUpdate = []
     player = Player(Position(1,1), board)
     toUpdate.append(player)
-    monster = Monster(Position(5,6), board)
+    monster = Monster(Position(1,6), board)
     toUpdate.append(monster)
+    monster2 = Monster(Position(1,3), board)
+    toUpdate.append(monster2)
+
+    bloc1 = Bloc(Position())
+
     print(board.all)
 
     for i in range(3):
