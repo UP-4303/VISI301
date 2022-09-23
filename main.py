@@ -18,8 +18,6 @@ if __name__ == '__main__':
     monster2 = Monster(Position(1,3), board)
     toUpdate.append(monster2)
 
-    bloc1 = Bloc(Position())
-
     print(board.all)
 
     for i in range(3):
