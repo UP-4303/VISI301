@@ -2,13 +2,17 @@ from classes.Board import Board
 from classes.Position import Position
 from classes.Vector import Vector
 
+from utils.Pathfinder import Pathfinder
+
 class Player():
-    def __init__(self, spawnCoordinates:Position, board:Board):
+    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list):
         # Attributes
         self.coordinates = spawnCoordinates
         self.board = board
         self.healthPoints = 9
         self.movePoints = 3
+
+        self.uncrossableTypes = uncrossableTypes
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
@@ -59,7 +63,7 @@ class Player():
 
     # Return two booleans "This move is valid" and "Case already occupied"
     def ValidMove(self, vector:Vector):
-        if abs(vector.x) + abs(vector.y) <= self.movePoints:
+        if len(Pathfinder(self.board, self, [self.coordinates + vector], self.uncrossableTypes).value) <= self.movePoints:
             caseOccupied = not(self.CheckAndMove(vector))
             validMove = not(caseOccupied)
         else:

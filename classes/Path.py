@@ -1,5 +1,4 @@
 from classes.Node import Node
-from classes.NodeList import NodeList
 
 class Path():
     def __init__(self, endNode:Node):

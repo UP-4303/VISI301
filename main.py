@@ -1,18 +1,9 @@
-#     INIT     #
-import pygame
-import sys
-import random
-pygame.init()
-game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
-
-from classes.Board import Board
-from classes.Monster import Monster
-from classes.Player import Player
-from classes.Position import Position
-from classes.Bloc import Bloc
-from classes.Vector import Vector
+from mainImport import *
 
 if __name__ == '__main__':
+    pygame.init()
+    game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
+    
     # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
     board = Board((10,10))
     toUpdate = []

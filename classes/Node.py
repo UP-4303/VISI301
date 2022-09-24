@@ -1,5 +1,3 @@
-from math import nan
-
 from classes.Position import Position
 
 class Node():

@@ -1,19 +1,18 @@
-from classes.Bloc import Bloc
 from classes.Board import Board
-from classes.Player import Player
 from classes.Position import Position
-from classes.Vector import Vector
 
 from utils.Pathfinder import Pathfinder
 
 class Monster():
-    def __init__(self, spawnCoordinates:Position, board:Board):
+    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, targetingFunction):
         # Attributes
         self.coordinates = spawnCoordinates
         self.board = board
         self.healthPoints = 9
         self.movePoints = 3
-        self.uncrossableTypes = [Player, Bloc]
+        self.uncrossableTypes = uncrossableTypes
+
+        self.TargetingFunction = targetingFunction
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
@@ -30,16 +29,18 @@ class Monster():
         self.board.DeleteObject(self.coordinates)
         self.__del__(reason)
 
-    # Just move the monster. USE IT CAUTIOUSLY (it can delete another object on the board)
+    # Use pathfinding to go to the nearest target position
     def Move(self):
-        path = Pathfinder(self.board, self, self.Targets(), self.uncrossableTypes)
-        movePoints = self.movePoints
-        newCoordinates = path.value[min(movePoints, len(path.value)-1)].coordinates
-        while self.board.get(newCoordinates) != None and self.board.get(newCoordinates) != self:
-            movePoints -= 1
+        targets = self.TargetingFunction(self)
+        if targets != []:
+            path = Pathfinder(self.board, self, targets, self.uncrossableTypes)
+            movePoints = self.movePoints
             newCoordinates = path.value[min(movePoints, len(path.value)-1)].coordinates
-        self.board.MoveObject(self.coordinates, newCoordinates)
-        self.coordinates = newCoordinates
+            while self.board.get(newCoordinates) != None and self.board.get(newCoordinates) != self:
+                movePoints -= 1
+                newCoordinates = path.value[min(movePoints, len(path.value)-1)].coordinates
+            self.board.MoveObject(self.coordinates, newCoordinates)
+            self.coordinates = newCoordinates
 
     # Decrease health
     def TakeDamage(self, amount:int):
@@ -48,26 +49,6 @@ class Monster():
     # Increase health
     def RecoverHealth(self, amount:int):
         self.healthPoints += amount
-
-    # Find all movement targets
-    def Targets(self):
-        targets = []
-        # For every cell
-        for y in range(self.board.size[1]):
-            for x in range(self.board.size[0]):
-                # If the cell is empty
-                if self.board.get(Position(x,y)) == None:
-                    # Check if this cell is a valid target.
-                    # Current rule for valid target : If a cell next to the checking cell contains a player, the checking cell is valid. 
-                    if x > 0 and type(self.board.get(Position(x-1,y))) == Player:
-                        targets.append(Position(x,y))
-                    elif x < self.board.size[0]-1 and type(self.board.get(Position(x+1,y))) == Player:
-                        targets.append(Position(x,y))
-                    elif y > 0 and type(self.board.get(Position(x,y-1))) == Player:
-                        targets.append(Position(x,y))
-                    elif y < self.board.size[1]-1 and type(self.board.get(Position(x,y+1))) == Player:
-                        targets.append(Position(x,y))
-        return targets
 
     # The main code of the monster, that will be called every turn (actually just check the health)
     def PlayTurn(self):
