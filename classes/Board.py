@@ -12,3 +12,6 @@ class Board():
 
     def IsCaseOccupied(self, coordinates:Position):
         return self.all[coordinates.x][coordinates.y] != None
+
+    def getCase(self, coordinates:Position):
+        return self.all[coordinates.x][coordinates.y]
