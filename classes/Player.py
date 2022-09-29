@@ -5,7 +5,7 @@ from classes.Vector import Vector
 from utils.Pathfinder import Pathfinder
 
 class Player():
-    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list):
+    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, hittingFunction):
         # Attributes
         self.coordinates = spawnCoordinates
         self.board = board
@@ -13,6 +13,8 @@ class Player():
         self.movePoints = 3
 
         self.uncrossableTypes = uncrossableTypes
+
+        self.HittingFunction = hittingFunction
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
@@ -87,3 +89,4 @@ class Player():
             self.DelFromBoard('PLAYER IS DEAD')
         else:
             self.RequestMove()
+            self.HittingFunction(self, Vector(0,1), True, 1)

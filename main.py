@@ -1,19 +1,14 @@
-
 #     INIT     #
 import pygame
 import sys
 import random
 
-from classes.Board import Board as Board
-from classes.Position import Position as Position
-from classes.Vector import Vector as Vector
-
 from mainImport import *
-
 
 import gestiongrille
 
 if __name__ == '__main__':
+    print("????")
     pygame.init()
     game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
     
