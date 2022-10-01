@@ -17,6 +17,11 @@ if __name__ == '__main__':
     monster2 = Monster(Position(1,3), board)
     toUpdate.append(monster2)
 
+    # Initialisation de l'affichage
+    SCREEN.fill(pygame.Color("white"))
+    show_grid(board, SCREEN, CELL_SIZE)
+    pygame.display.update()
+
     while game_on:
         for event in pygame.event.get():
             # ferme le jeu quand on le quitte
