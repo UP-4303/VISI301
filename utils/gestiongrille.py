@@ -2,15 +2,15 @@ import pygame
 import sys
 import random
 
-from classes.Position import Position as Position
-from classes.Vector import Vector as Vector
+from classes.Bloc import Bloc as Bloc
+from classes.Board import Board as Board
 from classes.Monster import Monster as Monster
 from classes.Player import Player as Player
-from classes.Bloc import Bloc as Bloc
+from classes.Position import Position as Position
+from classes.Vector import Vector as Vector
+
 pygame.init()
 game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
-
-from classes.Board import Board as Board
 
 
 
