@@ -1,10 +1,11 @@
 from classes.Board import Board
 from classes.Position import Position
+from classes.Vector import Vector
 
 from utils.Pathfinder import Pathfinder
 
 class Monster():
-    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, targetingFunction):
+    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, targetingFunction, hittingFunction):
         # Attributes
         self.coordinates = spawnCoordinates
         self.board = board
@@ -13,6 +14,7 @@ class Monster():
         self.uncrossableTypes = uncrossableTypes
 
         self.TargetingFunction = targetingFunction
+        self.HittingFunction = hittingFunction
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
@@ -57,3 +59,4 @@ class Monster():
             self.DelFromBoard('MONSTER IS DEAD')
         else:
             self.Move()
+            self.HittingFunction(self, Vector(0,-1))
