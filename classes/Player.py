@@ -35,14 +35,14 @@ class Player():
         self.__del__(reason)
 
     # Just move the player. USE IT CAUTIOUSLY (it can delete another object on the board)
-    def Move(self, vector:Vector):
-        self.board.MoveObject(self.coordinates, self.coordinates + vector)
-        self.coordinates.Move(vector)
+    def Move(self, position:Position):
+        self.board.MoveObject(self.coordinates, position)
+        self.coordinates.Move(position - self.coordinates)
     
     # Check if the destination case is occupied and move only if possible
-    def CheckAndMove(self, vector:Vector):
-        if not self.board.IsCaseOccupied(self.coordinates + vector) or vector == Vector(0,0):
-            self.Move(vector)
+    def CheckAndMove(self, position:Position):
+        if not self.board.IsCaseOccupied(position) or self.coordinates == position:
+            self.Move(position)
             didItMove = True
         else:
             didItMove = False

@@ -12,7 +12,7 @@ from classes.Vector import Vector as Vector
 def show_grid(board, SCREEN, CELL_SIZE):
     for y in range(board.size[1]):
         for x in range(board.size[0]):
-            rect = pygame.Rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            rect = pygame.Rect(y*CELL_SIZE, x*CELL_SIZE, CELL_SIZE, CELL_SIZE)
             #rect = pygame.draw.rect(screen, pygame.Color("black"), rect, width= 1)
             pos = Position(x,y)
             color = pygame.Color("black")
