@@ -5,7 +5,7 @@ from classes.Vector import Vector
 from utils.Pathfinder import Pathfinder
 
 class Player():
-    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, hittingFunction, convertPxInNumber, detectClick):
+    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, hittingFunction, convertPxInNumber, detectClick, mousePosition):
         # Attributes
         self.coordinates = spawnCoordinates
         self.board = board
@@ -17,6 +17,7 @@ class Player():
         self.HittingFunction = hittingFunction
         self.ConvertPxInNumber = convertPxInNumber
         self.DetectClick = detectClick
+        self.MousePosition = mousePosition
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
@@ -54,9 +55,10 @@ class Player():
 
         while mvtDone == False:
             if self.DetectClick():
+                mousePosition = self.MousePosition()
                 # On convertit en coordonées de case la position du click
-                position_x = self.ConvertPxInNumber(position[0])
-                position_y = self.ConvertPxInNumber(position[1])
+                position_x = self.ConvertPxInNumber(mousePosition[0])
+                position_y = self.ConvertPxInNumber(mousePosition[1])
                 requestedCoordinates = Vector(position_x, position_y)
 
                 mvtDone = self.ValidMove(requestedCoordinates)

@@ -36,3 +36,6 @@ def DetectClick():
     pygame.event.clear()
     event = pygame.event.wait()
     return event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]
+
+def MousePosition():
+    return pygame.mouse.get_pos()
