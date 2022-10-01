@@ -1,4 +1,5 @@
 import pygame
+import sys
 
 from classes.Bloc import Bloc as Bloc
 from classes.Board import Board as Board
