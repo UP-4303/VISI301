@@ -7,21 +7,8 @@ from classes.Player import Player as Player
 from classes.Position import Position as Position
 from classes.Vector import Vector as Vector
 
-pygame.init()
-CELL_SIZE = 40
-
-
-#à retirer ensuite
-board = Board((NB_ROW, NB_COL))
-
-screen = pygame.display.set_mode(size=(NB_COL * CELL_SIZE, NB_ROW * CELL_SIZE))
-
-timer = pygame.time.Clock()
-
-screen = pygame.display.set_mode(size=(15 * CELL_SIZE, 15 * CELL_SIZE))
-
 #fonction pour afficher la grille
-def show_grid(board):
+def show_grid(board, SCREEN, CELL_SIZE):
     for i in range(board.size[0]):
         for j in range(0, board.size[1]):
             rect = pygame.Rect(i*CELL_SIZE, j*CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -37,10 +24,15 @@ def show_grid(board):
             if isinstance(board.getCase(pos), Bloc):
                 color = pygame.Color("Red")
 
-            rect = pygame.draw.rect(screen, color, rect, width=4)
+            rect = pygame.draw.rect(SCREEN, color, rect, width=4)
 
 # fonction qui convertie un nombre de pixel en nombre de case
-def convert_px_in_number(px):
+def convert_px_in_number(px, CELL_SIZE):
     nb_case = px//CELL_SIZE
     return nb_case
 
+# Return true if a click is detected
+def DetectClick():
+    pygame.event.clear()
+    event = pygame.event.wait()
+    return event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]

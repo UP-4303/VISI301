@@ -14,7 +14,7 @@ from utils.gestiongrille import *
 
 
 def Player(spawnCoordinates:Position, board:Board):
-    return PlayerClass(spawnCoordinates, board, [Bloc, MonsterClass], lambda object, direction, HTH, damages: HitStraightLine(object, direction, HTH, damages))
+    return PlayerClass(spawnCoordinates, board, [Bloc, MonsterClass], lambda object, direction, HTH, damages: HitStraightLine(object, direction, HTH, damages), convert_px_in_number)
 
 def Monster(spawnCoordinates:Position, board:Board):
     return MonsterClass(spawnCoordinates, board, [Bloc, PlayerClass], lambda object: TargetStraightLine(object, [PlayerClass], 1), lambda object, direction: HitStraightLine(object, direction, True, 1))

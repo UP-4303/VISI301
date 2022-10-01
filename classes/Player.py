@@ -5,7 +5,7 @@ from classes.Vector import Vector
 from utils.Pathfinder import Pathfinder
 
 class Player():
-    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, hittingFunction):
+    def __init__(self, spawnCoordinates:Position, board:Board, uncrossableTypes:list, hittingFunction, convertPxInNumber, detectClick):
         # Attributes
         self.coordinates = spawnCoordinates
         self.board = board
@@ -15,6 +15,8 @@ class Player():
         self.uncrossableTypes = uncrossableTypes
 
         self.HittingFunction = hittingFunction
+        self.ConvertPxInNumber = convertPxInNumber
+        self.DetectClick = detectClick
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
@@ -51,29 +53,21 @@ class Player():
         mvtDone = False
 
         while mvtDone == False:
-            pygame.event.clear()
-            event = pygame.event.wait()
-            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+            if self.DetectClick():
                 # On convertit en coordonées de case la position du click
-                position_x = convert_px_in_number(position[0])
-                position_y = convert_px_in_number(position[1])
+                position_x = self.ConvertPxInNumber(position[0])
+                position_y = self.ConvertPxInNumber(position[1])
                 requestedCoordinates = Vector(position_x, position_y)
 
-                mvtDone, caseOccupied = self.ValidMove(requestedCoordinates)
+                mvtDone = self.ValidMove(requestedCoordinates)
 
-
-
-
-
-    # Return two booleans "This move is valid" and "Case already occupied"
+    # Check if the move is valid and do it, then return a boolean true if the movment is valid 
     def ValidMove(self, vector:Vector):
         if len(Pathfinder(self.board, self, [self.coordinates + vector], self.uncrossableTypes).value) <= self.movePoints:
-            caseOccupied = not(self.CheckAndMove(vector))
-            validMove = not(caseOccupied)
+            validMove = self.CheckAndMove(vector)
         else:
-            caseOccupied = False
             validMove = False
-        return validMove, caseOccupied
+        return validMove
         
 
     # Decrease health
