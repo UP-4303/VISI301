@@ -1,12 +1,6 @@
 from mainImport import *
 
 if __name__ == '__main__':
-    # Constantes
-    NB_COL = 10
-    NB_ROW = 4
-    CELL_SIZE = 40
-    SCREEN = pygame.display.set_mode(size=(15 * CELL_SIZE, 15 * CELL_SIZE))
-
     # Variables pour pygame
     timer = pygame.time.Clock()
     game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
@@ -22,8 +16,6 @@ if __name__ == '__main__':
     toUpdate.append(monster)
     monster2 = Monster(Position(1,3), board)
     toUpdate.append(monster2)
-
-    print(board.all)
 
     while game_on:
         for event in pygame.event.get():
