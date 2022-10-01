@@ -50,23 +50,3 @@ def convert_px_in_number(px):
     nb_case = px//CELL_SIZE
     return nb_case
 
-#on creer notre game loop
-while game_on:
-    for event in pygame.event.get():
-        # ferme le jeu quand on le quitte
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        # on ajoute l'evenement qui correspond au clic droit
-        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-            #obtenir la position de la souris
-            position = pygame.mouse.get_pos()
-            #On convertit en coordonées de case
-            position_x = convert_px_in_number(position[0])
-            position_y = convert_px_in_number(position[1])
-            print(position_x, position_y)
-
-    screen.fill(pygame.Color("white"))  # on change la couleur de l'element
-    show_grid()
-    pygame.display.update()  # met a jour la fenetre et redessine les elements
-    timer.tick(60)  # duree du game loop
