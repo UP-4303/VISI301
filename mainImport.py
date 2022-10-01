@@ -1,4 +1,5 @@
 import pygame
+import sys
 import random
 
 from classes.Bloc import Bloc as Bloc
