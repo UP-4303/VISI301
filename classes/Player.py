@@ -46,19 +46,21 @@ class Player():
     
     # Request the real player where to move
     def RequestMove(self):
-        print(f'Actual position : ({self.coordinates.x},{self.coordinates.y}).\n Where do you want to move ?')
-        requestedCoordinates = Vector(int(input('Axe X : ')),int(input('Axe Y : ')))
-        validMove, caseOccupied = self.ValidMove(requestedCoordinates)
-        while not(validMove):
-            if caseOccupied:
-                print('Case is already occupied.')
-            else:
-                print(f'You only have {self.movePoints} movement points.')
-            print('Where do you want to go ? ')
-            requestedCoordinates.x = int(input('Axe X : '))
-            requestedCoordinates.y = int(input('Axe Y : '))
-            validMove, caseOccupied = self.ValidMove(requestedCoordinates)
-        print('Movement done !')
+        mvtDone = False
+
+        while mvtDone == False:
+            pygame.event.clear()
+            event = pygame.event.wait()
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                # On convertit en coordonées de case la position du click
+                position_x = convert_px_in_number(position[0])
+                position_y = convert_px_in_number(position[1])
+                requestedCoordinates = Vector(position_x, position_y)
+
+                mvtDone, caseOccupied = self.ValidMove(requestedCoordinates)
+
+
+
 
 
     # Return two booleans "This move is valid" and "Case already occupied"

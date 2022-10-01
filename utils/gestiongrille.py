@@ -20,14 +20,15 @@ NB_COL = 10
 NB_ROW = 4
 CELL_SIZE = 40
 
+#à retirer ensuite
 board = Board((NB_ROW, NB_COL))
-
+##################
 screen = pygame.display.set_mode(size=(NB_COL * CELL_SIZE, NB_ROW * CELL_SIZE))
 
 timer = pygame.time.Clock()
 
 #fonction pour afficher la grille
-def show_grid():
+def show_grid(board):
     for i in range(0, NB_COL):
         for j in range(0, NB_ROW):
             rect = pygame.Rect(i*CELL_SIZE, j*CELL_SIZE, CELL_SIZE, CELL_SIZE)
