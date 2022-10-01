@@ -1,14 +1,8 @@
 #     INIT     #
-import pygame
-import sys
-import random
 
 from mainImport import *
 
-import gestiongrille
-
 if __name__ == '__main__':
-    print("????")
     pygame.init()
     game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
     

@@ -11,6 +11,8 @@ from classes.Position import Position
 from utils.FightPatterns import TargetStraightLine
 from utils.FightPatterns import HitStraightLine
 
+from utils.gestiongrille import *
+
 
 def Player(spawnCoordinates:Position, board:Board):
     return PlayerClass(spawnCoordinates, board, [Bloc, MonsterClass], lambda object, direction, HTH, damages: HitStraightLine(object, direction, HTH, damages))
