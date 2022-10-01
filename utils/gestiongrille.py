@@ -1,6 +1,4 @@
 import pygame
-import sys
-import random
 
 from classes.Bloc import Bloc as Bloc
 from classes.Board import Board as Board
@@ -10,26 +8,13 @@ from classes.Position import Position as Position
 from classes.Vector import Vector as Vector
 
 pygame.init()
-game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
-
-
-
-#   CST   #
-
-NB_COL = 10
-NB_ROW = 4
 CELL_SIZE = 40
-
-board = Board((NB_ROW, NB_COL))
-
-screen = pygame.display.set_mode(size=(NB_COL * CELL_SIZE, NB_ROW * CELL_SIZE))
-
-timer = pygame.time.Clock()
+screen = pygame.display.set_mode(size=(20 * CELL_SIZE, 20 * CELL_SIZE))
 
 #fonction pour afficher la grille
-def show_grid():
-    for i in range(0, NB_COL):
-        for j in range(0, NB_ROW):
+def show_grid(board):
+    for i in range(board.size[0]):
+        for j in range(0, board.size[1]):
             rect = pygame.Rect(i*CELL_SIZE, j*CELL_SIZE, CELL_SIZE, CELL_SIZE)
             #rect = pygame.draw.rect(screen, pygame.Color("black"), rect, width= 1)
             pos = Position(i,j)

@@ -1,4 +1,3 @@
-import pygame
 import sys
 import random
 
@@ -10,7 +9,6 @@ from classes.Position import Position
 
 from utils.FightPatterns import TargetStraightLine
 from utils.FightPatterns import HitStraightLine
-
 from utils.gestiongrille import *
 
 
