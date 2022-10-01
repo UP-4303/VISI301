@@ -60,13 +60,13 @@ class Player():
                 position_x = self.ConvertPxInNumber(mousePosition[0])
                 position_y = self.ConvertPxInNumber(mousePosition[1])
                 if position_x >= 0 and position_x < self.board.size[0] and position_y >= 0 and position_y < self.board.size[1]:
-                    requestedCoordinates = Vector(position_x, position_y)
+                    requestedCoordinates = Position(position_x, position_y)
                     mvtDone = self.ValidMove(requestedCoordinates)
 
     # Check if the move is valid and do it, then return a boolean true if the movment is valid 
-    def ValidMove(self, vector:Vector):
-        if len(Pathfinder(self.board, self, [self.coordinates + vector], self.uncrossableTypes).value) <= self.movePoints:
-            validMove = self.CheckAndMove(vector)
+    def ValidMove(self, position:Position):
+        if len(Pathfinder(self.board, self, [position], self.uncrossableTypes).value) <= self.movePoints:
+            validMove = self.CheckAndMove(position)
         else:
             validMove = False
         return validMove
