@@ -16,8 +16,6 @@ board = Board((NB_ROW, NB_COL))
 
 screen = pygame.display.set_mode(size=(NB_COL * CELL_SIZE, NB_ROW * CELL_SIZE))
 
-timer = pygame.time.Clock()
-
 screen = pygame.display.set_mode(size=(15 * CELL_SIZE, 15 * CELL_SIZE))
 
 #fonction pour afficher la grille

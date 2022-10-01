@@ -54,6 +54,7 @@ class Player():
             pygame.event.clear()
             event = pygame.event.wait()
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                position = pygame.mouse.get_pos()
                 # On convertit en coordonées de case la position du click
                 position_x = convert_px_in_number(position[0])
                 position_y = convert_px_in_number(position[1])

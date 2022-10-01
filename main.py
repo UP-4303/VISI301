@@ -28,14 +28,6 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            # on ajoute l'evenement qui correspond au clic droit
-            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                #obtenir la position de la souris
-                position = pygame.mouse.get_pos()
-                #On convertit en coordonées de case
-                position_x = convert_px_in_number(position[0])
-                position_y = convert_px_in_number(position[1])
-                print(position_x, position_y)
 
         for updatingObject in toUpdate:
             updatingObject.PlayTurn()
