@@ -35,6 +35,9 @@ def convert_px_in_number(px, CELL_SIZE):
 def DetectClick():
     pygame.event.clear()
     event = pygame.event.wait()
+    if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
     return event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]
 
 def MousePosition():
