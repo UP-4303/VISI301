@@ -9,11 +9,11 @@ from classes.Vector import Vector as Vector
 
 #fonction pour afficher la grille
 def show_grid(board, SCREEN, CELL_SIZE):
-    for i in range(board.size[0]):
-        for j in range(0, board.size[1]):
-            rect = pygame.Rect(i*CELL_SIZE, j*CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    for y in range(board.size[1]):
+        for x in range(board.size[0]):
+            rect = pygame.Rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
             #rect = pygame.draw.rect(screen, pygame.Color("black"), rect, width= 1)
-            pos = Position(i,j)
+            pos = Position(x,y)
             color = pygame.Color("black")
             if board.getCase(pos) is None:
                 color = pygame.Color("blue")
