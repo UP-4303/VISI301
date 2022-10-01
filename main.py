@@ -1,10 +1,8 @@
-
 #     INIT     #
 
 from mainImport import *
 
 if __name__ == '__main__':
-    pygame.init()
     game_on = True #on creer une variable booléen pour que la fenetre reste ouverte
     
     # Ici s'exécutera le code principal. Pour l'instant, contient les codes de test.
