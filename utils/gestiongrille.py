@@ -9,7 +9,7 @@ from classes.Vector import Vector as Vector
 
 pygame.init()
 CELL_SIZE = 40
-screen = pygame.display.set_mode(size=(20 * CELL_SIZE, 20 * CELL_SIZE))
+screen = pygame.display.set_mode(size=(15 * CELL_SIZE, 15 * CELL_SIZE))
 
 #fonction pour afficher la grille
 def show_grid(board):

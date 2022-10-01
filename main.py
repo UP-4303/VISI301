@@ -37,9 +37,10 @@ if __name__ == '__main__':
                 position_y = convert_px_in_number(position[1])
                 print(position_x, position_y)
 
-        screen.fill(pygame.Color("white"))  # on change la couleur de l'element
-        show_grid()
-        pygame.display.update()  # met a jour la fenetre et redessine les elements
-        timer.tick(60)  # duree du game loop
         for updatingObject in toUpdate:
             updatingObject.PlayTurn()
+
+        screen.fill(pygame.Color("white"))  # on change la couleur de l'element
+        show_grid(board)
+        pygame.display.update()  # met a jour la fenetre et redessine les elements
+        timer.tick(60)  # duree du game loop
