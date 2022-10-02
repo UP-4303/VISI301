@@ -59,6 +59,10 @@ class Player():
                 # On convertit en coordonées de case la position du click
                 position_x = self.ConvertPxInNumber(mousePosition[0])
                 position_y = self.ConvertPxInNumber(mousePosition[1])
+
+                print(position_x, position_y)
+
+
                 if position_x >= 0 and position_x < self.board.size[0] and position_y >= 0 and position_y < self.board.size[1]:
                     requestedCoordinates = Position(position_x, position_y)
                     mvtDone = self.ValidMove(requestedCoordinates)
@@ -88,3 +92,6 @@ class Player():
         else:
             self.RequestMove()
             self.HittingFunction(self, Vector(0,1), True, 1)
+
+
+            

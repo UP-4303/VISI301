@@ -1,3 +1,4 @@
+import pygame # a retirer plus tard
 from classes.Board import Board
 from classes.Position import Position
 from classes.Vector import Vector
@@ -10,6 +11,7 @@ class Monster():
         self.coordinates = spawnCoordinates
         self.board = board
         self.healthPoints = 9
+        self.maxHealthPoints = 10
         self.movePoints = 3
         self.uncrossableTypes = uncrossableTypes
 
@@ -60,3 +62,16 @@ class Monster():
         else:
             self.Move()
             self.HittingFunction(self, Vector(0,-1))
+
+
+
+    # Gestion de la barre de vie
+
+    def update_health_bar(self, surface):
+        # definition caracteristique bar
+        bar_color = (111, 210, 46) #couleur
+        bar_position = [self.coordinates.x, self.coordinates.y, self.healthPoints, 5] #x, y, w, h
+
+        # dessiner la barre
+        pygame.draw.rect(surface, bar_color, bar_position)
+
