@@ -1,7 +1,9 @@
 import pygame # a retirer plus tard
+
 from classes.Board import Board
 from classes.Position import Position
 from classes.Vector import Vector
+
 
 from utils.Pathfinder import Pathfinder
 
@@ -67,11 +69,10 @@ class Monster():
 
     # Gestion de la barre de vie
 
-    def update_health_bar(self, surface):
+    def update_health_bar(self, surface, CELL_SIZE):
         # definition caracteristique bar
-        bar_color = (111, 210, 46) #couleur
-        bar_position = [self.coordinates.x, self.coordinates.y, self.healthPoints, 5] #x, y, w, h
+        bar_color = (255, 0, 0) #couleur
+        bar_position = [self.coordinates.y* CELL_SIZE, self.coordinates.x * CELL_SIZE, (self.healthPoints) * (CELL_SIZE/self.maxHealthPoints), 7] #x, y, w, h
 
         # dessiner la barre
         pygame.draw.rect(surface, bar_color, bar_position)
-
