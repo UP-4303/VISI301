@@ -99,7 +99,7 @@ class Player():
     def update_health_bar(self, surface, CELL_SIZE):
         # definition caracteristique bar
         bar_color = (0, 255, 255)  # couleur
-        bar_position = [self.coordinates.y * CELL_SIZE, self.coordinates.x * CELL_SIZE,
+        bar_position = [self.coordinates.x * CELL_SIZE, self.coordinates.y * CELL_SIZE,
                         (self.healthPoints) * (CELL_SIZE / self.maxHealthPoints), 7]  # x, y, w, h
 
         # dessiner la barre

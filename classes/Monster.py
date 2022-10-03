@@ -70,9 +70,9 @@ class Monster():
     # Gestion de la barre de vie
 
     def update_health_bar(self, surface, CELL_SIZE):
-        # definition caracteristique bar
+        # de finition caracteristique bar
         bar_color = (255, 0, 0) #couleur
-        bar_position = [self.coordinates.y* CELL_SIZE, self.coordinates.x * CELL_SIZE, (self.healthPoints) * (CELL_SIZE/self.maxHealthPoints), 7] #x, y, w, h
+        bar_position = [self.coordinates.x* CELL_SIZE, self.coordinates.y * CELL_SIZE, (self.healthPoints) * (CELL_SIZE/self.maxHealthPoints), 7] #x, y, w, h
 
         # dessiner la barre
         pygame.draw.rect(surface, bar_color, bar_position)
