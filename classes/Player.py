@@ -1,3 +1,5 @@
+import pygame # a enlever plus tard
+
 from classes.Board import Board
 from classes.Position import Position
 from classes.Vector import Vector
@@ -10,6 +12,7 @@ class Player():
         self.coordinates = spawnCoordinates
         self.board = board
         self.healthPoints = 9
+        self.maxHealthPoints = 10
         self.movePoints = 3
 
         self.uncrossableTypes = uncrossableTypes
@@ -59,6 +62,10 @@ class Player():
                 # On convertit en coordonées de case la position du click
                 position_x = self.ConvertPxInNumber(mousePosition[0])
                 position_y = self.ConvertPxInNumber(mousePosition[1])
+
+                print(position_x, position_y)
+
+
                 if position_x >= 0 and position_x < self.board.size[0] and position_y >= 0 and position_y < self.board.size[1]:
                     requestedCoordinates = Position(position_x, position_y)
                     mvtDone = self.ValidMove(requestedCoordinates)
@@ -88,3 +95,12 @@ class Player():
         else:
             self.RequestMove()
             self.HittingFunction(self, Vector(0,1), True, 1)
+
+    def update_health_bar(self, surface, CELL_SIZE):
+        # definition caracteristique bar
+        bar_color = (0, 255, 255)  # couleur
+        bar_position = [self.coordinates.y * CELL_SIZE, self.coordinates.x * CELL_SIZE,
+                        (self.healthPoints) * (CELL_SIZE / self.maxHealthPoints), 7]  # x, y, w, h
+
+        # dessiner la barre
+        pygame.draw.rect(surface, bar_color, bar_position)

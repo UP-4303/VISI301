@@ -20,8 +20,12 @@ def show_grid(board, SCREEN, CELL_SIZE):
                 color = pygame.Color("blue")
             if isinstance(board.getCase(pos), Monster):
                 color = pygame.Color("green")
+                monster = board.getCase(pos)
+                healthBar = monster.update_health_bar(SCREEN, CELL_SIZE)
             if isinstance(board.getCase(pos), Player):
                 color = pygame.Color("Yellow")
+                player = board.getCase(pos)
+                healthBar = player.update_health_bar(SCREEN, CELL_SIZE)
             if isinstance(board.getCase(pos), Bloc):
                 color = pygame.Color("Red")
 
