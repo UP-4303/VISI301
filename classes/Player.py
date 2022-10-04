@@ -24,18 +24,14 @@ class Player():
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
-            self.__del__("SPAWN CASE ALREADY OCCUPIED")
+            print("PLAYER : SPAWN CASE ALREADY OCCUPIED")
         else:
             self.board.NewObject(self.coordinates, self)
 
-    # Delete the player and print a message for debug purpose
-    def __del__(self, reason:str="Player deleted"):
-        print(reason)
-
-    # Delete the player and it's board self. Don't call this method if the player is not on the board
+    # Delete the player on the board. Don't call this method if the player is not on the board
     def DelFromBoard(self,reason:str):
         self.board.DeleteObject(self.coordinates)
-        self.__del__(reason)
+        print(f"PLAYER : {reason}")
 
     # Just move the player. USE IT CAUTIOUSLY (it can delete another object on the board)
     def Move(self, position:Position):

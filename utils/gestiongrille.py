@@ -16,17 +16,17 @@ def show_grid(board, SCREEN, CELL_SIZE):
             #rect = pygame.draw.rect(screen, pygame.Color("black"), rect, width= 1)
             pos = Position(x,y)
             color = pygame.Color("black")
-            if board.getCase(pos) is None:
+            if board.get(pos) is None:
                 color = pygame.Color("blue")
-            if isinstance(board.getCase(pos), Monster):
+            if isinstance(board.get(pos), Monster):
                 color = pygame.Color("green")
-                monster = board.getCase(pos)
+                monster = board.get(pos)
                 healthBar = monster.update_health_bar(SCREEN, CELL_SIZE)
-            if isinstance(board.getCase(pos), Player):
+            if isinstance(board.get(pos), Player):
                 color = pygame.Color("Yellow")
-                player = board.getCase(pos)
+                player = board.get(pos)
                 healthBar = player.update_health_bar(SCREEN, CELL_SIZE)
-            if isinstance(board.getCase(pos), Bloc):
+            if isinstance(board.get(pos), Bloc):
                 color = pygame.Color("Red")
 
             rect = pygame.draw.rect(SCREEN, color, rect, width=4)

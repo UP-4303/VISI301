@@ -31,6 +31,8 @@ if __name__ == '__main__':
                 
         for updatingObject in toUpdate:
             updatingObject.PlayTurn()
+        if player.healthPoints <= 0:
+            game_on = False
 
         SCREEN.fill(pygame.Color("white"))  # on change la couleur de l'element
         show_grid(board, SCREEN, CELL_SIZE)

@@ -22,18 +22,14 @@ class Monster():
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
-            self.__del__("SPAWN CASE ALREADY OCCUPIED")
+            print("MONSTER : SPAWN CASE ALREADY OCCUPIED")
         else:
             self.board.NewObject(self.coordinates, self)
 
-    # Delete the monster and print a message for debug purpose
-    def __del__(self, reason:str="Monster deleted"):
-        print(reason)
-
-    # Delete the monster and it's board self. Don't call this method if the monster is not on the board
+    # Delete the monster on the board. Don't call this method if the monster is not on the board
     def DelFromBoard(self, reason:str):
         self.board.DeleteObject(self.coordinates)
-        self.__del__(reason)
+        print(f"MONSTER : {reason}")
 
     # Use pathfinding to go to the nearest target position
     def Move(self):

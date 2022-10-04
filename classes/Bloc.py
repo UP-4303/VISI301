@@ -11,18 +11,13 @@ class Bloc():
 
         # Treating creation on board
         if self.board.IsCaseOccupied(self.coordinates):
-            self.__del__("SPAWN CASE ALREADY OCCUPIED")
+            print("BLOC : SPAWN CASE ALREADY OCCUPIED")
         else:
             self.board.NewObject(self.coordinates, self)
-            
-    # Delete the bloc and print a message for debug purpose
-    def __del__(self, reason:str="Bloc deleted"):
-        print(reason)
-
-    # Delete the bloc and it's board self. Don't call this method if the bloc is not on the board
+    # Delete the bloc on the board. Don't call this method if the bloc is not on the board
     def DelFromBoard(self,reason:str):
         self.board.DeleteObject(self.coordinates)
-        self.__del__(reason)
+        print(f"BLOC : {reason}")
     
     # Decrease health
     def TakeDamage(self, amount:int):

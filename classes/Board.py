@@ -25,11 +25,6 @@ class Board():
     # Checking has to be down before movement for preventing unwanted deletion
     def IsCaseOccupied(self, coordinates:Position):
         return self.all[coordinates.x][coordinates.y] != None
-
-    def getCase(self, coordinates:Position):
-        return self.all[coordinates.x][coordinates.y]
-
-        return self.all[coordinates.y][coordinates.x] != None
     
     # Return the object in targeted position
     def get(self,coordinates:Position):
