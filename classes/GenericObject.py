@@ -9,7 +9,7 @@ class GenericObject(pygame.sprite.Sprite):
     imageLink:str
 
     healthPoints:int
-    maxhealthPoints:int
+    maxHealthPoints:int
 
     position:Position
 
@@ -19,7 +19,7 @@ class GenericObject(pygame.sprite.Sprite):
         self.description = description
         self.imageLink = imageLink
         self.healthPoints = healthPoints
-        self.maxhealthPoints = healthPoints
+        self.maxHealthPoints = healthPoints
 
         self.image = pygame.image.load(self.imageLink)
         self.rect = self.image.get_rect()
