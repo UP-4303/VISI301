@@ -1,6 +1,7 @@
 from typing import Any
 
 from classes.BlocObject import BlocObject
+from classes.Player import Player
 
 from classes.Size import Size
 
@@ -32,6 +33,8 @@ class Floor():
                     representation += ' '
                 elif isinstance(object_, BlocObject):
                     representation += 'B'
+                elif isinstance(object_, Player):
+                    representation += 'P'
             representation += '|'
             representation += '\n'
 

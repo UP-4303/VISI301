@@ -2,6 +2,7 @@ from classes.BlocObject import BlocObject
 from classes.Floor import Floor
 from classes.GenericObject import GenericObject
 from classes.MoveableObject import MoveableObject
+from classes.Player import Player
 from classes.Position import Position
 from classes.Size import Size
 from classes.StaticObject import StaticObject
@@ -41,5 +42,7 @@ weaponNoDamage = Weapon()
 
 f = Floor(size=Size(4,5))
 b = BlocObject(position=Position(3,2))
+p = Player(position=Position(2,2))
 f.layers['objects'][3][2] = b
+f.layers['objects'][2][2] = p
 print(f)
