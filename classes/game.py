@@ -1,6 +1,6 @@
 
 import pygame
-from classes.player_first import Player
+from classes.Player import Player
 
 
 class Game:
