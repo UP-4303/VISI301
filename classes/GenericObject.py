@@ -25,5 +25,11 @@ class GenericObject(pygame.sprite.Sprite):
     def IsDead(self):
         return self.healthPoints <= 0
 
+    def TakeDamage(self, damage:int):
+        self.healthPoints -= damage
+
+    def RecoverHealth(self, recover:int):
+        self.healthPoints = min(self.healthPoints + recover, self.maxHealthPoints)
+
     def __repr__(self):
         return self.name
