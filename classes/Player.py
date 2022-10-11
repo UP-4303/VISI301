@@ -1,4 +1,5 @@
 from classes.Character import Character
+from classes.Position import Position
 #Player class
 class Player(Character):
 
