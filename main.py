@@ -1,7 +1,6 @@
 import pygame
 import sys
 from classes.game import Game
-from classes.player_first import Player
 
 pygame.init()
 
@@ -17,7 +16,7 @@ background = pygame.image.load('assets/bg.jpg')
 game= Game()
 
 #init player
-player = Player()
+#player = Player()
 
 running = True #indicate  if the game is running
 

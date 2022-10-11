@@ -35,3 +35,12 @@ class GenericObject(pygame.sprite.Sprite):
 
     def __repr__(self):
         return self.name
+
+    # Utile : nous pouvons créer des groupes avec pygame.sprite.Group()
+    # all_player.add(player)
+    # all_player.draw(screen)
+    # for player in all_player :
+    # self.all_players.remove(self)
+
+    # Pour redimentioner une image
+    # self.image = pygame.transform.scale (self.image, (50, 50))
