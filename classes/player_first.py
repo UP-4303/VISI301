@@ -11,3 +11,13 @@ class Player(pygame.sprite.Sprite):
         self.velocity = 5
         self.image = pygame.image.load('assets/player.png')
         self.rect = self.image.get_rect()
+
+
+#Utile : nous pouvons créer des groupes avec pygame.sprite.Group()
+#all_player.add(player)
+#all_player.draw(screen)
+# for player in all_player :
+# self.all_players.remove(self)
+
+# Pour redimentioner une image
+#self.image = pygame.transform.scale (self.image, (50, 50))
