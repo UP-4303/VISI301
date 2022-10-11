@@ -1,5 +1,26 @@
 import pygame
 import sys
+from classes.game import Game
+from classes.player_first import Player
+
+pygame.init()
+
+#Generate the window of the game
+
+pygame.display.set_caption("Our game")
+screen = pygame.display.set_mode((1080,720)) # define the dimention of the window
+
+#import background
+background = pygame.image.load('assets/bg.jpg')
+
+#download the game
+game= Game()
+
+#init player
+player = Player()
+
+running = True #indicate  if the game is running
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -20,3 +41,4 @@ if __name__ == '__main__':
     
     pygame.quit()
     sys.exit()
+
