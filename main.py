@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     while running:
         screen.blit(background, (0, 0))
-
+        game.update(screen)
         # update screen
         pygame.display.flip()
         
