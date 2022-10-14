@@ -2,7 +2,7 @@
 import pygame
 from classes.Player import Player
 from classes.Monster import Monster
-
+from classes.Size import Size
 from classes.Floor import Floor
 class Game:
     score: int
@@ -10,11 +10,11 @@ class Game:
     floorList:list[Floor]
     currentFloor:int
 
-    def __init__(self, floorList:list[Floor]=[],currentFloor=0):
+    def __init__(self, floorList:list[Floor]=[],currentFloornb=0):
         # define is the game has begin
         self.isplaying = True
         self.floorList = floorList
-        self.currentFloor = currentFloor
+        self.currentFloornb = currentFloornb
         self.score = 0
         #generate the player
         self.player = Player()
@@ -22,8 +22,12 @@ class Game:
         #keep all the monsters in a groupe
         self.all_monsters = pygame.sprite.Group()
         self.current_monster = Monster()
+
         #TEST A ENLEVER
         self.spawn_monster()
+        floor = Floor("Floor0", size=Size(3,3))
+        self.floorList = [floor]
+        self.currentFloor =self.floorList[self.currentFloornb];
 
 
 
@@ -45,6 +49,9 @@ class Game:
 
         # show the player
         self.list_player.draw(screen)
+
+        # show floor
+        self.draw_floor(screen)
 
 
 
@@ -100,3 +107,35 @@ class Game:
         # Draw player helth bar
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
+
+    def draw_floor(self,screen):
+        top_left_x = 60
+        top_left_y = 110
+        large_max_grille = 390
+        #draw the background off the floor
+        back_floor = (46, 222, 231)
+        floor_position = [top_left_x, top_left_y, top_left_x + large_max_grille, large_max_grille]
+        pygame.draw.rect(screen, back_floor, floor_position)
+
+        #draw case
+
+        x= self.currentFloor.size.width
+        y= self.currentFloor.size.height
+
+        ecart = 3
+        larg_case = (large_max_grille - ((x+1) * ecart)) /x
+        long_case = (large_max_grille - ((y+1) * ecart)) / y
+
+        couleur_case = (76, 150, 255)
+
+        for i in range (0, x-1) :
+            for j in range (0, y-1) :
+                print(i, j)
+                top_left_x_case = top_left_x + (larg_case * i) +(ecart*i)
+                top_left_y_case = top_left_y + (long_case * j) +(ecart*j)
+                print(top_left_x_case, top_left_y_case)
+                position_case =[top_left_x_case,top_left_y_case ,top_left_x_case + larg_case, long_case]
+                pygame.draw.rect(screen, couleur_case, position_case)
+
+
+        print("LLLLLLLLLLLL")
