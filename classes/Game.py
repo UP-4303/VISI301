@@ -25,7 +25,7 @@ class Game:
 
         #TEST A ENLEVER
         self.spawn_monster()
-        floor = Floor("Floor0", size=Size(3,3))
+        floor = Floor("Floor0", size=Size(10,10))
         self.floorList = [floor]
         self.currentFloor =self.floorList[self.currentFloornb];
 
@@ -109,15 +109,23 @@ class Game:
         pygame.draw.rect(screen, bar_color, bar2_position)
 
     def draw_floor(self,screen):
+        #draw name of floor
+        font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
+        name_currentFloor_text = font_small.render( str(self.currentFloor.name), 1,
+                                                     (255, 255, 255))  # create texte name
+        screen.blit(name_currentFloor_text, (60, 32))  # show the name at the tuple position
+
+        #var on the screen background
         top_left_x = 60
         top_left_y = 110
-        large_max_grille = 390
+        large_max_grille = 450
+
         #draw the background off the floor
         back_floor = (46, 222, 231)
-        floor_position = [top_left_x, top_left_y, top_left_x + large_max_grille, large_max_grille]
+        floor_position = [top_left_x, top_left_y,large_max_grille, large_max_grille]
         pygame.draw.rect(screen, back_floor, floor_position)
 
-        #draw case
+        #draw all case
 
         x= self.currentFloor.size.width
         y= self.currentFloor.size.height
@@ -128,14 +136,13 @@ class Game:
 
         couleur_case = (76, 150, 255)
 
-        for i in range (0, x-1) :
-            for j in range (0, y-1) :
-                print(i, j)
-                top_left_x_case = top_left_x + (larg_case * i) +(ecart*i)
-                top_left_y_case = top_left_y + (long_case * j) +(ecart*j)
-                print(top_left_x_case, top_left_y_case)
-                position_case =[top_left_x_case,top_left_y_case ,top_left_x_case + larg_case, long_case]
+        for i in range (0, x) :
+            for j in range (0, y) :
+
+                top_left_x_case = ecart +top_left_x + (larg_case * i) +(ecart*i)
+                top_left_y_case = ecart +top_left_y + (long_case * j) +(ecart*j)
+
+                position_case =[top_left_x_case,top_left_y_case ,larg_case, long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
 
-        print("LLLLLLLLLLLL")
