@@ -23,6 +23,7 @@ class GenericObject(pygame.sprite.Sprite):
 
         self.image = pygame.image.load(self.imageLink)
         self.rect = self.image.get_rect()
+        self.position = position
     
     def IsDead(self):
         return self.healthPoints <= 0
