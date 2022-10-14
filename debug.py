@@ -9,6 +9,8 @@ from classes.StaticObject import StaticObject
 from classes.Vector import Vector
 from classes.Weapon import Weapon
 
+from utils.Pathfinder import Pathfinder
+
 patternTop = [
     [0,1,0],
     [0,0,0],
@@ -46,3 +48,5 @@ p = Player(position=Position(2,2))
 f.layers['objects'][3][2] = b
 f.layers['objects'][2][2] = p
 print(f)
+
+print(Pathfinder(Position(1,1), Position(3,4), f))
