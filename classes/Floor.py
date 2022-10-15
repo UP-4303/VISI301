@@ -2,6 +2,7 @@ from typing import Any
 
 from classes.BlocObject import BlocObject
 from classes.Player import Player
+from classes.Position import Position
 
 from classes.Size import Size
 
@@ -17,6 +18,9 @@ class Floor():
         self.layers = {
             "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)]
         }
+    
+    def GetObject(self, position:Position):
+        return self.layers["objects"][position.x][position.y]
 
     def __str__(self):
         representation = '+'
