@@ -6,7 +6,7 @@ from classes.Floor import Floor
 from math import inf
 
 def Pathfinder(actualPosition:Position, targetPosition:Position, floor:Floor):
-    path:list[Position] = []
+    path:list[dict[str,Position|float]] = []
     nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if floor.GetObject(Position(x,y)) != None else 0, Position(x,y) == actualPosition) for y in range(floor.size.height)] for x in range(floor.size.width)]
     nodesToExplore = ToExplore()
     
@@ -63,7 +63,7 @@ def Pathfinder(actualPosition:Position, targetPosition:Position, floor:Floor):
     
     if Position(currentNode.x, currentNode.y) == targetPosition:
         while not(currentNode.start):
-            path.insert(0, Position(currentNode.x, currentNode.y))
+            path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
             currentNode = currentNode.pointer
 
     return path
