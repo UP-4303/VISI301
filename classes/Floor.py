@@ -86,7 +86,7 @@ class Floor():
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
         path:list[PathPoint] = []
-        nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 0, Position(x,y) == actualPosition) for y in range(floor.size.height)] for x in range(floor.size.width)]
+        nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 0, Position(x,y) == actualPosition) for y in range(self.size.height)] for x in range(self.size.width)]
         nodesToExplore = ToExplore()
         
         currentNode = nodes[actualPosition.x][actualPosition.y]
