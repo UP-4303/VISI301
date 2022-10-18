@@ -4,6 +4,7 @@ from classes.Player import Player
 from classes.Monster import Monster
 from classes.Size import Size
 from classes.Floor import Floor
+from classes.Position import Position
 class Game:
     score: int
     isplaying:bool
@@ -20,7 +21,8 @@ class Game:
         #generate the player
         self.player = Player()
         self.list_player = pygame.sprite.Group()
-        #keep all the monsters in a groupe
+        self.list_player.add(self.player)
+        #keep all the monsters in as groupe
         self.all_monsters = pygame.sprite.Group()
         self.current_monster = Monster()
 
@@ -30,11 +32,16 @@ class Game:
         self.top_left_y = 110
         self.large_max_grille = 450
 
-        #TEST A ENLEVER
-        self.spawn_monster()
-        floor = Floor("Floor0", size=Size(10,8))
+        floor = Floor("Floor0", size=Size(7, 7))
         self.floorList = [floor]
-        self.currentFloor =self.floorList[self.currentFloornb]
+        self.currentFloor = self.floorList[self.currentFloornb]
+        #TEST A ENLEVER
+        self.spawn_monster(position = Position(4,4))
+
+        self.init_sprite_size()
+
+
+
 
 
 
@@ -44,6 +51,9 @@ class Game:
         font = pygame.font.SysFont("monospace", 25, True) #create the font style
         score_text = font.render("Score :" + str(self.score),1, (255,255,255))  #create texte
         screen.blit(score_text, (640,60)) #show the score at the tuple position
+
+        # show floor
+        self.draw_floor(screen)
 
         # show player info
         self.draw_player_infos(screen)
@@ -57,8 +67,7 @@ class Game:
         # show the player
         self.list_player.draw(screen)
 
-        # show floor
-        self.draw_floor(screen)
+        self.update_position_sprite()
 
         for event in pygame.event.get():
             # ferme le jeu quand on le quitte
@@ -71,9 +80,42 @@ class Game:
 
 
     #Generate a monster
-    def spawn_monster(self):
+    def spawn_monster(self, position: Position):
         monster = Monster()
         self.all_monsters.add(monster)
+        monster.position = position
+        monster.rect.x, monster.rect.y = self.convert_case_in_px(position.x, position.y)
+
+
+    def update_position_sprite(self):
+        for monster in self.all_monsters:
+            position = monster.position
+            monster.rect.x, monster.rect.y = self.convert_case_in_px(position.x, position.y)
+        for player in self.list_player :
+            position = player.position
+            player.rect.x, player.rect.y = self.convert_case_in_px(position.x, position.y)
+
+    def init_sprite_size(self):
+
+        x = self.currentFloor.size.width
+        y = self.currentFloor.size.height
+
+        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+
+        DEFAULT_IMAGE_SIZE = (larg_case, long_case)
+
+        for monster in self.all_monsters:
+          image = monster.image
+          image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+          monster.image = image
+
+        for player in self.list_player :
+            image = player.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+            player.image = image
 
     def draw_player_infos(self,screen):
 
@@ -181,6 +223,18 @@ class Game:
 
         return case_x, case_y
 
+    def convert_case_in_px(self, case_x, case_y):
+
+        x = self.currentFloor.size.width
+        y = self.currentFloor.size.height
+
+        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+
+        px_x = case_x * (larg_case + self.ecart) + self.top_left_x
+        px_y  = case_y * (long_case + self.ecart) + self.top_left_y
+
+        return px_x, px_y
     def DetectClick(self):
         pygame.event.clear()
         event = pygame.event.wait()
