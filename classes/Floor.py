@@ -17,7 +17,7 @@ class Floor():
     playerGroup:pygame.sprite.Group
     monsterGroup:pygame.sprite.Group
 
-    def __init__(self, name:str="Floor 0", size:Size=Size(0,0)):
+    def __init__(self, name:str="Floor 0", size:Size=Size(6,6)):
         self.name = name
         self.size = size
 
@@ -35,12 +35,11 @@ class Floor():
         if self.GetObject(position) == None:
             self.layers["objects"][position.x][position.y] = object_
             object_.position = position
-            self.objects.append(object_)
 
-            if isinstance(object_, Player):
-                self.playerGroup.add(object_)
-            if isinstance(object_, Monster):
-                self.monsterGroup.add(object_)
+            #if isinstance(object_, Player):
+                #self.playerGroup.add(object_)
+            #if isinstance(object_, Monster):
+                #self.monsterGroup.add(object_)
 
             return True
         else:

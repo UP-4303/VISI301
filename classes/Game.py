@@ -1,4 +1,4 @@
-
+import sys
 import pygame
 from classes.Player import Player
 from classes.Monster import Monster
@@ -28,7 +28,7 @@ class Game:
         self.list_player.add(self.player)
         #keep all the monsters in as groupe
         self.all_monsters = pygame.sprite.Group()
-        self.current_monster = Monster()
+
 
         #const needed to draw the map
         self.ecart = 3
@@ -38,10 +38,10 @@ class Game:
 
         floor = Floor("Floor0", size=Size(7, 7))
         self.floorList = [floor]
-        self.currentFloor = self.floorList[self.currentFloornb]
+
         #TEST A ENLEVER
         self.spawn_monster(position = Position(4,4))
-
+        self.current_monster = Monster()
 
 
         self.currentFloor.SetNewObject(Position(0,0), self.player)
@@ -78,6 +78,21 @@ class Game:
 
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 self.convert_px_in_case( pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
+            # TEST AFFICHAGES
+            if event.type == pygame.KEYDOWN:
+                # wich one
+                if event.key == pygame.K_q:
+                    print("Player is hit")
+                    for player in self.list_player:
+                        player.healthPoints = player.healthPoints -1
+
+
+                elif event.key == pygame.K_s:
+                    print("you earn score")
+                    self.score = self.score +3
+
+
 
 
 
@@ -229,6 +244,7 @@ class Game:
 
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
+
 
         larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
         long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
