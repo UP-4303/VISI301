@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, TypedDict
 from math import inf
+import pygame
 
 from classes.GenericObject import GenericObject
 from classes.Monster import Monster
@@ -13,7 +14,8 @@ class Floor():
     name:str
     size:Size
     layers:dict[str, Any]
-    objects:list[GenericObject]
+    playerGroup:pygame.sprite.Group
+    monsterGroup:pygame.sprite.Group
 
     def __init__(self, name:str="Floor 0", size:Size=Size(0,0)):
         self.name = name
@@ -26,12 +28,19 @@ class Floor():
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
 
+
 # Ajoute un object
+
     def SetNewObject(self, position:Position, object_:GenericObject):
         if self.GetObject(position) == None:
             self.layers["objects"][position.x][position.y] = object_
             object_.position = position
             self.objects.append(object_)
+
+            if isinstance(object_, Player):
+                self.playerGroup.add(object_)
+            if isinstance(object_, Monster):
+                self.monsterGroup.add(object_)
 
             return True
         else:
@@ -53,18 +62,6 @@ class Floor():
             return True
         else:
             return False
-
-    def UpdateAll(self):
-        for i in self.objects:
-            if isinstance(i, Player):
-                self.UpdatePlayer(i)
-        for i in self.objects:
-            if isinstance(i, Monster):
-                self.UpdateMonster(i)
-        for i in self.objects:
-            if i.IsDead():
-                self.RemoveObject(i.position)
-                self.objects.remove(i)
 
     def UpdatePlayer(self, player:Player):
         requestedNewPosition = NotImplemented
