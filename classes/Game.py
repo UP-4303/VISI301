@@ -10,6 +10,7 @@ class Game:
     floorList:list[Floor]
     currentFloor:int
 
+
     def __init__(self, floorList:list[Floor]=[],currentFloornb=0):
         # define is the game has begin
         self.isplaying = True
@@ -23,9 +24,15 @@ class Game:
         self.all_monsters = pygame.sprite.Group()
         self.current_monster = Monster()
 
+        #const needed to draw the map
+        self.ecart = 3
+        self.top_left_x = 60
+        self.top_left_y = 110
+        self.large_max_grille = 450
+
         #TEST A ENLEVER
         self.spawn_monster()
-        floor = Floor("Floor0", size=Size(4,4))
+        floor = Floor("Floor0", size=Size(10,8))
         self.floorList = [floor]
         self.currentFloor =self.floorList[self.currentFloornb]
 
@@ -52,6 +59,15 @@ class Game:
 
         # show floor
         self.draw_floor(screen)
+
+        for event in pygame.event.get():
+            # ferme le jeu quand on le quitte
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                self.convert_px_in_case( pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
 
     #Generate a monster
@@ -115,13 +131,13 @@ class Game:
         screen.blit(name_currentFloor_text, (60, 32))  # show the name at the tuple position
 
         #var on the screen background
-        top_left_x = 60
-        top_left_y = 110
-        large_max_grille = 450
+        #top_left_x = 60
+        #top_left_y = 110
+        #large_max_grille = 450
 
         #draw the background off the floor
         back_floor = (46, 222, 231)
-        floor_position = [top_left_x, top_left_y,large_max_grille, large_max_grille]
+        floor_position = [self.top_left_x, self.top_left_y,self.large_max_grille, self.large_max_grille]
         pygame.draw.rect(screen, back_floor, floor_position)
 
         #draw all case
@@ -129,19 +145,43 @@ class Game:
         x= self.currentFloor.size.width
         y= self.currentFloor.size.height
 
-        ecart = 3
-        larg_case = (large_max_grille - ((x+1) * ecart)) /x
-        long_case = (large_max_grille - ((y+1) * ecart)) / y
+
+        larg_case = (self.large_max_grille - ((x+1) * self.ecart)) /x
+        long_case = (self.large_max_grille - ((y+1) * self.ecart)) / y
 
         couleur_case = (76, 150, 255)
 
         for i in range (0, x) :
             for j in range (0, y) :
 
-                top_left_x_case = ecart +top_left_x + (larg_case * i) +(ecart*i)
-                top_left_y_case = ecart +top_left_y + (long_case * j) +(ecart*j)
+                top_left_x_case = self.ecart + self.top_left_x + (larg_case * i) +(self.ecart*i)
+                top_left_y_case = self.ecart + self.top_left_y + (long_case * j) +(self.ecart*j)
 
                 position_case =[top_left_x_case,top_left_y_case ,larg_case, long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
+    #convert postion on the screen to position en the map, -10 -10 if out of map
+    def convert_px_in_case(self, px_x, px_y):
 
+        x = self.currentFloor.size.width
+        y = self.currentFloor.size.height
+
+        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+
+        case_x = int((px_x - self.top_left_x)//(larg_case + self.ecart))
+        case_y = int((px_y - self.top_left_y) // (long_case + self.ecart))
+
+        # check if it's out of the map
+        if case_x >= x or case_y >= y or case_x<0 or case_y<0:
+            case_x = -10
+            case_y = -10
+
+        print(case_x, case_y) #Suppr later
+
+        return case_x, case_y
+
+    def DetectClick(self):
+        pygame.event.clear()
+        event = pygame.event.wait()
+        return event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]

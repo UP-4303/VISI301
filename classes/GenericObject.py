@@ -37,6 +37,19 @@ class GenericObject(pygame.sprite.Sprite):
     def __repr__(self):
         return self.name
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     # Utile : nous pouvons créer des groupes avec pygame.sprite.Group()
     # all_player.add(player)
     # all_player.draw(screen)

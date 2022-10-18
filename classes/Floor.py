@@ -26,11 +26,13 @@ class Floor():
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
 
-    def SetNewObject(self, position:Position, object_:Any):
+# Ajoute un object
+    def SetNewObject(self, position:Position, object_:GenericObject):
         if self.GetObject(position) == None:
             self.layers["objects"][position.x][position.y] = object_
             object_.position = position
             self.objects.append(object_)
+
             return True
         else:
             return False
