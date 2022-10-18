@@ -27,7 +27,7 @@ class Game:
         self.spawn_monster()
         floor = Floor("Floor0", size=Size(4,4))
         self.floorList = [floor]
-        self.currentFloor =self.floorList[self.currentFloornb];
+        self.currentFloor =self.floorList[self.currentFloornb]
 
 
 
