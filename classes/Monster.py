@@ -8,8 +8,8 @@ class Monster(Character):
         super().__init__(name, description, imageLink, healthPoints, position, movementPoints, weapon)
 
         #TEST
-        self.rect.x = 200
-        self.rect.y = 100
+        self.rect.x = self.position.x
+        self.rect.y = self.position.y
 
 
 

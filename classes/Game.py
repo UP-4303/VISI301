@@ -25,7 +25,7 @@ class Game:
 
         #TEST A ENLEVER
         self.spawn_monster()
-        floor = Floor("Floor0", size=Size(10,10))
+        floor = Floor("Floor0", size=Size(4,4))
         self.floorList = [floor]
         self.currentFloor =self.floorList[self.currentFloornb];
 
@@ -52,7 +52,6 @@ class Game:
 
         # show floor
         self.draw_floor(screen)
-
 
 
     #Generate a monster
