@@ -4,33 +4,24 @@ from classes.Player import Player
 from classes.Monster import Monster
 from classes.Size import Size
 from classes.Floor import Floor
+from classes.Position import Position
+
 class Game:
     score: int
     isplaying:bool
     floorList:list[Floor]
     currentFloor:int
 
-    def __init__(self, floorList:list[Floor]=[],currentFloornb=0):
+    def __init__(self):
         # define is the game has begin
         self.isplaying = True
-        self.floorList = floorList
-        self.currentFloornb = currentFloornb
+        self.floorList = [Floor()]
+        self.currentFloorIndex = 0
+        self.currentFloor = self.floorList[self.currentFloorIndex]
         self.score = 0
         #generate the player
         self.player = Player()
-        self.list_player = pygame.sprite.Group()
-        #keep all the monsters in a groupe
-        self.all_monsters = pygame.sprite.Group()
-        self.current_monster = Monster()
-
-        #TEST A ENLEVER
-        self.spawn_monster()
-        floor = Floor("Floor0", size=Size(10,10))
-        self.floorList = [floor]
-        self.currentFloor =self.floorList[self.currentFloornb]
-
-
-
+        self.currentFloor.SetNewObject(Position(0,0), self.player)
 
     def update(self, screen):
         # show the score on the screen
@@ -52,13 +43,6 @@ class Game:
 
         # show floor
         self.draw_floor(screen)
-
-
-
-    #Generate a monster
-    def spawn_monster(self):
-        monster = Monster()
-        self.all_monsters.add(monster)
 
     def draw_player_infos(self,screen):
 
@@ -86,8 +70,7 @@ class Game:
     def draw_monster_infos(self,screen):
         # show monster info
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
-        name_currentMonster_text = font_small.render("Name :" + str(self.current_monster.name), 1,
-                                                     (255, 255, 255))  # create texte name
+        name_currentMonster_text = font_small.render("Name :" + str(self.current_monster.name), 1, (255, 255, 255))  # create texte name
         screen.blit(name_currentMonster_text, (650, 420))  # show the name at the tuple position
 
         description_currentMonster_text = font_small.render("Description :" + str(self.current_monster.description), 1,
