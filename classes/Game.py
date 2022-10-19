@@ -23,11 +23,7 @@ class Game:
         self.score = 0
         #generate the player
         self.player = Player()
-
-        self.list_player = pygame.sprite.Group()
-        self.list_player.add(self.player)
-        #keep all the monsters in as groupe
-        self.all_monsters = pygame.sprite.Group()
+        self.currentFloor.SetNewObject(Position(0,0), self.player)
 
 
         #const needed to draw the map
@@ -36,15 +32,10 @@ class Game:
         self.top_left_y = 110
         self.large_max_grille = 450
 
-        floor = Floor("Floor0", size=Size(7, 7))
-        self.floorList = [floor]
-
         #TEST A ENLEVER
         self.spawn_monster(position = Position(4,4))
         self.current_monster = Monster()
 
-
-        self.currentFloor.SetNewObject(Position(0,0), self.player)
         self.init_sprite_size()
 
     def update(self, screen):
@@ -63,10 +54,10 @@ class Game:
         self.draw_monster_infos(screen)
 
         # show monstres (maybe better in main)
-        self.all_monsters.draw(screen)
+        self.currentFloor.monsterGroup.draw(screen)
 
         # show the player
-        self.list_player.draw(screen)
+        self.currentFloor.playerGroup.draw(screen)
 
         self.update_position_sprite()
 
@@ -84,7 +75,7 @@ class Game:
                 # wich one
                 if event.key == pygame.K_q:
                     print("Player is hit")
-                    for player in self.list_player:
+                    for player in self.currentFloor.playerGroup:
                         player.healthPoints = player.healthPoints -1
 
 
@@ -92,23 +83,17 @@ class Game:
                     print("you earn score")
                     self.score = self.score +3
 
-
-
-
-
     #Generate a monster
     def spawn_monster(self, position: Position):
         monster = Monster()
-        self.all_monsters.add(monster)
-        monster.position = position
+        self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position.x, position.y)
 
-
     def update_position_sprite(self):
-        for monster in self.all_monsters:
+        for monster in self.currentFloor.monsterGroup:
             position = monster.position
             monster.rect.x, monster.rect.y = self.convert_case_in_px(position.x, position.y)
-        for player in self.list_player :
+        for player in self.currentFloor.playerGroup :
             position = player.position
             player.rect.x, player.rect.y = self.convert_case_in_px(position.x, position.y)
 
@@ -122,18 +107,17 @@ class Game:
 
         DEFAULT_IMAGE_SIZE = (larg_case, long_case)
 
-        for monster in self.all_monsters:
+        for monster in self.currentFloor.monsterGroup:
           image = monster.image
           image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
           monster.image = image
 
-        for player in self.list_player :
+        for player in self.currentFloor.playerGroup :
             image = player.image
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
             player.image = image
-
 
     def draw_player_infos(self,screen):
 
@@ -253,6 +237,7 @@ class Game:
         px_y  = case_y * (long_case + self.ecart) + self.top_left_y
 
         return px_x, px_y
+
     def DetectClick(self):
         pygame.event.clear()
         event = pygame.event.wait()
