@@ -36,7 +36,7 @@ class Game:
         self.top_left_y = 110
         self.large_max_grille = 450
 
-        floor = Floor("Floor0", size=Size(7, 7))
+        floor = Floor("Floor0", size=Size(5, 5))
         self.floorList = [floor]
 
         #TEST A ENLEVER
