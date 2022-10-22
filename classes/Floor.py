@@ -73,13 +73,14 @@ class Floor():
         path = self.Pathfinder(player.position, destination)
         if path != []:
             movementPoints = player.movementPoints
-            index = 0
-            currentPosition = path[index]
-            while index < len(path)-1 and movementPoints >= currentPosition["bias"]:
-                movementPoints -= currentPosition["bias"]
-                index += 1
+            if movementPoints > 0:
+                index = 0
                 currentPosition = path[index]
-            self.UpdateObject(player.position, path[index]["position"])
+                while index < len(path)-1 and movementPoints >= currentPosition["bias"]:
+                    movementPoints -= currentPosition["bias"]
+                    index += 1
+                    currentPosition = path[index]
+                self.UpdateObject(player.position, path[index]["position"])
 
     def UpdateMonster(self, monster:Monster):
         pass
@@ -145,8 +146,6 @@ class Floor():
             while not(currentNode.start):
                 path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
                 currentNode = currentNode.pointer
-            path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
-
         return path
 
     def __str__(self):
