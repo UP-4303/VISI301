@@ -43,16 +43,15 @@ class Floor():
                 self.playerGroup.add(object_)
             if isinstance(object_, Monster):
                 self.monsterGroup.add(object_)
-
-
             return True
         else:
             return False
     
     def UpdateObject(self, position:Position, newPosition:Position):
         if self.GetObject(newPosition) == None:
-            self.layers["objects"][newPosition.x][newPosition.y] = self.GetObject(position)
-            self.GetObject(newPosition).position = newPosition
+            object_ = self.GetObject(position)
+            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
             self.layers["objects"][position.x][newPosition.y] = None
             return True
         else:
@@ -60,7 +59,11 @@ class Floor():
     
     def RemoveObject(self, position:Position):
         if self.GetObject(position)!= None:
-            self.objects.remove(self.GetObject(position))
+            object_ = self.GetObject(position)
+            if isinstance(object_, Player):
+                self.playerGroup.remove(object_)
+            if isinstance(object_, Monster):
+                self.monsterGroup.remove(object_)
             self.layers["objects"][position.x][position.y] = None
             return True
         else:
@@ -77,7 +80,6 @@ class Floor():
                 index += 1
                 currentPosition = path[index]
             self.UpdateObject(player.position, path[index]["position"])
-            player.position = path[index]["position"]
 
     def UpdateMonster(self, monster:Monster):
         pass
@@ -85,7 +87,7 @@ class Floor():
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
         path:list[PathPoint] = []
-        nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 0, Position(x,y) == actualPosition) for y in range(self.size.height)] for x in range(self.size.width)]
+        nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 1, Position(x,y) == actualPosition) for y in range(self.size.height)] for x in range(self.size.width)]
         nodesToExplore = ToExplore()
         
         currentNode = nodes[actualPosition.x][actualPosition.y]
@@ -113,7 +115,7 @@ class Floor():
             addingNode.Discover(currentNode.gCost+1, currentNode)
             if not(addingNode.explored and not(addingNode in nodesToExplore)):
                 nodesToExplore.append(addingNode)
-        
+
         while nodesToExplore!= [] and Position(currentNode.x, currentNode.y) != targetPosition :
             currentNode = nodesToExplore.pop(-1)
             currentNode.Explore()
@@ -143,6 +145,7 @@ class Floor():
             while not(currentNode.start):
                 path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
                 currentNode = currentNode.pointer
+            path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
 
         return path
 

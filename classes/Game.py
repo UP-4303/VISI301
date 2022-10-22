@@ -28,7 +28,7 @@ class Game:
         self.currentFloor = self.floorList[self.currentFloorIndex]
         self.score = 0
         #generate the player
-        self.player = Player()
+        self.player = Player(movementPoints=3)
         self.currentFloor.SetNewObject(Position(0,0), self.player)
 
 
