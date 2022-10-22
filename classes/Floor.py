@@ -52,7 +52,7 @@ class Floor():
             object_ = self.GetObject(position)
             self.layers["objects"][newPosition.x][newPosition.y] = object_
             object_.position = newPosition
-            self.layers["objects"][position.x][newPosition.y] = None
+            self.layers["objects"][position.x][position.y] = None
             return True
         else:
             return False
