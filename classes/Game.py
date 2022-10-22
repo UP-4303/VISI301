@@ -11,6 +11,12 @@ class Game:
     isplaying:bool
     floorList:list[Floor]
     currentFloor:int
+    status:str
+    # Status :
+    # PlayerTurn : Waiting for player to choose an action
+    # PlayerMovement : Waiting for player to choose a cell for movement
+    # PlayerAttack : Waiting for player to choose a cell for attack
+    # MonsterTurn
 
 
     def __init__(self):
@@ -36,6 +42,8 @@ class Game:
         self.spawn_monster(position = Position(4,4))
         self.current_monster = Monster()
 
+        self.status = "MonsterTurn"
+
         self.init_sprite_size()
 
     def update(self, screen):
@@ -43,22 +51,16 @@ class Game:
         font = pygame.font.SysFont("monospace", 25, True) #create the font style
         score_text = font.render("Score :" + str(self.score),1, (255,255,255))  #create texte
         screen.blit(score_text, (640,60)) #show the score at the tuple position
-
         # show floor
         self.draw_floor(screen)
-
         # show player info
         self.draw_player_infos(screen)
-
         # show monster info
         self.draw_monster_infos(screen)
-
         # show monstres (maybe better in main)
         self.currentFloor.monsterGroup.draw(screen)
-
         # show the player
         self.currentFloor.playerGroup.draw(screen)
-
         self.update_position_sprite()
 
         for event in pygame.event.get():
@@ -68,7 +70,13 @@ class Game:
                 sys.exit()
 
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                self.convert_px_in_case( pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                if self.status == "PlayerTurn":
+                    self.status = "PlayerMovement"
+                if self.status == "PlayerMovement":
+                    self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
+                    self.status == "MonsterTurn"
+                if self.status == "PlayerAttack":
+                    self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
             # TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
@@ -78,24 +86,29 @@ class Game:
                     for player in self.currentFloor.playerGroup:
                         player.healthPoints = player.healthPoints -1
 
-
                 elif event.key == pygame.K_s:
                     print("you earn score")
                     self.score = self.score +3
+        
+        if self.status == "MonsterTurn":
+            for monster in self.currentFloor.monsterGroup:
+                self.currentFloor.UpdateMonster(monster)
+            self.status = "PlayerTurn"
+
 
     #Generate a monster
     def spawn_monster(self, position: Position):
         monster = Monster()
         self.currentFloor.SetNewObject(position, monster)
-        monster.rect.x, monster.rect.y = self.convert_case_in_px(position.x, position.y)
+        monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 
     def update_position_sprite(self):
         for monster in self.currentFloor.monsterGroup:
             position = monster.position
-            monster.rect.x, monster.rect.y = self.convert_case_in_px(position.x, position.y)
+            monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
         for player in self.currentFloor.playerGroup :
             position = player.position
-            player.rect.x, player.rect.y = self.convert_case_in_px(position.x, position.y)
+            player.rect.x, player.rect.y = self.convert_case_in_px(position)
 
     def init_sprite_size(self):
 
@@ -222,9 +235,9 @@ class Game:
 
         print(case_x, case_y) #Suppr later
 
-        return case_x, case_y
+        return Position(case_x, case_y)
 
-    def convert_case_in_px(self, case_x, case_y):
+    def convert_case_in_px(self, position:Position):
 
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
@@ -233,8 +246,8 @@ class Game:
         larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
         long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
 
-        px_x = case_x * (larg_case + self.ecart) + self.top_left_x
-        px_y  = case_y * (long_case + self.ecart) + self.top_left_y
+        px_x = position.x * (larg_case + self.ecart) + self.top_left_x
+        px_y  = position.y * (long_case + self.ecart) + self.top_left_y
 
         return px_x, px_y
 

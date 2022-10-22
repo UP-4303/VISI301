@@ -66,9 +66,8 @@ class Floor():
         else:
             return False
 
-    def UpdatePlayer(self, player:Player):
-        requestedNewPosition = NotImplemented
-        path = self.Pathfinder(player.position, requestedNewPosition)
+    def UpdatePlayer(self, player:Player, destination:Position):
+        path = self.Pathfinder(player.position, destination)
         if path != []:
             movementPoints = player.movementPoints
             index = 0
@@ -77,8 +76,6 @@ class Floor():
                 movementPoints -= currentPosition["bias"]
                 index += 1
                 currentPosition = path[index]
-            if movementPoints >= currentPosition["bias"]:
-                index += 1
             self.UpdateObject(player.position, path[index]["position"])
             player.position = path[index]["position"]
 
