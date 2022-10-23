@@ -71,16 +71,14 @@ class Floor():
 
     def UpdatePlayer(self, player:Player, destination:Position):
         path = self.Pathfinder(player.position, destination)
-        if path != []:
-            movementPoints = player.movementPoints
-            if movementPoints > 0:
-                index = 0
-                currentPosition = path[index]
-                while index < len(path)-1 and movementPoints >= currentPosition["bias"]:
-                    movementPoints -= currentPosition["bias"]
-                    index += 1
-                    currentPosition = path[index]
-                self.UpdateObject(player.position, path[index]["position"])
+        # print(path, destination)
+        sumCost = 0
+        for currentNode in path:
+            sumCost += currentNode["bias"]
+        if sumCost <= player.movementPoints and sumCost != 0:
+            self.UpdateObject(player.position, path[-1]["position"])
+        else:
+            print("Chemin trop long ou inexistant !")
 
     def UpdateMonster(self, monster:Monster):
         pass
@@ -90,10 +88,12 @@ class Floor():
         path:list[PathPoint] = []
         nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 1, Position(x,y) == actualPosition) for y in range(self.size.height)] for x in range(self.size.width)]
         nodesToExplore = ToExplore()
+
+        # for x in range(self.size.width):
+        #     for y in range(self.size.height):
+        #         print(nodes[x][y].bias)
         
         currentNode = nodes[actualPosition.x][actualPosition.y]
-
-        currentNode.Discover(0, currentNode)
         
         currentNode.Explore()
         if currentNode.x > 0:
@@ -120,6 +120,8 @@ class Floor():
         while nodesToExplore!= [] and Position(currentNode.x, currentNode.y) != targetPosition :
             currentNode = nodesToExplore.pop(-1)
             currentNode.Explore()
+            # print("current node : ", currentNode, currentNode.bias)
+            # print("To explore :", nodesToExplore)
             if currentNode.gCost != inf:
                 if currentNode.x > 0:
                     addingNode = nodes[currentNode.x-1][currentNode.y]
@@ -187,6 +189,9 @@ class Node(Position):
         self.hCost = abs(targetPosition - self)
         self.bias = bias
         self.start = start
+        if self.start:
+            self.gCost = 0
+            self.explored = True
 
     def Discover(self, gCost:float, pointer:Node):
         if self.explored:
