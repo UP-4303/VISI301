@@ -81,7 +81,16 @@ class Floor():
             print("Chemin trop long ou inexistant !")
 
     def UpdateMonster(self, monster:Monster):
-        pass
+        allTargets = []
+        for xBoard in range(self.size.width):
+            for yBoard in range(self.size.height):
+                for xPattern in range(len(monster.weapon.pattern)):
+                    for yPattern in range(len(monster.weapon.pattern[xPattern])):
+                        position = Position(xBoard + xPattern - monster.weapon.center.x, yBoard + yPattern - monster.weapon.center.y)
+                        if position.InBoard(self.size):
+                            if isinstance(self.GetObject(position), Player) and monster.weapon.pattern[xPattern][yPattern] > 0:
+                               allTargets.append(position)
+        print(allTargets)
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)

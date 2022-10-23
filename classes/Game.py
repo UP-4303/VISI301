@@ -5,6 +5,7 @@ from classes.Monster import Monster
 from classes.Size import Size
 from classes.Floor import Floor
 from classes.Position import Position
+from classes.Weapon import Weapon
 
 class Game:
     score: int
@@ -39,7 +40,7 @@ class Game:
         self.large_max_grille = 450
 
         #TEST A ENLEVER
-        self.spawn_monster(position = Position(4,4))
+        self.spawn_monster(position = Position(4,4), weapon=Weapon([[0,1,0],[1,0,1],[0,1,0]], Position(0,0)))
         self.current_monster = Monster()
 
         self.status = "MonsterTurn"
@@ -91,14 +92,16 @@ class Game:
                     self.score = self.score +3
         
         if self.status == "MonsterTurn":
+            print("?")
             for monster in self.currentFloor.monsterGroup:
                 self.currentFloor.UpdateMonster(monster)
+                print("!")
             self.status = "PlayerTurn"
 
 
     #Generate a monster
-    def spawn_monster(self, position: Position):
-        monster = Monster()
+    def spawn_monster(self, position: Position, weapon):
+        monster = Monster(weapon=weapon)
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 
