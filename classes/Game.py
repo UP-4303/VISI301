@@ -40,7 +40,7 @@ class Game:
         self.large_max_grille = 450
 
         #TEST A ENLEVER
-        self.spawn_monster(position = Position(4,4), weapon=Weapon([[0,1,0],[1,0,1],[0,1,0]], Position(0,0)))
+        self.spawn_monster(position = Position(4,4), movementPoints=5, weapon=Weapon([[0,1,0],[1,0,1],[0,1,0]], Position(1,1)))
         self.current_monster = Monster()
 
         self.status = "MonsterTurn"
@@ -64,18 +64,18 @@ class Game:
         self.currentFloor.playerGroup.draw(screen)
         self.update_position_sprite()
 
+        running = True
+
         for event in pygame.event.get():
-            # ferme le jeu quand on le quitte
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 if self.status == "PlayerTurn":
                     self.status = "PlayerMovement"
                 if self.status == "PlayerMovement":
                     self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
-                    self.status == "MonsterTurn"
+                    self.status = "MonsterTurn"
                 if self.status == "PlayerAttack":
                     self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
@@ -90,18 +90,18 @@ class Game:
                 elif event.key == pygame.K_s:
                     print("you earn score")
                     self.score = self.score +3
-        
+
         if self.status == "MonsterTurn":
-            print("?")
             for monster in self.currentFloor.monsterGroup:
                 self.currentFloor.UpdateMonster(monster)
-                print("!")
             self.status = "PlayerTurn"
+
+        return running
 
 
     #Generate a monster
-    def spawn_monster(self, position: Position, weapon):
-        monster = Monster(weapon=weapon)
+    def spawn_monster(self, position: Position, movementPoints:int=0, weapon:Weapon=Weapon([[0]],Position(0,0))):
+        monster = Monster(movementPoints=movementPoints, weapon=weapon)
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 
@@ -236,7 +236,7 @@ class Game:
             case_x = -10
             case_y = -10
 
-        print(case_x, case_y) #Suppr later
+        # print(case_x, case_y) #Suppr later
 
         return Position(case_x, case_y)
 
