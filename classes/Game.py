@@ -7,18 +7,19 @@ from classes.Floor import Floor
 from classes.Position import Position
 from classes.Weapon import Weapon
 
+
 class Game:
     score: int
-    isplaying:bool
-    floorList:list[Floor]
-    currentFloor:int
-    status:str
+    isplaying: bool
+    floorList: list[Floor]
+    currentFloor: int
+    status: str
+
     # Status :
     # PlayerTurn : Waiting for player to choose an action
     # PlayerMovement : Waiting for player to choose a cell for movement
     # PlayerAttack : Waiting for player to choose a cell for attack
     # MonsterTurn
-
 
     def __init__(self):
 
@@ -28,19 +29,19 @@ class Game:
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
         self.score = 0
-        #generate the player
+        # generate the player
         self.player = Player(movementPoints=3)
-        self.currentFloor.SetNewObject(Position(0,0), self.player)
+        self.currentFloor.SetNewObject(Position(0, 0), self.player)
 
-
-        #const needed to draw the map
+        # const needed to draw the map
         self.ecart = 3
         self.top_left_x = 60
         self.top_left_y = 110
         self.large_max_grille = 450
 
-        #TEST A ENLEVER
-        self.spawn_monster(position = Position(4,4), movementPoints=5, weapon=Weapon([[0,1,0],[1,0,1],[0,1,0]], Position(1,1)))
+        # TEST A ENLEVER
+        self.spawn_monster(position=Position(4, 4), movementPoints=5,
+                           weapon=Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
         self.current_monster = Monster()
 
         self.status = "MonsterTurn"
@@ -48,21 +49,25 @@ class Game:
         self.init_sprite_size()
 
     def update(self, screen):
-
-        #update affichage
+        # update affichage
         self.draw_everything(screen)
         button = pygame.draw.rect(screen, (255, 0, 0), (100, 100, 100, 100))
 
+        running = True
+
         for event in pygame.event.get():
-            # ferme le jeu quand on le quitte
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                running = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                self.convert_px_in_case( pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                if button.rect.collidepoint(pygame.mouse.get_pos()):
-                    print("Mouse clickes on the button")
+                if self.status == "PlayerTurn":
+                    self.status = "PlayerMovement"
+                if self.status == "PlayerMovement":
+                    self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
+                                                                                        pygame.mouse.get_pos()[1]))
+                    self.status = "MonsterTurn"
+                if self.status == "PlayerAttack":
+                    self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
             # TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
@@ -70,13 +75,18 @@ class Game:
                 if event.key == pygame.K_q:
                     print("Player is hit")
                     for player in self.currentFloor.playerGroup:
-                        player.healthPoints = player.healthPoints -1
-
+                        player.healthPoints = player.healthPoints - 1
 
                 elif event.key == pygame.K_s:
                     print("you earn score")
-                    self.score = self.score +3
+                    self.score = self.score + 3
 
+        if self.status == "MonsterTurn":
+            for monster in self.currentFloor.monsterGroup:
+                self.currentFloor.UpdateMonster(monster)
+            self.status = "PlayerTurn"
+
+        return running
 
     def draw_everything(self, screen):
         # show the score on the screen
@@ -96,44 +106,9 @@ class Game:
 
         self.update_position_sprite()
 
-        running = True
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                if self.status == "PlayerTurn":
-                    self.status = "PlayerMovement"
-                if self.status == "PlayerMovement":
-                    self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]))
-                    self.status = "MonsterTurn"
-                if self.status == "PlayerAttack":
-                    self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-
-            # TEST AFFICHAGES
-            if event.type == pygame.KEYDOWN:
-                # wich one
-                if event.key == pygame.K_q:
-                    print("Player is hit")
-                    for player in self.currentFloor.playerGroup:
-                        player.healthPoints = player.healthPoints -1
-
-                elif event.key == pygame.K_s:
-                    print("you earn score")
-                    self.score = self.score +3
-
-
-        if self.status == "MonsterTurn":
-            for monster in self.currentFloor.monsterGroup:
-                self.currentFloor.UpdateMonster(monster)
-            self.status = "PlayerTurn"
-
-        return running
-
-
-    #Generate a monster
-    def spawn_monster(self, position: Position, movementPoints:int=0, weapon:Weapon=Weapon([[0]],Position(0,0))):
+    # Generate a monster
+    def spawn_monster(self, position: Position, movementPoints: int = 0,
+                      weapon: Weapon = Weapon([[0]], Position(0, 0))):
         monster = Monster(movementPoints=movementPoints, weapon=weapon)
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
@@ -142,7 +117,7 @@ class Game:
         for monster in self.currentFloor.monsterGroup:
             position = monster.position
             monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
-        for player in self.currentFloor.playerGroup :
+        for player in self.currentFloor.playerGroup:
             position = player.position
             player.rect.x, player.rect.y = self.convert_case_in_px(position)
 
@@ -157,18 +132,18 @@ class Game:
         DEFAULT_IMAGE_SIZE = (larg_case, long_case)
 
         for monster in self.currentFloor.monsterGroup:
-          image = monster.image
-          image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+            image = monster.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
-          monster.image = image
+            monster.image = image
 
-        for player in self.currentFloor.playerGroup :
+        for player in self.currentFloor.playerGroup:
             image = player.image
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
             player.image = image
 
-    def draw_player_infos(self,screen):
+    def draw_player_infos(self, screen):
 
         # show players info
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
@@ -191,10 +166,11 @@ class Game:
         pygame.draw.rect(screen, bar_back_color, bar_back_position)
         pygame.draw.rect(screen, bar_color, bar_position)
 
-    def draw_monster_infos(self,screen):
+    def draw_monster_infos(self, screen):
         # show monster info
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
-        name_currentMonster_text = font_small.render("Name :" + str(self.current_monster.name), 1, (255, 255, 255))  # create texte name
+        name_currentMonster_text = font_small.render("Name :" + str(self.current_monster.name), 1,
+                                                     (255, 255, 255))  # create texte name
         screen.blit(name_currentMonster_text, (650, 420))  # show the name at the tuple position
 
         description_currentMonster_text = font_small.render("Description :" + str(self.current_monster.description), 1,
@@ -215,39 +191,37 @@ class Game:
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
 
-    def draw_floor(self,screen):
-        #draw name of floor
+    def draw_floor(self, screen):
+        # draw name of floor
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
-        name_currentFloor_text = font_small.render( str(self.currentFloor.name), 1,
-                                                     (255, 255, 255))  # create texte name
+        name_currentFloor_text = font_small.render(str(self.currentFloor.name), 1,
+                                                   (255, 255, 255))  # create texte name
         screen.blit(name_currentFloor_text, (60, 32))  # show the name at the tuple position
 
-        #draw the background off the floor
+        # draw the background off the floor
         back_floor = (46, 222, 231)
-        floor_position = [self.top_left_x, self.top_left_y,self.large_max_grille, self.large_max_grille]
+        floor_position = [self.top_left_x, self.top_left_y, self.large_max_grille, self.large_max_grille]
         pygame.draw.rect(screen, back_floor, floor_position)
 
-        #draw all case
+        # draw all case
 
-        x= self.currentFloor.size.width
-        y= self.currentFloor.size.height
+        x = self.currentFloor.size.width
+        y = self.currentFloor.size.height
 
-
-        larg_case = (self.large_max_grille - ((x+1) * self.ecart)) /x
-        long_case = (self.large_max_grille - ((y+1) * self.ecart)) / y
+        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
 
         couleur_case = (76, 150, 255)
 
-        for i in range (0, x) :
-            for j in range (0, y) :
+        for i in range(0, x):
+            for j in range(0, y):
+                top_left_x_case = self.ecart + self.top_left_x + (larg_case * i) + (self.ecart * i)
+                top_left_y_case = self.ecart + self.top_left_y + (long_case * j) + (self.ecart * j)
 
-                top_left_x_case = self.ecart + self.top_left_x + (larg_case * i) +(self.ecart*i)
-                top_left_y_case = self.ecart + self.top_left_y + (long_case * j) +(self.ecart*j)
-
-                position_case =[top_left_x_case,top_left_y_case ,larg_case, long_case]
+                position_case = [top_left_x_case, top_left_y_case, larg_case, long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
-    #convert postion on the screen to position en the map, -10 -10 if out of map
+    # convert postion on the screen to position en the map, -10 -10 if out of map
     def convert_px_in_case(self, px_x, px_y):
 
         x = self.currentFloor.size.width
@@ -256,11 +230,11 @@ class Game:
         larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
         long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
 
-        case_x = int((px_x - self.top_left_x)//(larg_case + self.ecart))
+        case_x = int((px_x - self.top_left_x) // (larg_case + self.ecart))
         case_y = int((px_y - self.top_left_y) // (long_case + self.ecart))
 
         # check if it's out of the map
-        if case_x >= x or case_y >= y or case_x<0 or case_y<0:
+        if case_x >= x or case_y >= y or case_x < 0 or case_y < 0:
             case_x = -10
             case_y = -10
 
@@ -268,17 +242,16 @@ class Game:
 
         return Position(case_x, case_y)
 
-    def convert_case_in_px(self, position:Position):
+    def convert_case_in_px(self, position: Position):
 
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
-
 
         larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
         long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
 
         px_x = position.x * (larg_case + self.ecart) + self.top_left_x
-        px_y  = position.y * (long_case + self.ecart) + self.top_left_y
+        px_y = position.y * (long_case + self.ecart) + self.top_left_y
 
         return px_x, px_y
 
