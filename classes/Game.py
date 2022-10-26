@@ -48,53 +48,10 @@ class Game:
         self.init_sprite_size()
 
     def update(self, screen):
-
         #update affichage
         self.draw_everything(screen)
         button = pygame.draw.rect(screen, (255, 0, 0), (100, 100, 100, 100))
-
-        for event in pygame.event.get():
-            # ferme le jeu quand on le quitte
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                self.convert_px_in_case( pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                if button.rect.collidepoint(pygame.mouse.get_pos()):
-                    print("Mouse clickes on the button")
-            # TEST AFFICHAGES
-            if event.type == pygame.KEYDOWN:
-                # wich one
-                if event.key == pygame.K_q:
-                    print("Player is hit")
-                    for player in self.currentFloor.playerGroup:
-                        player.healthPoints = player.healthPoints -1
-
-
-                elif event.key == pygame.K_s:
-                    print("you earn score")
-                    self.score = self.score +3
-
-
-    def draw_everything(self, screen):
-        # show the score on the screen
-        font = pygame.font.SysFont("monospace", 25, True)  # create the font style
-        score_text = font.render("Score :" + str(self.score), 1, (255, 255, 255))  # create texte
-        screen.blit(score_text, (640, 60))  # show the score at the tuple position
-        # show floor
-        self.draw_floor(screen)
-        # show player info
-        self.draw_player_infos(screen)
-        # show monster info
-        self.draw_monster_infos(screen)
-        # show monstres (maybe better in main)
-        self.currentFloor.monsterGroup.draw(screen)
-        # show the player
-        self.currentFloor.playerGroup.draw(screen)
-
-        self.update_position_sprite()
-
+            
         running = True
 
         for event in pygame.event.get():
@@ -129,6 +86,25 @@ class Game:
             self.status = "PlayerTurn"
 
         return running
+
+
+    def draw_everything(self, screen):
+        # show the score on the screen
+        font = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        score_text = font.render("Score :" + str(self.score), 1, (255, 255, 255))  # create texte
+        screen.blit(score_text, (640, 60))  # show the score at the tuple position
+        # show floor
+        self.draw_floor(screen)
+        # show player info
+        self.draw_player_infos(screen)
+        # show monster info
+        self.draw_monster_infos(screen)
+        # show monstres (maybe better in main)
+        self.currentFloor.monsterGroup.draw(screen)
+        # show the player
+        self.currentFloor.playerGroup.draw(screen)
+
+        self.update_position_sprite()
 
 
     #Generate a monster
