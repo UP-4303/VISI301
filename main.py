@@ -24,22 +24,9 @@ if __name__ == '__main__':
 
     while running:
         screen.blit(background, (0, 0))
-        game.update(screen)
+        running = game.update(screen)
         # update screen
         pygame.display.flip()
-        
-        for event in pygame.event.get():
-            # Quit game
-            if event.type == pygame.QUIT:
-                running = False
-                print("Game has been closed")
-            # detect if player has touched a key on the keyboard
-            elif event.type == pygame.KEYDOWN:
-                # wich one
-                if event.key == pygame.K_q:
-                    print("you touched q")
-                elif event.key == pygame.K_RETURN:
-                    print("you touched return")
     
     pygame.quit()
     sys.exit()

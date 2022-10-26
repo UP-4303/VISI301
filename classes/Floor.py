@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Any, TypedDict
 from math import inf
+from random import randint
 import pygame
 
 from classes.GenericObject import GenericObject
@@ -43,57 +44,88 @@ class Floor():
                 self.playerGroup.add(object_)
             if isinstance(object_, Monster):
                 self.monsterGroup.add(object_)
-
-
             return True
         else:
             return False
     
     def UpdateObject(self, position:Position, newPosition:Position):
         if self.GetObject(newPosition) == None:
-            self.layers["objects"][newPosition.x][newPosition.y] = self.GetObject(position)
-            self.GetObject(newPosition).position = newPosition
-            self.layers["objects"][position.x][newPosition.y] = None
+            object_ = self.GetObject(position)
+            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["objects"][position.x][position.y] = None
             return True
         else:
             return False
     
     def RemoveObject(self, position:Position):
         if self.GetObject(position)!= None:
-            self.objects.remove(self.GetObject(position))
+            object_ = self.GetObject(position)
+            if isinstance(object_, Player):
+                self.playerGroup.remove(object_)
+            if isinstance(object_, Monster):
+                self.monsterGroup.remove(object_)
             self.layers["objects"][position.x][position.y] = None
             return True
         else:
             return False
 
-    def UpdatePlayer(self, player:Player):
-        requestedNewPosition = NotImplemented
-        path = self.Pathfinder(player.position, requestedNewPosition)
-        if path != []:
-            movementPoints = player.movementPoints
-            index = 0
-            currentPosition = path[index]
-            while index < len(path)-1 and movementPoints >= currentPosition["bias"]:
-                movementPoints -= currentPosition["bias"]
-                index += 1
-                currentPosition = path[index]
-            if movementPoints >= currentPosition["bias"]:
-                index += 1
-            self.UpdateObject(player.position, path[index]["position"])
-            player.position = path[index]["position"]
+    def UpdatePlayer(self, player:Player, destination:Position):
+        path = self.Pathfinder(player.position, destination)
+        # print(path, destination)
+        sumCost = 0
+        for currentNode in path:
+            sumCost += currentNode["bias"]
+        if sumCost <= player.movementPoints and sumCost != 0:
+            self.UpdateObject(player.position, path[-1]["position"])
+        else:
+            print("Chemin trop long ou inexistant !")
 
     def UpdateMonster(self, monster:Monster):
-        pass
+        allTargets = []
+        for xBoard in range(self.size.width):
+            for yBoard in range(self.size.height):
+                for xPattern in range(len(monster.weapon.pattern)):
+                    for yPattern in range(len(monster.weapon.pattern[xPattern])):
+                        position = Position(xBoard + xPattern - monster.weapon.center.x, yBoard + yPattern - monster.weapon.center.y)
+                        if position.InBoard(self.size):
+                            if isinstance(self.GetObject(position), Player) and monster.weapon.pattern[xPattern][yPattern] > 0:
+                               allTargets.append(Position(xBoard, yBoard))
+        
+        completePaths = []
+        partialPaths = []
+        for target in allTargets:
+            path = self.Pathfinder(monster.position, target)
+            if path != []:
+                pathLenght = 0
+                for node in path:
+                    pathLenght += node['bias']
+                if pathLenght <= monster.movementPoints:
+                    completePaths.append(path)
+                elif path[0]['bias'] <= monster.movementPoints:
+                        partialPaths.append(path)
+        if completePaths != []:
+            self.UpdateObject(monster.position, completePaths[randint(0,len(completePaths)-1)][-1]["position"])
+        elif partialPaths != []:
+            pathIndex = randint(0,len(partialPaths)-1)
+            positionIndex = 0
+            pathLenght = partialPaths[pathIndex][positionIndex]['bias']
+            while pathLenght + partialPaths[pathIndex][positionIndex+1]['bias'] <= monster.movementPoints:
+                positionIndex += 1
+                pathLenght += partialPaths[pathIndex][positionIndex]['bias']
+            self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
         path:list[PathPoint] = []
-        nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 0, Position(x,y) == actualPosition) for y in range(self.size.height)] for x in range(self.size.width)]
+        nodes:list[list[Node]] = [[Node(x,y,targetPosition, inf if self.GetObject(Position(x,y)) != None else 1, Position(x,y) == actualPosition) for y in range(self.size.height)] for x in range(self.size.width)]
         nodesToExplore = ToExplore()
+
+        # for x in range(self.size.width):
+        #     for y in range(self.size.height):
+        #         print(nodes[x][y].bias)
         
         currentNode = nodes[actualPosition.x][actualPosition.y]
-
-        currentNode.Discover(0, currentNode)
         
         currentNode.Explore()
         if currentNode.x > 0:
@@ -116,10 +148,12 @@ class Floor():
             addingNode.Discover(currentNode.gCost+1, currentNode)
             if not(addingNode.explored and not(addingNode in nodesToExplore)):
                 nodesToExplore.append(addingNode)
-        
+
         while nodesToExplore!= [] and Position(currentNode.x, currentNode.y) != targetPosition :
             currentNode = nodesToExplore.pop(-1)
             currentNode.Explore()
+            # print("current node : ", currentNode, currentNode.bias)
+            # print("To explore :", nodesToExplore)
             if currentNode.gCost != inf:
                 if currentNode.x > 0:
                     addingNode = nodes[currentNode.x-1][currentNode.y]
@@ -146,7 +180,6 @@ class Floor():
             while not(currentNode.start):
                 path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
                 currentNode = currentNode.pointer
-
         return path
 
     def __str__(self):
@@ -188,6 +221,9 @@ class Node(Position):
         self.hCost = abs(targetPosition - self)
         self.bias = bias
         self.start = start
+        if self.start:
+            self.gCost = 0
+            self.explored = True
 
     def Discover(self, gCost:float, pointer:Node):
         if self.explored:
