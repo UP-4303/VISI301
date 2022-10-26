@@ -63,6 +63,7 @@ class Game:
                 self.convert_px_in_case( pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                 if button.rect.collidepoint(pygame.mouse.get_pos()):
                     print("Mouse clickes on the button")
+
             # TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
                 # wich one
