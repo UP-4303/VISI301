@@ -181,6 +181,12 @@ class Floor():
                 path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
                 currentNode = currentNode.pointer
         return path
+    
+    def PathLength(self, path):
+        length = 0
+        for pathPoint in path:
+            lenght += pathPoint['bias']
+        return length
 
     def __str__(self):
         representation = '+'

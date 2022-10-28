@@ -1,5 +1,7 @@
 import sys
 import pygame
+from typing import TypedDict
+
 from classes.Player import Player
 from classes.Monster import Monster
 from classes.Size import Size
@@ -20,6 +22,8 @@ class Game:
     # PlayerMovement : Waiting for player to choose a cell for movement
     # PlayerAttack : Waiting for player to choose a cell for attack
     # MonsterTurn
+
+    lastPath: list[TypedDict('PathPoint', position=Position, bias=float)] = []
 
     def __init__(self):
 
@@ -63,11 +67,10 @@ class Game:
                 if self.status == "PlayerTurn":
                     self.status = "PlayerMovement"
                 if self.status == "PlayerMovement":
-                    self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
-                                                                                        pygame.mouse.get_pos()[1]))
+                    self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
                     self.status = "MonsterTurn"
                 if self.status == "PlayerAttack":
-                    self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    pass
 
             # TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
@@ -85,8 +88,24 @@ class Game:
             for monster in self.currentFloor.monsterGroup:
                 self.currentFloor.UpdateMonster(monster)
             self.status = "PlayerTurn"
+        if self.status == "PlayerMovement":
+            path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
+            if path != self.lastPath:
+                self.lastPath = path
+                pathLength = self.currentFloor.PathLength(path)
+                if pathLength <= self.player.movementPoints:
+                    for pathPoint in path:
+                        # NYI
+                        pathPoint # Color every path point in green
+                else:
+                    for pathPoint in path:
+                        # NYI
+                        pathPoint # Color every path point in red
 
         return running
+
+    def MouseBoardPosition(self):
+        return self.convert_px_in_case(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
 
     def draw_everything(self, screen):
         # show the score on the screen
