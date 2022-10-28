@@ -33,6 +33,10 @@ class Game:
         self.player = Player(movementPoints=3)
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
 
+        # boutons
+        self.button_finir = pygame.Rect(710, 630, 50, 20)
+        self.button_mvt = pygame.Rect(650, 630, 50, 20)
+        self.button_attack = pygame.Rect(770, 630, 50, 20)
         # const needed to draw the map
         self.ecart = 3
         self.top_left_x = 60
@@ -45,13 +49,11 @@ class Game:
         self.current_monster = Monster()
 
         self.status = "MonsterTurn"
-
         self.init_sprite_size()
 
     def update(self, screen):
         # update affichage
         self.draw_everything(screen)
-        button = pygame.draw.rect(screen, (255, 0, 0), (100, 100, 100, 100))
 
         running = True
 
@@ -59,15 +61,28 @@ class Game:
             if event.type == pygame.QUIT:
                 running = False
 
+           # Status (PlayerMovement, PlayerTurn,
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+
                 if self.status == "PlayerTurn":
-                    self.status = "PlayerMovement"
+                    print("C'est au tour du joueur")
+
                 if self.status == "PlayerMovement":
                     self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
                                                                                         pygame.mouse.get_pos()[1]))
-                    self.status = "MonsterTurn"
                 if self.status == "PlayerAttack":
                     self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
+                if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
+                    print("vous avez appuyé sur le bouton mvt")
+                    self.status = "PlayerMovement"
+
+                if self.button_attack.collidepoint(pygame.mouse.get_pos()):
+                    print("vous avez appuyé sur le bouton attack")
+
+                if self.button_finir.collidepoint(pygame.mouse.get_pos()):
+                    print("vous avez appuyé sur le bouton finir tour")
+                    self.status = "MonsterTurn"
 
             # TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
@@ -103,8 +118,13 @@ class Game:
         self.currentFloor.monsterGroup.draw(screen)
         # show the player
         self.currentFloor.playerGroup.draw(screen)
-
+        # update position of every images
         self.update_position_sprite()
+
+        # Draw buttons
+        pygame.draw.rect(screen, (255, 0, 0), self.button_mvt)
+        pygame.draw.rect(screen, (0, 255, 0), self.button_finir)
+        pygame.draw.rect(screen, (0, 0, 255), self.button_attack)
 
     # Generate a monster
     def spawn_monster(self, position: Position, movementPoints: int = 0,
