@@ -49,7 +49,15 @@ if __name__ == '__main__':
             screen.blit(banner, banner_rect)
             screen.blit(play_button, play_button_rect)
 
+        # deal with quitting or beginning the game
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                # check if the mouse collide the button play
+                if play_button_rect.collidepoint(event.pos):
+                    game.isplaying = True
 
         # update screen
         pygame.display.flip()
