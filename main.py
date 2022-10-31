@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     # import welcome background
     banner = pygame.image.load('assets/banner.png')
-    banner = pygame.transform.scale(banner, (500,500))
+    banner = pygame.transform.scale(banner, (700,700))
     banner_rect = banner.get_rect()
     banner_rect.x = (screen.get_width() // 2) - (banner.get_width() //2)
 
