@@ -20,11 +20,37 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     background = pygame.image.load('assets/bg.jpg') #import background
 
+    # import welcome background
+    banner = pygame.image.load('assets/banner.png')
+    banner = pygame.transform.scale(banner, (500,500))
+    banner_rect = banner.get_rect()
+    banner_rect.x = (screen.get_width() // 2) - (banner.get_width() //2)
+
+    # import button to start the game
+    play_button = pygame.image.load('assets/button_play.png')
+    play_button = pygame.transform.scale(play_button, (400,150))
+    play_button_rect = play_button.get_rect()
+    play_button_rect.x = (screen.get_width() // 2) - (play_button.get_width() //2)
+    play_button_rect.y = (screen.get_height()) - (play_button.get_height() +22)
+
     running = True #indicate  if the game is running
 
     while running:
+        #apply the window of the game
         screen.blit(background, (0, 0))
-        running = game.update(screen)
+
+        # check if the game has started
+        if game.isplaying:
+            #launch the game instruction
+            running = game.update(screen)
+        # check if the game has not started yet
+        else:
+            #add the welcoming screen
+            screen.blit(banner, banner_rect)
+            screen.blit(play_button, play_button_rect)
+
+
+
         # update screen
         pygame.display.flip()
     

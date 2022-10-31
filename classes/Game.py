@@ -24,7 +24,7 @@ class Game:
     def __init__(self):
 
         # define is the game has begin
-        self.isplaying = True
+        self.isplaying = False
         self.floorList = [Floor()]
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
