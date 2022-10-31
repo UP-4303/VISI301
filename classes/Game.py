@@ -25,30 +25,39 @@ class Game:
 
         # define is the game has begin
         self.isplaying = False
+
         self.floorList = [Floor()]
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
         self.score = 0
+
         # generate the player
         self.player = Player(movementPoints=3)
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
 
         # boutons
-        self.button_finir = pygame.Rect(710, 630, 50, 20)
-        self.button_mvt = pygame.Rect(650, 630, 50, 20)
-        self.button_attack = pygame.Rect(770, 630, 50, 20)
+        self.button_attack = pygame.Rect(710, 630, 50, 20)
+        self.button_mvt= pygame.Rect(650, 630, 50, 20)
+        self.button_finir = pygame.Rect(770, 630, 50, 20)
+        self.button_armes = pygame.Rect(830, 630, 50, 20)
+
+
+
         # const needed to draw the map
         self.ecart = 3
         self.top_left_x = 60
         self.top_left_y = 110
         self.large_max_grille = 450
 
+        # var to know where we are in the game
+        self.status = "MonsterTurn"
+        self.has_moved = False
+        self.has_attacked = False
+
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5,
                            weapon=Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
         self.current_monster = Monster()
-
-        self.status = "MonsterTurn"
         self.init_sprite_size()
 
     def update(self, screen):
@@ -67,22 +76,55 @@ class Game:
                 if self.status == "PlayerTurn":
                     print("C'est au tour du joueur")
 
-                if self.status == "PlayerMovement":
+                # The player is moving
+                if self.status == "PlayerMovement" :
                     self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
                                                                                         pygame.mouse.get_pos()[1]))
-                if self.status == "PlayerAttack":
+                    self.has_moved = True
+
+                    print("Le joueur a choisit un deplacement")
+
+                    self.status = "PlayerTurn"
+
+                # The player is attacking
+                if self.status == "PlayerAttack" :
                     self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
+                    self.has_attacked = True
+                    print("Le joueur a choisit une attack ")
+
+                    self.status = "PlayerTurn"
+                # Detect if the player push the mouvement button
                 if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
                     print("vous avez appuyé sur le bouton mvt")
-                    self.status = "PlayerMovement"
+                    # check if the player has already moved during this turn
+                    if self.has_moved == False:
+                        self.status = "PlayerMovement"
+                    else:
+                        print("Vous avez deja bougé vous ne pouvez plus")
 
+
+                # Detect if the player push the attack button
                 if self.button_attack.collidepoint(pygame.mouse.get_pos()):
                     print("vous avez appuyé sur le bouton attack")
+                    #check if the player has already attacked during this turn
+                    if self.has_attacked == False :
+                        self.status = "PlayerAttack"
+                    else :
+                        print("Vous avez deja attaquer vous ne pouvez plus")
 
+                # Detect if the player push the end turn button
                 if self.button_finir.collidepoint(pygame.mouse.get_pos()):
                     print("vous avez appuyé sur le bouton finir tour")
+                    #Put the variable back to normal
+                    self.has_moved = False
+                    self.has_attacked = False
+                    #Begin the monster turn
                     self.status = "MonsterTurn"
+
+                #Detect if the player push the weapon choice button
+                if self.button_armes.collidepoint(pygame.mouse.get_pos()):
+                    print("vous choisissez votre arme")
 
             # TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
@@ -122,9 +164,24 @@ class Game:
         self.update_position_sprite()
 
         # Draw buttons
+        font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
+
         pygame.draw.rect(screen, (255, 0, 0), self.button_mvt)
+        txt_button_mvt = font_small.render("mvt", 1, (255, 255, 255))
+        screen.blit(txt_button_mvt, (650, 630))
+
         pygame.draw.rect(screen, (0, 255, 0), self.button_finir)
+        txt_button_finir = font_small.render("end", 1, (255, 255, 255))
+        screen.blit(txt_button_finir, (770, 630))
+
         pygame.draw.rect(screen, (0, 0, 255), self.button_attack)
+        txt_button_attack = font_small.render("fight", 1, (255, 255, 255))
+        screen.blit(txt_button_attack, (710, 630))
+
+        pygame.draw.rect(screen, (0, 124, 124), self.button_armes)
+        txt_button_armes = font_small.render("bag", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (830, 630))
+
 
     # Generate a monster
     def spawn_monster(self, position: Position, movementPoints: int = 0,
@@ -211,6 +268,7 @@ class Game:
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
 
+    #draw the floor
     def draw_floor(self, screen):
         # draw name of floor
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
@@ -241,7 +299,7 @@ class Game:
                 position_case = [top_left_x_case, top_left_y_case, larg_case, long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
-    # convert postion on the screen to position en the map, -10 -10 if out of map
+    # convert position on the screen to position en the map, -10 -10 if out of map
     def convert_px_in_case(self, px_x, px_y):
 
         x = self.currentFloor.size.width
@@ -262,6 +320,7 @@ class Game:
 
         return Position(case_x, case_y)
 
+    # convert case of the floor to position on the screen in px
     def convert_case_in_px(self, position: Position):
 
         x = self.currentFloor.size.width
