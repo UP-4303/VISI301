@@ -127,7 +127,7 @@ class Game:
                 if self.button_armes.collidepoint(pygame.mouse.get_pos()):
                     print("vous choisissez votre arme")
 
-            # TEST AFFICHAGES
+            ### TEST AFFICHAGES
             if event.type == pygame.KEYDOWN:
                 # wich one
                 if event.key == pygame.K_q:
@@ -138,7 +138,7 @@ class Game:
                 elif event.key == pygame.K_s:
                     print("you earn score")
                     self.score = self.score + 3
-
+            ### FIN TEST AFFICHAGE
         if self.status == "MonsterTurn":
             for monster in self.currentFloor.monsterGroup:
                 self.currentFloor.UpdateMonster(monster)
@@ -152,6 +152,11 @@ class Game:
         font = pygame.font.SysFont("monospace", 25, True)  # create the font style
         score_text = font.render("Score :" + str(self.score), 1, (255, 255, 255))  # create texte
         screen.blit(score_text, (640, 60))  # show the score at the tuple position
+
+        # show the number of the turn
+        turn_text = font.render("Turn :" + str(self.turn), 1, (255, 255, 255))  # create texte
+        screen.blit(turn_text, (640, 100))  # show the turn at the tuple position
+
         # show floor
         self.draw_floor(screen)
 
@@ -254,7 +259,6 @@ class Game:
         pygame.draw.rect(screen, (0, 124, 124), self.button_armes)
         txt_button_armes = font_small.render("bag", 1, (255, 255, 255))
         screen.blit(txt_button_armes, (830, 630))
-
 
    #draw monster info
     def draw_monster_infos(self, screen):
