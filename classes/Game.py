@@ -23,8 +23,6 @@ class Game:
     # PlayerAttack : Waiting for player to choose a cell for attack
     # MonsterTurn
 
-    lastPath: list[TypedDict('PathPoint', position=Position, bias=float)] = []
-
     def __init__(self):
 
         # define is the game has begin
@@ -97,10 +95,6 @@ class Game:
                         # Put the variable back to normal
                         self.bagisopen = False
 
-
-
-
-
             else :
                # Deal with click if we are in the game pannel
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
@@ -110,8 +104,7 @@ class Game:
 
                     # The player is moving
                     if self.status == "PlayerMovement" :
-                        self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
-                                                                                            pygame.mouse.get_pos()[1]))
+                        self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
                         self.has_moved = True
 
                         print("Le joueur a choisit un deplacement")
@@ -120,7 +113,7 @@ class Game:
 
                     # The player is attacking
                     if self.status == "PlayerAttack" :
-                        self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                        self.MouseBoardPosition()
 
                         self.has_attacked = True
                         print("Le joueur a choisit une attack ")
@@ -169,9 +162,9 @@ class Game:
                         for player in self.currentFloor.playerGroup:
                             player.healthPoints = player.healthPoints - 1
 
-                elif event.key == pygame.K_s:
-                    print("you earn score")
-                    self.score = self.score + 3
+                    elif event.key == pygame.K_s:
+                        print("you earn score")
+                        self.score = self.score + 3
 
         if self.status == "MonsterTurn":
             for monster in self.currentFloor.monsterGroup:
@@ -179,17 +172,18 @@ class Game:
             self.status = "PlayerTurn"
         if self.status == "PlayerMovement":
             path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
-            if path != self.lastPath:
-                self.lastPath = path
-                pathLength = self.currentFloor.PathLength(path)
-                if pathLength <= self.player.movementPoints:
-                    for pathPoint in path:
-                        # NYI
-                        pathPoint # Color every path point in green
-                else:
-                    for pathPoint in path:
-                        # NYI
-                        pathPoint # Color every path point in red
+            pathLength = self.currentFloor.PathLength(path)
+            if pathLength <= self.player.movementPoints:
+                color = (0,255,0)
+            else:
+                color = (255,0,0)
+            x = self.currentFloor.size.width
+            y = self.currentFloor.size.height
+            larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+            long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+            for pathPoint in path:
+                pathPointRect = pygame.Rect(self.top_left_x+(pathPoint['position'].x*(self.ecart+long_case+1)), self.top_left_y+(pathPoint['position'].y*(self.ecart+larg_case+1)), long_case, larg_case)
+                pygame.draw.rect(screen, color, pathPointRect)
 
         return running
 

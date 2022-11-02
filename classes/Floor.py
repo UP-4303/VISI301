@@ -186,7 +186,7 @@ class Floor():
     def PathLength(self, path):
         length = 0
         for pathPoint in path:
-            lenght += pathPoint['bias']
+            length += pathPoint['bias']
         return length
 
     def __str__(self):
