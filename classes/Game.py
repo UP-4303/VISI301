@@ -41,8 +41,6 @@ class Game:
         self.button_finir = pygame.Rect(770, 630, 50, 20)
         self.button_armes = pygame.Rect(830, 630, 50, 20)
 
-
-
         # const needed to draw the map
         self.ecart = 3
         self.top_left_x = 60
@@ -50,6 +48,7 @@ class Game:
         self.large_max_grille = 450
 
         # var to know where we are in the game
+        self.turn = 0
         self.status = "MonsterTurn"
         self.has_moved = False
         self.has_attacked = False
@@ -121,6 +120,8 @@ class Game:
                     self.has_attacked = False
                     #Begin the monster turn
                     self.status = "MonsterTurn"
+                    #increase the turn count
+                    self.turn = self.turn + 1
 
                 #Detect if the player push the weapon choice button
                 if self.button_armes.collidepoint(pygame.mouse.get_pos()):
@@ -145,6 +146,7 @@ class Game:
 
         return running
 
+    #draws everything on the screen by calling specific function
     def draw_everything(self, screen):
         # show the score on the screen
         font = pygame.font.SysFont("monospace", 25, True)  # create the font style
@@ -152,35 +154,24 @@ class Game:
         screen.blit(score_text, (640, 60))  # show the score at the tuple position
         # show floor
         self.draw_floor(screen)
+
         # show player info
         self.draw_player_infos(screen)
+
         # show monster info
         self.draw_monster_infos(screen)
+
         # show monstres (maybe better in main)
         self.currentFloor.monsterGroup.draw(screen)
+
         # show the player
         self.currentFloor.playerGroup.draw(screen)
+
         # update position of every images
         self.update_position_sprite()
 
         # Draw buttons
-        font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
-
-        pygame.draw.rect(screen, (255, 0, 0), self.button_mvt)
-        txt_button_mvt = font_small.render("mvt", 1, (255, 255, 255))
-        screen.blit(txt_button_mvt, (650, 630))
-
-        pygame.draw.rect(screen, (0, 255, 0), self.button_finir)
-        txt_button_finir = font_small.render("end", 1, (255, 255, 255))
-        screen.blit(txt_button_finir, (770, 630))
-
-        pygame.draw.rect(screen, (0, 0, 255), self.button_attack)
-        txt_button_attack = font_small.render("fight", 1, (255, 255, 255))
-        screen.blit(txt_button_attack, (710, 630))
-
-        pygame.draw.rect(screen, (0, 124, 124), self.button_armes)
-        txt_button_armes = font_small.render("bag", 1, (255, 255, 255))
-        screen.blit(txt_button_armes, (830, 630))
+        self.draw_buttons(screen)
 
 
     # Generate a monster
@@ -220,6 +211,7 @@ class Game:
 
             player.image = image
 
+    #draw players infos in the up case
     def draw_player_infos(self, screen):
 
         # show players info
@@ -243,6 +235,28 @@ class Game:
         pygame.draw.rect(screen, bar_back_color, bar_back_position)
         pygame.draw.rect(screen, bar_color, bar_position)
 
+    #draw buttons on the right down
+    def draw_buttons(self, screen):
+        font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
+
+        pygame.draw.rect(screen, (255, 0, 0), self.button_mvt)
+        txt_button_mvt = font_small.render("mvt", 1, (255, 255, 255))
+        screen.blit(txt_button_mvt, (650, 630))
+
+        pygame.draw.rect(screen, (0, 255, 0), self.button_finir)
+        txt_button_finir = font_small.render("end", 1, (255, 255, 255))
+        screen.blit(txt_button_finir, (770, 630))
+
+        pygame.draw.rect(screen, (0, 0, 255), self.button_attack)
+        txt_button_attack = font_small.render("fight", 1, (255, 255, 255))
+        screen.blit(txt_button_attack, (710, 630))
+
+        pygame.draw.rect(screen, (0, 124, 124), self.button_armes)
+        txt_button_armes = font_small.render("bag", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (830, 630))
+
+
+   #draw monster info
     def draw_monster_infos(self, screen):
         # show monster info
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
