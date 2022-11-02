@@ -40,6 +40,7 @@ class Game:
         self.button_mvt= pygame.Rect(650, 630, 50, 20)
         self.button_finir = pygame.Rect(770, 630, 50, 20)
         self.button_armes = pygame.Rect(830, 630, 50, 20)
+        self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
 
         # const needed to draw the map
         self.ecart = 3
@@ -53,96 +54,125 @@ class Game:
         self.has_moved = False
         self.has_attacked = False
 
+        self.bagisopen = False
+        self.bag = []
+
+
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5,
                            weapon=Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
         self.current_monster = Monster()
         self.init_sprite_size()
 
+
+        self.weaponGroup = pygame.sprite.Group()
+        #self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1))
+        #self.weaponGroup.add(Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
+
     def update(self, screen):
         # update affichage
         self.draw_everything(screen)
-
         running = True
+        if self.bagisopen:
+            self.draw_bag(screen)
 
+
+        # deal with quit
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-           # Status (PlayerMovement, PlayerTurn,
-            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+            if self.bagisopen :
+                # Deal with click if we are in the bag
+                if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                    print("you clicked in the bag")
 
-                if self.status == "PlayerTurn":
-                    print("C'est au tour du joueur")
-
-                # The player is moving
-                if self.status == "PlayerMovement" :
-                    self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
-                                                                                        pygame.mouse.get_pos()[1]))
-                    self.has_moved = True
-
-                    print("Le joueur a choisit un deplacement")
-
-                    self.status = "PlayerTurn"
-
-                # The player is attacking
-                if self.status == "PlayerAttack" :
-                    self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-
-                    self.has_attacked = True
-                    print("Le joueur a choisit une attack ")
-
-                    self.status = "PlayerTurn"
-                # Detect if the player push the mouvement button
-                if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton mvt")
-                    # check if the player has already moved during this turn
-                    if self.has_moved == False:
-                        self.status = "PlayerMovement"
-                    else:
-                        print("Vous avez deja bougé vous ne pouvez plus")
+                    # Detect if the player push the end turn button
+                    if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
+                        print("vous avez appuyé sur le bouton quitter le sac")
+                        # Put the variable back to normal
+                        self.bagisopen = False
 
 
-                # Detect if the player push the attack button
-                if self.button_attack.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton attack")
-                    #check if the player has already attacked during this turn
-                    if self.has_attacked == False :
-                        self.status = "PlayerAttack"
-                    else :
-                        print("Vous avez deja attaquer vous ne pouvez plus")
 
-                # Detect if the player push the end turn button
-                if self.button_finir.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton finir tour")
-                    #Put the variable back to normal
-                    self.has_moved = False
-                    self.has_attacked = False
-                    #Begin the monster turn
-                    self.status = "MonsterTurn"
-                    #increase the turn count
-                    self.turn = self.turn + 1
 
-                #Detect if the player push the weapon choice button
-                if self.button_armes.collidepoint(pygame.mouse.get_pos()):
-                    print("vous choisissez votre arme")
 
-            ### TEST AFFICHAGES
-            if event.type == pygame.KEYDOWN:
-                # wich one
-                if event.key == pygame.K_q:
-                    print("Player is hit")
-                    for player in self.currentFloor.playerGroup:
-                        player.healthPoints = player.healthPoints - 1
+            else :
+               # Deal with click if we are in the game pannel
+                if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 
-                elif event.key == pygame.K_s:
-                    print("you earn score")
-                    self.score = self.score + 3
-            ### FIN TEST AFFICHAGE
-        if self.status == "MonsterTurn":
-            for monster in self.currentFloor.monsterGroup:
-                self.currentFloor.UpdateMonster(monster)
-            self.status = "PlayerTurn"
+                    if self.status == "PlayerTurn":
+                        print("C'est au tour du joueur")
+
+                    # The player is moving
+                    if self.status == "PlayerMovement" :
+                        self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
+                                                                                            pygame.mouse.get_pos()[1]))
+                        self.has_moved = True
+
+                        print("Le joueur a choisit un deplacement")
+
+                        self.status = "PlayerTurn"
+
+                    # The player is attacking
+                    if self.status == "PlayerAttack" :
+                        self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
+                        self.has_attacked = True
+                        print("Le joueur a choisit une attack ")
+
+                        self.status = "PlayerTurn"
+                    # Detect if the player push the mouvement button
+                    if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
+                        print("vous avez appuyé sur le bouton mvt")
+                        # check if the player has already moved during this turn
+                        if self.has_moved == False:
+                            self.status = "PlayerMovement"
+                        else:
+                            print("Vous avez deja bougé vous ne pouvez plus")
+
+
+                    # Detect if the player push the attack button
+                    if self.button_attack.collidepoint(pygame.mouse.get_pos()):
+                        print("vous avez appuyé sur le bouton attack")
+                        #check if the player has already attacked during this turn
+                        if self.has_attacked == False :
+                            self.status = "PlayerAttack"
+                        else :
+                            print("Vous avez deja attaquer vous ne pouvez plus")
+
+                    # Detect if the player push the end turn button
+                    if self.button_finir.collidepoint(pygame.mouse.get_pos()):
+                        print("vous avez appuyé sur le bouton finir tour")
+                        #Put the variable back to normal
+                        self.has_moved = False
+                        self.has_attacked = False
+                        #Begin the monster turn
+                        self.status = "MonsterTurn"
+                        #increase the turn count
+                        self.turn = self.turn + 1
+
+                    #Detect if the player push the weapon choice button
+                    if self.button_armes.collidepoint(pygame.mouse.get_pos()):
+                        print("vous choisissez votre arme")
+                        self.bagisopen = True
+
+                ### TEST AFFICHAGES
+                if event.type == pygame.KEYDOWN:
+                    # wich one
+                    if event.key == pygame.K_q:
+                        print("Player is hit")
+                        for player in self.currentFloor.playerGroup:
+                            player.healthPoints = player.healthPoints - 1
+
+                    elif event.key == pygame.K_s:
+                        print("you earn score")
+                        self.score = self.score + 3
+                ### FIN TEST AFFICHAGE
+            if self.status == "MonsterTurn":
+                for monster in self.currentFloor.monsterGroup:
+                    self.currentFloor.UpdateMonster(monster)
+                self.status = "PlayerTurn"
 
         return running
 
@@ -316,6 +346,19 @@ class Game:
 
                 position_case = [top_left_x_case, top_left_y_case, larg_case, long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
+
+    #draw bag when is open
+    def draw_bag(self, screen):
+        bag_background = pygame.image.load('assets/inventaire.png')  # import background
+        screen.blit(bag_background, (0, 0))
+
+        font_small = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        pygame.draw.rect(screen, (0, 124, 124), self.quit_bag_button)
+        txt_button_quit = font_small.render("Quit", 1, (255, 255, 255))
+        screen.blit(txt_button_quit, (500, 500))
+
+        for arme in self.weaponGroup :
+            pygame.draw(arme)
 
     # convert position on the screen to position en the map, -10 -10 if out of map
     def convert_px_in_case(self, px_x, px_y):
