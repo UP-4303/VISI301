@@ -28,7 +28,8 @@ class Floor():
 
         self.playerGroup = pygame.sprite.Group()
         self.monsterGroup = pygame.sprite.Group()
-    
+
+
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
 
