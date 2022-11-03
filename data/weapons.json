@@ -1,0 +1,31 @@
+{
+    "TEST WEAPON":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":true
+        },
+        "pattern":{
+            "damages":[
+                [0,1,0],
+                [1,1,1],
+                [0,1,0]
+            ],
+            "center":[1,1],
+            "disance":Infinity,
+            "directionCardinal":true,
+            "directionDiagonal":false,
+            "overObstacles":false,
+            "pushSelfForward":1,
+            "push":[
+                [0,1,0],
+                [1,1,1],
+                [0,1,0]
+            ]
+        }
+    }
+}

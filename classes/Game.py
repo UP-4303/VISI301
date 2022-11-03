@@ -1,6 +1,7 @@
 import sys
 import pygame
 from typing import TypedDict
+import json
 
 from classes.Player import Player
 from classes.Monster import Monster
@@ -24,6 +25,13 @@ class Game:
     # MonsterTurn
 
     def __init__(self):
+        with open('data/weapons.json','r', encoding='utf-8') as dataFile:
+            data = dataFile.read()
+            weaponsJson = json.loads(data)
+
+        weapons = {}
+        for weaponName,weaponValue in weaponsJson.items():
+            weapons[weaponName] = Weapon(weaponName, '/assets/weapon1.png', pattern=weaponValue['pattern'], onPick=weaponValue['onPick'], onDrop=weaponValue['onDrop'], onAttack=weaponValue['onAttack'])
 
         # define is the game has begin
         self.isplaying = False
@@ -34,7 +42,7 @@ class Game:
         self.score = 0
 
         # generate the player
-        self.player = Player(movementPoints=3)
+        self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
 
         # boutons
@@ -61,8 +69,7 @@ class Game:
 
 
         # TEST A ENLEVER
-        self.spawn_monster(position=Position(4, 4), movementPoints=5,
-                           weapon=Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
+        self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
         self.current_monster = Monster()
         self.init_sprite_size()
 
