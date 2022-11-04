@@ -31,7 +31,8 @@ class Game:
 
         weapons = {}
         for weaponName,weaponValue in weaponsJson.items():
-            weapons[weaponName] = Weapon(weaponName, '/assets/weapon1.png', pattern=weaponValue['pattern'], onPick=weaponValue['onPick'], onDrop=weaponValue['onDrop'], onAttack=weaponValue['onAttack'])
+            weapons[weaponName] = Weapon(weaponName, '/assets/weapon1.png', **weaponValue)
+        print(weapons)
 
         # define is the game has begin
         self.isplaying = False
