@@ -1,11 +1,13 @@
 import sys
 import pygame
+import numpy as np
 from classes.Player import Player
 from classes.Monster import Monster
 from classes.Size import Size
 from classes.Floor import Floor
 from classes.Position import Position
 from classes.Weapon import Weapon
+
 
 
 class Game:
@@ -65,9 +67,12 @@ class Game:
         self.init_sprite_size()
 
 
-        self.weaponGroup = pygame.sprite.Group()
-        #self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1))
-        #self.weaponGroup.add(Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
+        self.weaponTab = []
+
+        self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1), "./assets/weapon1.png")
+
+        self.weaponTab.append(self.myweapon)
+
 
     def update(self, screen):
         # update affichage
