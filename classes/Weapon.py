@@ -11,11 +11,12 @@ class Weapon(pygame.sprite.Sprite):
     onAttack:dict[str,Any]
     imageLink: str
 
-    def __init__(self, name:str='Weapon', imageLink:str='/assets/weapon1.png', **kwargs):
+    def __init__(self, name:str='Weapon', imageLink:str='./assets/weapon1.png', **kwargs):
         #kwargs is zero, one or infinity of parameters
 
         self.name = name
         self.imageLink = imageLink
+        self.button = pygame.Rect(0,0,0,0)
 
         for key,value in kwargs.items():
             setattr(self,key,value)
@@ -44,6 +45,7 @@ class Weapon(pygame.sprite.Sprite):
 
     def __repr__(self):
         representation:str = ""
+
         for key,value in self.__dict__.items():
             representation += f'{key}:{value} | '
         return representation

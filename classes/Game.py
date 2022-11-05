@@ -27,13 +27,15 @@ class Game:
     # MonsterTurn
 
     def __init__(self):
+
+
         with open('data/weapons.json','r', encoding='utf-8') as dataFile:
             data = dataFile.read()
             weaponsJson = json.loads(data)
 
         weapons = {}
         for weaponName,weaponValue in weaponsJson.items():
-            weapons[weaponName] = Weapon(weaponName, '/assets/weapon1.png', **weaponValue)
+            weapons[weaponName] = Weapon(weaponName, './assets/weapon1.png', **weaponValue)
         print(weapons)
 
         # define is the game has begin
@@ -47,7 +49,7 @@ class Game:
         # generate the player
         self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
-
+        self.currentweapon = self.player.weapon
         # boutons
         self.button_attack = pygame.Rect(710, 630, 50, 20)
         self.button_mvt= pygame.Rect(650, 630, 50, 20)
@@ -80,11 +82,9 @@ class Game:
         self.init_sprite_size()
 
 
-        #self.weaponTab = []
 
-        #self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1), "./assets/weapon1.png")
+        self.weaponTab = weapons
 
-        #self.weaponTab.append(self.myweapon)
 
 
     def update(self, screen):
@@ -103,6 +103,13 @@ class Game:
                 # Deal with click if we are in the bag
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                     print("you clicked in the bag")
+
+                    for arme in self.weaponTab :
+                       if self.weaponTab[arme].button.collidepoint(pygame.mouse.get_pos()):
+                           print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
+                           self.currentweapon = self.weaponTab[arme]
+
+
 
                     # Detect if the player push the end turn button
                     if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
@@ -202,24 +209,7 @@ class Game:
                 pathPointRect = pygame.Rect(self.top_left_x+(pathPoint['position'].x*(self.ecart+long_case+1)), self.top_left_y+(pathPoint['position'].y*(self.ecart+larg_case+1)), long_case, larg_case)
                 pygame.draw.rect(screen, color, pathPointRect)
 
-            # pre shot the attack
-            if self.status == "PlayerAttack":
-                path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
-                pathLength = self.currentFloor.PathLength(path)
-                if pathLength <= self.player.movementPoints:
-                    color = (0, 255, 0)
-                else:
-                    color = (255, 0, 0)
-                x = self.currentFloor.size.width
-                y = self.currentFloor.size.height
-                larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-                long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-                for pathPoint in path:
-                    pathPointRect = pygame.Rect(
-                        self.top_left_x + (pathPoint['position'].x * (self.ecart + long_case + 1)),
-                        self.top_left_y + (pathPoint['position'].y * (self.ecart + larg_case + 1)), long_case,
-                        larg_case)
-                    pygame.draw.rect(screen, color, pathPointRect)
+
         return running
 
     # return the case where the mouse is
@@ -258,6 +248,10 @@ class Game:
         # Draw buttons
         self.draw_buttons(screen)
 
+        #draw the current weapon infos
+        self.draw_weapon_info(screen)
+
+        # draw the life bars next to the monstrers
         self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
 
 
@@ -362,6 +356,24 @@ class Game:
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
 
+    def draw_weapon_info(self,screen):
+        font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
+        name_currentMonster_text = font_small.render("Name :" + str(self.currentweapon.name), 1,
+                                                     (255, 255, 255))  # create texte name
+        screen.blit(name_currentMonster_text, (705, 250))  # show the name at the tuple position
+
+        # draw image
+        taille = 50
+        DEFAULT_IMAGE_SIZE = (taille, taille)
+        back_color = (253, 250, 217)
+        x = 650
+        y = 250
+        back_square_pos = [x, y, taille, taille]  # x, y, w, h
+        pygame.draw.rect(screen, back_color, back_square_pos)
+        image_arme = pygame.image.load(self.currentweapon.imageLink)  # import image
+        image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+        screen.blit(image_arme, (x, y))
+
     #draw the floor
     def draw_floor(self, screen):
         # draw name of floor
@@ -391,14 +403,51 @@ class Game:
 
     #draw bag when is open
     def draw_bag(self, screen):
+
+
+        font_small = pygame.font.SysFont("monospace", 25, True)  # create the font style
+
+        #Draw the background of the bag
         bag_background = pygame.image.load('assets/inventaire.png')  # import background
         screen.blit(bag_background, (0, 0))
 
-        font_small = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        #draw the quit button
         pygame.draw.rect(screen, (0, 124, 124), self.quit_bag_button)
         txt_button_quit = font_small.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
+        # draw the weapons
+        taille = 90
+        DEFAULT_IMAGE_SIZE = (taille, taille)
+        back_color = (253, 250, 217)
+        x_start = 170
+        y_start = 170
+        ecart = 40
+        compte_arme = 0
+        x = x_start
+        y = y_start
+
+        for arme in self.weaponTab :
+            if (compte_arme % 6) == 0 :
+                if not (compte_arme == 0):
+                    x = x_start
+                    y = y + ecart + taille
+
+            else :
+
+                x = x + ecart + taille
+
+            back_square_pos = [x, y, taille, taille]  # x, y, w, h
+            pygame.draw.rect(screen, back_color, back_square_pos)
+
+            image_arme = pygame.image.load(self.weaponTab[arme].imageLink)  # import image
+            image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+            screen.blit(image_arme, (x, y))
+
+
+            self.weaponTab[arme].button = pygame.Rect(x, y, taille, taille)
+
+            compte_arme = compte_arme + 1
 
 
     # convert position on the screen to position en the map, -10 -10 if out of map
