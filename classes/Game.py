@@ -1,6 +1,6 @@
 import sys
 import pygame
-import numpy as np
+
 from typing import TypedDict
 import json
 
@@ -61,6 +61,9 @@ class Game:
         self.top_left_y = 110
         self.large_max_grille = 450
 
+        self.larg_case = (self.large_max_grille - ((self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
+        self.long_case = (self.large_max_grille - ((self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
+
         # var to know where we are in the game
         self.turn = 0
         self.status = "MonsterTurn"
@@ -77,11 +80,11 @@ class Game:
         self.init_sprite_size()
 
 
-        self.weaponTab = []
+        #self.weaponTab = []
 
-        self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1), "./assets/weapon1.png")
+        #self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1), "./assets/weapon1.png")
 
-        self.weaponTab.append(self.myweapon)
+        #self.weaponTab.append(self.myweapon)
 
 
     def update(self, screen):
@@ -90,7 +93,6 @@ class Game:
         running = True
         if self.bagisopen:
             self.draw_bag(screen)
-
 
         # deal with quit
         for event in pygame.event.get():
@@ -183,6 +185,8 @@ class Game:
             for monster in self.currentFloor.monsterGroup:
                 self.currentFloor.UpdateMonster(monster)
             self.status = "PlayerTurn"
+
+        #pre shot the movement
         if self.status == "PlayerMovement":
             path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
             pathLength = self.currentFloor.PathLength(path)
@@ -198,11 +202,31 @@ class Game:
                 pathPointRect = pygame.Rect(self.top_left_x+(pathPoint['position'].x*(self.ecart+long_case+1)), self.top_left_y+(pathPoint['position'].y*(self.ecart+larg_case+1)), long_case, larg_case)
                 pygame.draw.rect(screen, color, pathPointRect)
 
+            # pre shot the attack
+            if self.status == "PlayerAttack":
+                path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
+                pathLength = self.currentFloor.PathLength(path)
+                if pathLength <= self.player.movementPoints:
+                    color = (0, 255, 0)
+                else:
+                    color = (255, 0, 0)
+                x = self.currentFloor.size.width
+                y = self.currentFloor.size.height
+                larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+                long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+                for pathPoint in path:
+                    pathPointRect = pygame.Rect(
+                        self.top_left_x + (pathPoint['position'].x * (self.ecart + long_case + 1)),
+                        self.top_left_y + (pathPoint['position'].y * (self.ecart + larg_case + 1)), long_case,
+                        larg_case)
+                    pygame.draw.rect(screen, color, pathPointRect)
         return running
 
+    # return the case where the mouse is
     def MouseBoardPosition(self):
         return self.convert_px_in_case(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
 
+    #draw all basics elements
     def draw_everything(self, screen):
         # show the score on the screen
         font = pygame.font.SysFont("monospace", 25, True)  # create the font style
@@ -234,6 +258,8 @@ class Game:
         # Draw buttons
         self.draw_buttons(screen)
 
+        self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
+
 
     # Generate a monster
     def spawn_monster(self, position: Position, movementPoints: int = 0,
@@ -252,13 +278,7 @@ class Game:
 
     def init_sprite_size(self):
 
-        x = self.currentFloor.size.width
-        y = self.currentFloor.size.height
-
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-
-        DEFAULT_IMAGE_SIZE = (larg_case, long_case)
+        DEFAULT_IMAGE_SIZE = (self.larg_case, self.long_case)
 
         for monster in self.currentFloor.monsterGroup:
             image = monster.image
@@ -356,21 +376,17 @@ class Game:
         pygame.draw.rect(screen, back_floor, floor_position)
 
         # draw all case
-
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
-
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
 
         couleur_case = (76, 150, 255)
 
         for i in range(0, x):
             for j in range(0, y):
-                top_left_x_case = self.ecart + self.top_left_x + (larg_case * i) + (self.ecart * i)
-                top_left_y_case = self.ecart + self.top_left_y + (long_case * j) + (self.ecart * j)
+                top_left_x_case = self.ecart + self.top_left_x + (self.larg_case * i) + (self.ecart * i)
+                top_left_y_case = self.ecart + self.top_left_y + (self.long_case * j) + (self.ecart * j)
 
-                position_case = [top_left_x_case, top_left_y_case, larg_case, long_case]
+                position_case = [top_left_x_case, top_left_y_case, self.larg_case, self.long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
     #draw bag when is open
@@ -383,8 +399,7 @@ class Game:
         txt_button_quit = font_small.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
-        for arme in self.weaponGroup :
-            pygame.draw(arme)
+
 
     # convert position on the screen to position en the map, -10 -10 if out of map
     def convert_px_in_case(self, px_x, px_y):
@@ -392,11 +407,8 @@ class Game:
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
 
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-
-        case_x = int((px_x - self.top_left_x) // (larg_case + self.ecart))
-        case_y = int((px_y - self.top_left_y) // (long_case + self.ecart))
+        case_x = int((px_x - self.top_left_x) // (self.larg_case + self.ecart))
+        case_y = int((px_y - self.top_left_y) // (self.long_case + self.ecart))
 
         # check if it's out of the map
         if case_x >= x or case_y >= y or case_x < 0 or case_y < 0:
@@ -413,11 +425,8 @@ class Game:
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
 
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-
-        px_x = position.x * (larg_case + self.ecart) + self.top_left_x
-        px_y = position.y * (long_case + self.ecart) + self.top_left_y
+        px_x = position.x * (self.larg_case + self.ecart) + self.top_left_x
+        px_y = position.y * (self.long_case + self.ecart) + self.top_left_y
 
         return px_x, px_y
 

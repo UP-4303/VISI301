@@ -12,6 +12,8 @@ class Weapon(pygame.sprite.Sprite):
     imageLink: str
 
     def __init__(self, name:str='Weapon', imageLink:str='/assets/weapon1.png', **kwargs):
+        #kwargs is zero, one or infinity of parameters
+
         self.name = name
         self.imageLink = imageLink
 
