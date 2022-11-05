@@ -1,6 +1,9 @@
 import sys
 import pygame
 import numpy as np
+from typing import TypedDict
+import json
+
 from classes.Player import Player
 from classes.Monster import Monster
 from classes.Size import Size
@@ -24,6 +27,14 @@ class Game:
     # MonsterTurn
 
     def __init__(self):
+        with open('data/weapons.json','r', encoding='utf-8') as dataFile:
+            data = dataFile.read()
+            weaponsJson = json.loads(data)
+
+        weapons = {}
+        for weaponName,weaponValue in weaponsJson.items():
+            weapons[weaponName] = Weapon(weaponName, '/assets/weapon1.png', **weaponValue)
+        print(weapons)
 
         # define is the game has begin
         self.isplaying = False
@@ -34,7 +45,7 @@ class Game:
         self.score = 0
 
         # generate the player
-        self.player = Player(movementPoints=3)
+        self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
 
         # boutons
@@ -61,8 +72,7 @@ class Game:
 
 
         # TEST A ENLEVER
-        self.spawn_monster(position=Position(4, 4), movementPoints=5,
-                           weapon=Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
+        self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
         self.current_monster = Monster()
         self.init_sprite_size()
 
@@ -98,10 +108,6 @@ class Game:
                         # Put the variable back to normal
                         self.bagisopen = False
 
-
-
-
-
             else :
                # Deal with click if we are in the game pannel
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
@@ -111,8 +117,7 @@ class Game:
 
                     # The player is moving
                     if self.status == "PlayerMovement" :
-                        self.currentFloor.UpdatePlayer(self.player, self.convert_px_in_case(pygame.mouse.get_pos()[0],
-                                                                                            pygame.mouse.get_pos()[1]))
+                        self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
                         self.has_moved = True
 
                         print("Le joueur a choisit un deplacement")
@@ -121,7 +126,7 @@ class Game:
 
                     # The player is attacking
                     if self.status == "PlayerAttack" :
-                        self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                        self.MouseBoardPosition()
 
                         self.has_attacked = True
                         print("Le joueur a choisit une attack ")
@@ -173,15 +178,31 @@ class Game:
                     elif event.key == pygame.K_s:
                         print("you earn score")
                         self.score = self.score + 3
-                ### FIN TEST AFFICHAGE
-            if self.status == "MonsterTurn":
-                for monster in self.currentFloor.monsterGroup:
-                    self.currentFloor.UpdateMonster(monster)
-                self.status = "PlayerTurn"
+
+        if self.status == "MonsterTurn":
+            for monster in self.currentFloor.monsterGroup:
+                self.currentFloor.UpdateMonster(monster)
+            self.status = "PlayerTurn"
+        if self.status == "PlayerMovement":
+            path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
+            pathLength = self.currentFloor.PathLength(path)
+            if pathLength <= self.player.movementPoints:
+                color = (0,255,0)
+            else:
+                color = (255,0,0)
+            x = self.currentFloor.size.width
+            y = self.currentFloor.size.height
+            larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+            long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+            for pathPoint in path:
+                pathPointRect = pygame.Rect(self.top_left_x+(pathPoint['position'].x*(self.ecart+long_case+1)), self.top_left_y+(pathPoint['position'].y*(self.ecart+larg_case+1)), long_case, larg_case)
+                pygame.draw.rect(screen, color, pathPointRect)
 
         return running
 
-    #draws everything on the screen by calling specific function
+    def MouseBoardPosition(self):
+        return self.convert_px_in_case(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
+
     def draw_everything(self, screen):
         # show the score on the screen
         font = pygame.font.SysFont("monospace", 25, True)  # create the font style
