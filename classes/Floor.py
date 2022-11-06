@@ -9,6 +9,7 @@ from classes.Monster import Monster
 from classes.Player import Player
 from classes.Position import Position
 from classes.Size import Size
+from classes.Weapon import *
 
 
 class Floor():
@@ -118,6 +119,7 @@ class Floor():
         #         pathLenght += partialPaths[pathIndex][positionIndex]['bias']
         #     self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
 
+
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
         path:list[PathPoint] = []
@@ -216,6 +218,30 @@ class Floor():
             representation += '-'
         representation += '+'
         return representation
+
+    def draw_monsters_lifebars(self, screen, larg_case ):
+
+        for monstre in self.monsterGroup :
+
+            max_health_point = monstre.maxHealthPoints
+            health_points = monstre.healthPoints
+            ecart = 1
+            larg_one_point = (larg_case - (max_health_point * ecart)) // max_health_point
+
+            bar_back_color = (253, 250, 217)
+            bar_front_color = (0, 255, 0)
+
+            for i in range(0,max_health_point):
+                if i < health_points :
+                    bar_color = bar_front_color
+                else :
+                    bar_color = bar_back_color
+
+                bar_x = monstre.rect.x + (ecart * (i)) + (larg_one_point * (i))
+                bar_back_position = [bar_x , monstre.rect.y-15, larg_one_point, 7]  # x, y, w, h
+
+                pygame.draw.rect(screen, bar_color, bar_back_position)
+
 
 class Node(Position):
     hCost: int

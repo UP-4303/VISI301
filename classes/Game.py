@@ -1,5 +1,6 @@
 import sys
 import pygame
+
 from typing import TypedDict
 import json
 
@@ -9,6 +10,7 @@ from classes.Size import Size
 from classes.Floor import Floor
 from classes.Position import Position
 from classes.Weapon import Weapon
+
 
 
 class Game:
@@ -25,13 +27,15 @@ class Game:
     # MonsterTurn
 
     def __init__(self):
+
+
         with open('data/weapons.json','r', encoding='utf-8') as dataFile:
             data = dataFile.read()
             weaponsJson = json.loads(data)
 
         weapons = {}
         for weaponName,weaponValue in weaponsJson.items():
-            weapons[weaponName] = Weapon(weaponName, '/assets/weapon1.png', **weaponValue)
+            weapons[weaponName] = Weapon(weaponName, './assets/weapon1.png', **weaponValue)
         print(weapons)
 
         # define is the game has begin
@@ -45,12 +49,13 @@ class Game:
         # generate the player
         self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
-
+        self.currentweapon = self.player.weapon
         # boutons
         self.button_attack = pygame.Rect(710, 630, 50, 20)
         self.button_mvt= pygame.Rect(650, 630, 50, 20)
         self.button_finir = pygame.Rect(770, 630, 50, 20)
         self.button_armes = pygame.Rect(830, 630, 50, 20)
+        self.button_annuler = pygame.Rect(890, 630, 50, 20)
         self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
 
         # const needed to draw the map
@@ -58,6 +63,9 @@ class Game:
         self.top_left_x = 60
         self.top_left_y = 110
         self.large_max_grille = 450
+
+        self.larg_case = (self.large_max_grille - ((self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
+        self.long_case = (self.large_max_grille - ((self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
 
         # var to know where we are in the game
         self.turn = 0
@@ -75,9 +83,10 @@ class Game:
         self.init_sprite_size()
 
 
-        self.weaponGroup = pygame.sprite.Group()
-        #self.myweapon = Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1))
-        #self.weaponGroup.add(Weapon([[0, 1, 0], [1, 0, 1], [0, 1, 0]], Position(1, 1)))
+
+        self.weaponTab = weapons
+
+
 
     def update(self, screen):
         # update affichage
@@ -85,7 +94,6 @@ class Game:
         running = True
         if self.bagisopen:
             self.draw_bag(screen)
-
 
         # deal with quit
         for event in pygame.event.get():
@@ -96,6 +104,13 @@ class Game:
                 # Deal with click if we are in the bag
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                     print("you clicked in the bag")
+
+                    for arme in self.weaponTab :
+                       if self.weaponTab[arme].button.collidepoint(pygame.mouse.get_pos()):
+                           print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
+                           self.currentweapon = self.weaponTab[arme]
+
+
 
                     # Detect if the player push the end turn button
                     if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
@@ -109,6 +124,10 @@ class Game:
 
                     if self.status == "PlayerTurn":
                         print("C'est au tour du joueur")
+
+                    if self.button_annuler.collidepoint(pygame.mouse.get_pos()):
+                        print("Vous avez annulé l'action")
+                        self.status = "PlayerTurn"
 
                     # The player is moving
                     if self.status == "PlayerMovement" :
@@ -178,6 +197,8 @@ class Game:
             for monster in self.currentFloor.monsterGroup:
                 self.currentFloor.UpdateMonster(monster)
             self.status = "PlayerTurn"
+
+        #pre shot the movement
         if self.status == "PlayerMovement":
             path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
             pathLength = self.currentFloor.PathLength(path)
@@ -193,11 +214,14 @@ class Game:
                 pathPointRect = pygame.Rect(self.top_left_x+(pathPoint['position'].x*(self.ecart+long_case+1)), self.top_left_y+(pathPoint['position'].y*(self.ecart+larg_case+1)), long_case, larg_case)
                 pygame.draw.rect(screen, color, pathPointRect)
 
+
         return running
 
+    # return the case where the mouse is
     def MouseBoardPosition(self):
         return self.convert_px_in_case(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
 
+    #draw all basics elements
     def draw_everything(self, screen):
         # show the score on the screen
         font = pygame.font.SysFont("monospace", 25, True)  # create the font style
@@ -229,6 +253,12 @@ class Game:
         # Draw buttons
         self.draw_buttons(screen)
 
+        #draw the current weapon infos
+        self.draw_weapon_info(screen)
+
+        # draw the life bars next to the monstrers
+        self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
+
 
     # Generate a monster
     def spawn_monster(self, position: Position, movementPoints: int = 0,
@@ -247,13 +277,7 @@ class Game:
 
     def init_sprite_size(self):
 
-        x = self.currentFloor.size.width
-        y = self.currentFloor.size.height
-
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-
-        DEFAULT_IMAGE_SIZE = (larg_case, long_case)
+        DEFAULT_IMAGE_SIZE = (self.larg_case, self.long_case)
 
         for monster in self.currentFloor.monsterGroup:
             image = monster.image
@@ -311,6 +335,10 @@ class Game:
         txt_button_armes = font_small.render("bag", 1, (255, 255, 255))
         screen.blit(txt_button_armes, (830, 630))
 
+        pygame.draw.rect(screen, (0, 124, 124), self.button_annuler)
+        txt_button_armes = font_small.render("annul", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (890, 630))
+
    #draw monster info
     def draw_monster_infos(self, screen):
         # show monster info
@@ -337,6 +365,24 @@ class Game:
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
 
+    def draw_weapon_info(self,screen):
+        font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
+        name_currentMonster_text = font_small.render("Name :" + str(self.currentweapon.name), 1,
+                                                     (255, 255, 255))  # create texte name
+        screen.blit(name_currentMonster_text, (705, 250))  # show the name at the tuple position
+
+        # draw image
+        taille = 50
+        DEFAULT_IMAGE_SIZE = (taille, taille)
+        back_color = (253, 250, 217)
+        x = 650
+        y = 250
+        back_square_pos = [x, y, taille, taille]  # x, y, w, h
+        pygame.draw.rect(screen, back_color, back_square_pos)
+        image_arme = pygame.image.load(self.currentweapon.imageLink)  # import image
+        image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+        screen.blit(image_arme, (x, y))
+
     #draw the floor
     def draw_floor(self, screen):
         # draw name of floor
@@ -351,35 +397,67 @@ class Game:
         pygame.draw.rect(screen, back_floor, floor_position)
 
         # draw all case
-
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
-
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
 
         couleur_case = (76, 150, 255)
 
         for i in range(0, x):
             for j in range(0, y):
-                top_left_x_case = self.ecart + self.top_left_x + (larg_case * i) + (self.ecart * i)
-                top_left_y_case = self.ecart + self.top_left_y + (long_case * j) + (self.ecart * j)
+                top_left_x_case = self.ecart + self.top_left_x + (self.larg_case * i) + (self.ecart * i)
+                top_left_y_case = self.ecart + self.top_left_y + (self.long_case * j) + (self.ecart * j)
 
-                position_case = [top_left_x_case, top_left_y_case, larg_case, long_case]
+                position_case = [top_left_x_case, top_left_y_case, self.larg_case, self.long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
     #draw bag when is open
     def draw_bag(self, screen):
+
+
+        font_small = pygame.font.SysFont("monospace", 25, True)  # create the font style
+
+        #Draw the background of the bag
         bag_background = pygame.image.load('assets/inventaire.png')  # import background
         screen.blit(bag_background, (0, 0))
 
-        font_small = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        #draw the quit button
         pygame.draw.rect(screen, (0, 124, 124), self.quit_bag_button)
         txt_button_quit = font_small.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
-        for arme in self.weaponGroup :
-            pygame.draw(arme)
+        # draw the weapons
+        taille = 90
+        DEFAULT_IMAGE_SIZE = (taille, taille)
+        back_color = (253, 250, 217)
+        x_start = 170
+        y_start = 170
+        ecart = 40
+        compte_arme = 0
+        x = x_start
+        y = y_start
+
+        for arme in self.weaponTab :
+            if (compte_arme % 6) == 0 :
+                if not (compte_arme == 0):
+                    x = x_start
+                    y = y + ecart + taille
+
+            else :
+
+                x = x + ecart + taille
+
+            back_square_pos = [x, y, taille, taille]  # x, y, w, h
+            pygame.draw.rect(screen, back_color, back_square_pos)
+
+            image_arme = pygame.image.load(self.weaponTab[arme].imageLink)  # import image
+            image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+            screen.blit(image_arme, (x, y))
+
+
+            self.weaponTab[arme].button = pygame.Rect(x, y, taille, taille)
+
+            compte_arme = compte_arme + 1
+
 
     # convert position on the screen to position en the map, -10 -10 if out of map
     def convert_px_in_case(self, px_x, px_y):
@@ -387,11 +465,8 @@ class Game:
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
 
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-
-        case_x = int((px_x - self.top_left_x) // (larg_case + self.ecart))
-        case_y = int((px_y - self.top_left_y) // (long_case + self.ecart))
+        case_x = int((px_x - self.top_left_x) // (self.larg_case + self.ecart))
+        case_y = int((px_y - self.top_left_y) // (self.long_case + self.ecart))
 
         # check if it's out of the map
         if case_x >= x or case_y >= y or case_x < 0 or case_y < 0:
@@ -408,11 +483,8 @@ class Game:
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
 
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-
-        px_x = position.x * (larg_case + self.ecart) + self.top_left_x
-        px_y = position.y * (long_case + self.ecart) + self.top_left_y
+        px_x = position.x * (self.larg_case + self.ecart) + self.top_left_x
+        px_y = position.y * (self.long_case + self.ecart) + self.top_left_y
 
         return px_x, px_y
 
