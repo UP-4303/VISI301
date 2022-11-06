@@ -55,6 +55,7 @@ class Game:
         self.button_mvt= pygame.Rect(650, 630, 50, 20)
         self.button_finir = pygame.Rect(770, 630, 50, 20)
         self.button_armes = pygame.Rect(830, 630, 50, 20)
+        self.button_annuler = pygame.Rect(890, 630, 50, 20)
         self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
 
         # const needed to draw the map
@@ -123,6 +124,10 @@ class Game:
 
                     if self.status == "PlayerTurn":
                         print("C'est au tour du joueur")
+
+                    if self.button_annuler.collidepoint(pygame.mouse.get_pos()):
+                        print("Vous avez annulé l'action")
+                        self.status = "PlayerTurn"
 
                     # The player is moving
                     if self.status == "PlayerMovement" :
@@ -329,6 +334,10 @@ class Game:
         pygame.draw.rect(screen, (0, 124, 124), self.button_armes)
         txt_button_armes = font_small.render("bag", 1, (255, 255, 255))
         screen.blit(txt_button_armes, (830, 630))
+
+        pygame.draw.rect(screen, (0, 124, 124), self.button_annuler)
+        txt_button_armes = font_small.render("annul", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (890, 630))
 
    #draw monster info
     def draw_monster_infos(self, screen):
