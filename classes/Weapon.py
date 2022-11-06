@@ -36,9 +36,6 @@ class Weapon(pygame.sprite.Sprite):
                         wielder.maxHealthPoints = value
                     case "pattern":
                         pattern = actionValue['pattern']
-                        
-                            
-                
 
     def __repr__(self):
         representation:str = ""
