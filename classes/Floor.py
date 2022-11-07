@@ -238,7 +238,7 @@ class Floor():
                     bar_color = bar_back_color
 
                 bar_x = monstre.rect.x + (ecart * (i)) + (larg_one_point * (i))
-                bar_back_position = [bar_x , monstre.rect.y-15, larg_one_point, 7]  # x, y, w, h
+                bar_back_position = [bar_x , monstre.rect.y + 10, larg_one_point, 7]  # x, y, w, h
 
                 pygame.draw.rect(screen, bar_color, bar_back_position)
 
