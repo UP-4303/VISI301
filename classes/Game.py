@@ -92,6 +92,7 @@ class Game:
         # update affichage
         self.draw_everything(screen)
         running = True
+
         if self.bagisopen:
             self.draw_bag(screen)
 
