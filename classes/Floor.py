@@ -9,7 +9,8 @@ from classes.Monster import Monster
 from classes.Player import Player
 from classes.Position import Position
 from classes.Size import Size
-from classes.Weapon import *
+from classes.Vector import Vector
+from classes.Weapon import Weapon
 
 
 class Floor():
@@ -90,23 +91,47 @@ class Floor():
         pattern = monster.weapon.GetAttackPattern()
         if pattern != {}:
             distanceMax = pattern['distance']
-            directions = [(0,1),(1,0),(0,-1),(-1,0)]
-            patternAttack = pattern['attack']
+            directions = [Vector(0,1),Vector(1,0),Vector(0,-1),Vector(-1,0)]
+            patternAttack = pattern['damages']
             patternCenter = pattern['center']
             for xBoard in range(self.size.width):
                 for yBoard in range(self.size.height):
                     positionIsTarget = False
-                    allChecked = False
                     for xPattern in range(len(patternAttack)):
                         for yPattern in range(len(patternAttack[xPattern])):
                             checkingPosition = Position(xBoard + xPattern - patternCenter[0], yBoard + yPattern - patternCenter[1])
                             if checkingPosition.InBoard(self.size):
-                                if isinstance(self.GetObject(position), Player) and patternAttack[xPattern][yPattern] > 0:
+                                if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
                                     allTargets.append(Position(xBoard, yBoard))
                                     positionIsTarget = True
 
-                    while not positionIsTarget and not allChecked:
-                        
+                    if distanceMax > 0 :
+                        directionIndex = 0
+                        while not positionIsTarget and directionIndex <= 3:
+                            distance = 1
+                            fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
+                            
+                            for xPattern in range(len(patternAttack)):
+                                for yPattern in range(len(patternAttack[xPattern])):
+                                    checkingPosition = Position(fireAtPosition.x + xPattern - patternCenter[0], fireAtPosition.y + yPattern - patternCenter[1])
+                                    if checkingPosition.InBoard(self.size):
+                                        if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
+                                            allTargets.append(Position(xBoard, yBoard))
+                                            positionIsTarget = True
+                            distance += 1
+                            fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
+
+                            while not positionIsTarget and distance <= distanceMax and fireAtPosition.InBoard(self.size) and self.GetObject(fireAtPosition) != None:
+                                for xPattern in range(len(patternAttack)):
+                                    for yPattern in range(len(patternAttack[xPattern])):
+                                        checkingPosition = Position(fireAtPosition.x + xPattern - patternCenter[0], fireAtPosition.y + yPattern - patternCenter[1])
+                                        if checkingPosition.InBoard(self.size):
+                                            if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
+                                                allTargets.append(Position(xBoard, yBoard))
+                                                positionIsTarget = True
+                                distance += 1
+                                fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
+                            directionIndex += 1
         
         completePaths = []
         partialPaths = []
