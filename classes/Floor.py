@@ -89,35 +89,24 @@ class Floor():
         allTargets = []
         pattern = monster.weapon.GetAttackPattern()
         if pattern != {}:
+            distanceMax = pattern['distance']
+            directions = [(0,1),(1,0),(0,-1),(-1,0)]
+            patternAttack = pattern['attack']
+            patternCenter = pattern['center']
             for xBoard in range(self.size.width):
                 for yBoard in range(self.size.height):
                     positionIsTarget = False
                     allChecked = False
+                    for xPattern in range(len(patternAttack)):
+                        for yPattern in range(len(patternAttack[xPattern])):
+                            checkingPosition = Position(xBoard + xPattern - patternCenter[0], yBoard + yPattern - patternCenter[1])
+                            if checkingPosition.InBoard(self.size):
+                                if isinstance(self.GetObject(position), Player) and patternAttack[xPattern][yPattern] > 0:
+                                    allTargets.append(Position(xBoard, yBoard))
+                                    positionIsTarget = True
 
-                    
-
-                    if pattern['directionCardinal'] and not pattern['directionDiagonal']:
-                        directions = [(0,1),(1,0),(0,-1),(-1,0)]
-                    elif not pattern['directionCardinal'] and pattern['directionDiagonal']:
-                        directions = [(1,1),(1,-1),(-1,-1),(-1,1)]
-                    elif pattern['directionCardinal'] and pattern['directionDiagonal']:
-                        directions = [(0,1),(1,0),(0,-1),(-1,0),(1,1),(1,-1),(-1,-1),(-1,1)]
-                    else:
-                        directions = []
-                    
                     while not positionIsTarget and not allChecked:
                         
-                        
-                        for directionX,directionY in directions:
-                            distanceMax = pattern['distance']
-                            while 
-
-                        for xPattern in range(len(monster.weapon.pattern)):
-                            for yPattern in range(len(monster.weapon.pattern[xPattern])):
-                                position = Position(xBoard + xPattern - monster.weapon.center.x, yBoard + yPattern - monster.weapon.center.y)
-                                if position.InBoard(self.size):
-                                    if isinstance(self.GetObject(position), Player) and monster.weapon.pattern[xPattern][yPattern] > 0:
-                                        allTargets.append(Position(xBoard, yBoard))
         
         completePaths = []
         partialPaths = []

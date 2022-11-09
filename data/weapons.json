@@ -15,8 +15,6 @@
                 ],
                 "center":[1,1],
                 "disance":Infinity,
-                "directionCardinal":true,
-                "directionDiagonal":false,
                 "overObstacles":false,
                 "pushSelfForward":1,
                 "push":[
@@ -45,8 +43,6 @@
                 ],
                 "center":[1,1],
                 "disance":Infinity,
-                "directionCardinal":true,
-                "directionDiagonal":false,
                 "overObstacles":false,
                 "pushSelfForward":1,
                 "push":[
