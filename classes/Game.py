@@ -52,7 +52,7 @@ class Game:
         self.currentweapon = self.player.weapon
         # boutons
         self.button_attack = pygame.Rect(710, 630, 50, 20)
-        self.button_mvt= pygame.Rect(650, 630, 50, 20)
+        self.button_mvt = pygame.Rect(650, 630, 50, 20)
         self.button_finir = pygame.Rect(770, 630, 50, 20)
         self.button_armes = pygame.Rect(830, 630, 50, 20)
         self.button_annuler = pygame.Rect(890, 630, 50, 20)
@@ -72,6 +72,7 @@ class Game:
         self.status = "MonsterTurn"
         self.has_moved = False
         self.has_attacked = False
+        self.won = False
 
         self.bagisopen = False
         self.bag = []
@@ -92,8 +93,13 @@ class Game:
         # update affichage
         self.draw_everything(screen)
         running = True
+
         if self.bagisopen:
             self.draw_bag(screen)
+
+        self.won = (self.turn == 10)
+        if self.won :
+            self.draw_won(screen)
 
         # deal with quit
         for event in pygame.event.get():
@@ -117,7 +123,8 @@ class Game:
                         print("vous avez appuyé sur le bouton quitter le sac")
                         # Put the variable back to normal
                         self.bagisopen = False
-
+            elif (self.won):
+                print("vous avez gagné !")
             else :
                # Deal with click if we are in the game pannel
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
@@ -319,15 +326,15 @@ class Game:
     def draw_buttons(self, screen):
         font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
 
-        pygame.draw.rect(screen, (255, 0, 0), self.button_mvt)
+        pygame.draw.rect(screen, (0, 124, 124), self.button_mvt)
         txt_button_mvt = font_small.render("mvt", 1, (255, 255, 255))
         screen.blit(txt_button_mvt, (650, 630))
 
-        pygame.draw.rect(screen, (0, 255, 0), self.button_finir)
+        pygame.draw.rect(screen, (0, 124, 124), self.button_finir)
         txt_button_finir = font_small.render("end", 1, (255, 255, 255))
         screen.blit(txt_button_finir, (770, 630))
 
-        pygame.draw.rect(screen, (0, 0, 255), self.button_attack)
+        pygame.draw.rect(screen, (0, 124, 124), self.button_attack)
         txt_button_attack = font_small.render("fight", 1, (255, 255, 255))
         screen.blit(txt_button_attack, (710, 630))
 
@@ -410,19 +417,22 @@ class Game:
                 position_case = [top_left_x_case, top_left_y_case, self.larg_case, self.long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
+    def draw_won(self, screen):
+        # Draw won background
+        won_background = pygame.image.load('assets/won.png')  # import background
+        screen.blit(won_background, (0, 0))
+
     #draw bag when is open
     def draw_bag(self, screen):
-
-
-        font_small = pygame.font.SysFont("monospace", 25, True)  # create the font style
-
+        font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
         #Draw the background of the bag
         bag_background = pygame.image.load('assets/inventaire.png')  # import background
         screen.blit(bag_background, (0, 0))
 
         #draw the quit button
         pygame.draw.rect(screen, (0, 124, 124), self.quit_bag_button)
-        txt_button_quit = font_small.render("Quit", 1, (255, 255, 255))
+        txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
         # draw the weapons
@@ -453,6 +463,8 @@ class Game:
             image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
             screen.blit(image_arme, (x, y))
 
+            txt_arme = font_small.render(self.weaponTab[arme].name, 1, (255, 255, 255))
+            screen.blit(txt_arme, (x, y + taille))
 
             self.weaponTab[arme].button = pygame.Rect(x, y, taille, taille)
 

@@ -84,40 +84,37 @@ class Floor():
             print("Chemin trop long ou inexistant !")
 
     def UpdateMonster(self, monster:Monster):
-        pass
-        NotImplemented
-        # allTargets = []
-        # for xBoard in range(self.size.width):
-        #     for yBoard in range(self.size.height):
-        #         for xPattern in range(len(monster.weapon.pattern)):
-        #             for yPattern in range(len(monster.weapon.pattern[xPattern])):
-        #                 position = Position(xBoard + xPattern - monster.weapon.center.x, yBoard + yPattern - monster.weapon.center.y)
-        #                 if position.InBoard(self.size):
-        #                     if isinstance(self.GetObject(position), Player) and monster.weapon.pattern[xPattern][yPattern] > 0:
-        #                        allTargets.append(Position(xBoard, yBoard))
+        allTargets = []
+        for xBoard in range(self.size.width):
+            for yBoard in range(self.size.height):
+                for x,y in [(0,1),(1,0),(0,-1),(-1,0)]:
+                    position = Position(xBoard + x, yBoard + y)
+                    if position.InBoard(self.size):
+                        if isinstance(self.GetObject(position), Player):
+                            allTargets.append(Position(xBoard, yBoard))
         
-        # completePaths = []
-        # partialPaths = []
-        # for target in allTargets:
-        #     path = self.Pathfinder(monster.position, target)
-        #     if path != []:
-        #         pathLenght = 0
-        #         for node in path:
-        #             pathLenght += node['bias']
-        #         if pathLenght <= monster.movementPoints:
-        #             completePaths.append(path)
-        #         elif path[0]['bias'] <= monster.movementPoints:
-        #                 partialPaths.append(path)
-        # if completePaths != []:
-        #     self.UpdateObject(monster.position, completePaths[randint(0,len(completePaths)-1)][-1]["position"])
-        # elif partialPaths != []:
-        #     pathIndex = randint(0,len(partialPaths)-1)
-        #     positionIndex = 0
-        #     pathLenght = partialPaths[pathIndex][positionIndex]['bias']
-        #     while pathLenght + partialPaths[pathIndex][positionIndex+1]['bias'] <= monster.movementPoints:
-        #         positionIndex += 1
-        #         pathLenght += partialPaths[pathIndex][positionIndex]['bias']
-        #     self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
+        completePaths = []
+        partialPaths = []
+        for target in allTargets:
+            path = self.Pathfinder(monster.position, target)
+            if path != []:
+                pathLenght = 0
+                for node in path:
+                    pathLenght += node['bias']
+                if pathLenght <= monster.movementPoints:
+                    completePaths.append(path)
+                elif path[0]['bias'] <= monster.movementPoints:
+                        partialPaths.append(path)
+        if completePaths != []:
+            self.UpdateObject(monster.position, completePaths[randint(0,len(completePaths)-1)][-1]["position"])
+        elif partialPaths != []:
+            pathIndex = randint(0,len(partialPaths)-1)
+            positionIndex = 0
+            pathLenght = partialPaths[pathIndex][positionIndex]['bias']
+            while pathLenght + partialPaths[pathIndex][positionIndex+1]['bias'] <= monster.movementPoints:
+                positionIndex += 1
+                pathLenght += partialPaths[pathIndex][positionIndex]['bias']
+            self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
 
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
@@ -238,7 +235,7 @@ class Floor():
                     bar_color = bar_back_color
 
                 bar_x = monstre.rect.x + (ecart * (i)) + (larg_one_point * (i))
-                bar_back_position = [bar_x , monstre.rect.y-15, larg_one_point, 7]  # x, y, w, h
+                bar_back_position = [bar_x , monstre.rect.y + 10, larg_one_point, 7]  # x, y, w, h
 
                 pygame.draw.rect(screen, bar_color, bar_back_position)
 
