@@ -78,6 +78,7 @@ class Game:
         self.has_attacked = False
         self.won = False
         self.message = " Hello world "
+        self.running = True
 
         self.bagisopen = False
         self.bag = []
@@ -101,41 +102,105 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
 
     def update(self, screen):
-        # update affichage
+        # update affichage et update var
         self.draw_everything(screen)
-        running = True
+        self.running = True
+        self.won = (self.turn == 10)
 
         # deal with the bag is open
         if self.bagisopen:
-            self.draw_bag(screen)
-            for event in pygame.event.get():
-                # Deal with click if we are in the bag
-                if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                    print("you clicked in the bag")
-
-                    for arme in self.weaponTab:
-                        if self.weaponTab[arme].button.collidepoint(pygame.mouse.get_pos()):
-                            print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
-                            self.currentweapon = self.weaponTab[arme]
-
-                    # Detect if the player push the end turn button
-                    if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
-                        print("vous avez appuyé sur le bouton quitter le sac")
-                        # Put the variable back to normal
-                        self.bagisopen = False
+            self.dealWithOpenBag(screen)
 
         # deal with the situation of winning
-        self.won = (self.turn == 10)
-        if self.won :
-            self.draw_won(screen)
-            print("vous avez gagné !")
+        elif self.won :
+            self.dealWithWon(screen)
 
-        # deal with action out the bag
+        # deal with the action in the pannel Game, out of the bag and not in a winning situation
+        else :
+            self.dealWithActionPannelGame(screen)
+
+
+        if self.status == "MonsterTurn":
+            self.monsterTurn()
+
+        #pre shot the movement
+        if self.status == "PlayerMovement":
+            self.preShowMovement(screen)
+
+        return self.running
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # ACTION GESTION
+    # -------------------------------------------------------------------------------------------------------------------
+    def wantToAttack(self):
+        print("vous avez appuyé sur le bouton attack")
+        # check if the player has already attacked during this turn
+        if self.has_attacked == False:
+            self.status = "PlayerAttack"
+            self.message = " Choisissez où vous voulez attaquer"
+
+        else:
+            print("Vous avez deja attaquer vous ne pouvez plus")
+            self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
+
+    def wantToOpenTheBag(self):
+        print("vous choisissez votre arme")
+        self.bagisopen = True
+    def wantToAnnul(self):
+        print("Vous avez annulé l'action")
+        self.message = " Vous avez annulé l'action"
+        self.status = "PlayerTurn"
+    def wantToEndTurn(self):
+        print("vous avez appuyé sur le bouton finir tour")
+        self.message = " Fin de votre tour, la main est aux monstree "
+        # Put the variable back to normal
+        self.has_moved = False
+        self.has_attacked = False
+        # Begin the monster turn
+        self.status = "MonsterTurn"
+        # increase the turn count
+        self.turn = self.turn + 1
+    def wantToChoseMouvement(self):
+        print("vous avez appuyé sur le bouton mvt")
+
+        # check if the player has already moved during this turn
+        if self.has_moved == False:
+            self.message = " Choisissez où vous voulez vous déplacer"
+            self.status = "PlayerMovement"
+        else:
+            print("Vous avez deja bougé vous ne pouvez plus")
+            self.message = " Vous essayer de vous déplacer mais vous avez deja bougé "
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # DECOUPE FONCTION UDATE
+    # -------------------------------------------------------------------------------------------------------------------
+    def dealWithWon(self,screen):
+        self.draw_won(screen)
+        print("vous avez gagné !")
+
+    def dealWithOpenBag(self, screen):
+        self.draw_bag(screen)
+        for event in pygame.event.get():
+            # Deal with click if we are in the bag
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                print("you clicked in the bag")
+
+                for arme in self.weaponTab:
+                    if self.weaponTab[arme].button.collidepoint(pygame.mouse.get_pos()):
+                        print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
+                        self.currentweapon = self.weaponTab[arme]
+
+                # Detect if the player push the end turn button
+                if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
+                    print("vous avez appuyé sur le bouton quitter le sac")
+                    # Put the variable back to normal
+                    self.bagisopen = False
+
+    def dealWithActionPannelGame(self, screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-
-
+                self.running = False
+                print("aurevoir")
                # Deal with click if we are in the game pannel
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 
@@ -144,9 +209,7 @@ class Game:
                     self.message = " A vous de jouez"
 
                 if self.button_annuler.collidepoint(pygame.mouse.get_pos()):
-                    print("Vous avez annulé l'action")
-                    self.message = " Vous avez annulé l'action"
-                    self.status = "PlayerTurn"
+                    self.wantToAnnul()
 
                 # The player is moving
                 if self.status == "PlayerMovement" :
@@ -196,6 +259,8 @@ class Game:
                     self.wantToChoseMouvement()
                 elif event.key == pygame.K_RETURN and self.won == False:
                     self.wantToEndTurn()
+                elif event.key == pygame.K_BACKSPACE :
+                    self.wantToAnnul()
                 elif event.key == pygame.K_q:
                     print("Player is hit")
                     for player in self.currentFloor.playerGroup:
@@ -205,67 +270,27 @@ class Game:
                     self.score = self.score + 3
 
 
-        if self.status == "MonsterTurn":
-            for monster in self.currentFloor.monsterGroup:
-                self.currentFloor.UpdateMonster(monster)
-            self.status = "PlayerTurn"
+    def monsterTurn(self):
+        for monster in self.currentFloor.monsterGroup:
+            self.currentFloor.UpdateMonster(monster)
+        self.status = "PlayerTurn"
 
-        #pre shot the movement
-        if self.status == "PlayerMovement":
-            path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
-            pathLength = self.currentFloor.PathLength(path)
-            if pathLength <= self.player.movementPoints:
-                color = (0,255,0)
-            else:
-                color = (255,0,0)
-            x = self.currentFloor.size.width
-            y = self.currentFloor.size.height
-            larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-            long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
-            for pathPoint in path:
-                pathPointRect = pygame.Rect(self.top_left_x+(pathPoint['position'].x*(self.ecart+long_case+1)), self.top_left_y+(pathPoint['position'].y*(self.ecart+larg_case+1)), long_case, larg_case)
-                pygame.draw.rect(screen, color, pathPointRect)
-
-
-        return running
-
-    # -------------------------------------------------------------------------------------------------------------------
-    # ACTION GESTION
-    # -------------------------------------------------------------------------------------------------------------------
-    def wantToAttack(self):
-        print("vous avez appuyé sur le bouton attack")
-        # check if the player has already attacked during this turn
-        if self.has_attacked == False:
-            self.status = "PlayerAttack"
-            self.message = " Choisissez où vous voulez attaquer"
-
+    def preShowMovement(self, screen):
+        path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
+        pathLength = self.currentFloor.PathLength(path)
+        if pathLength <= self.player.movementPoints:
+            color = (0, 255, 0)
         else:
-            print("Vous avez deja attaquer vous ne pouvez plus")
-            self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
-
-    def wantToOpenTheBag(self):
-        print("vous choisissez votre arme")
-        self.bagisopen = True
-    def wantToEndTurn(self):
-        print("vous avez appuyé sur le bouton finir tour")
-        self.message = " Fin de votre tour, la main est aux monstree "
-        # Put the variable back to normal
-        self.has_moved = False
-        self.has_attacked = False
-        # Begin the monster turn
-        self.status = "MonsterTurn"
-        # increase the turn count
-        self.turn = self.turn + 1
-    def wantToChoseMouvement(self):
-        print("vous avez appuyé sur le bouton mvt")
-
-        # check if the player has already moved during this turn
-        if self.has_moved == False:
-            self.message = " Choisissez où vous voulez vous déplacer"
-            self.status = "PlayerMovement"
-        else:
-            print("Vous avez deja bougé vous ne pouvez plus")
-            self.message = " Vous essayer de vous déplacer mais vous avez deja bougé "
+            color = (255, 0, 0)
+        x = self.currentFloor.size.width
+        y = self.currentFloor.size.height
+        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
+        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
+        for pathPoint in path:
+            pathPointRect = pygame.Rect(self.top_left_x + (pathPoint['position'].x * (self.ecart + long_case + 1)),
+                                        self.top_left_y + (pathPoint['position'].y * (self.ecart + larg_case + 1)),
+                                        long_case, larg_case)
+            pygame.draw.rect(screen, color, pathPointRect)
 
     # -------------------------------------------------------------------------------------------------------------------
     # SPAWN
