@@ -12,6 +12,8 @@ from classes.Position import Position
 from classes.Weapon import Weapon
 from classes.PickableObject import PickableObject
 from classes.Money import Money
+from classes.MovementPotion import MovementPotion
+from classes.LifePotion import LifePotion
 
 
 
@@ -82,7 +84,8 @@ class Game:
 
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
-        self.spawn_pickableObject(position=Position(2, 2), object= Money())
+        self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
+        self.spawn_pickableObject(position=Position(4, 4), objectType='Money')
         self.current_monster = Monster()
         self.init_sprite_size()
 
@@ -242,7 +245,16 @@ class Game:
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 
     # Generate a pickeable object
-    def spawn_pickableObject(self, position: Position, object):
+    def spawn_pickableObject(self, position: Position, objectType: str='Money'):
+        if objectType == 'Money':
+            object = Money()
+        elif objectType == 'MovementPotion':
+            object = MovementPotion()
+        elif objectType == 'LifePotion':
+            object = LifePotion()
+        else :
+            object = Money()
+
         self.currentFloor.SetNewObject(position, object)
         object.rect.x, object.rect.y = self.convert_case_in_px(position)
 
@@ -447,6 +459,7 @@ class Game:
                 position_case = [top_left_x_case, top_left_y_case, self.larg_case, self.long_case]
                 pygame.draw.rect(screen, couleur_case, position_case)
 
+    #draw an end won screen
     def draw_won(self, screen):
         # Draw won background
         won_background = pygame.image.load('assets/won.png')  # import background
