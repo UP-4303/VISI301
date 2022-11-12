@@ -76,16 +76,6 @@ class Floor():
                 return True
             else:
                 return False
-
-    def UpdateObject(self, position:Position, newPosition:Position):
-        if self.GetObject(newPosition) == None:
-            object_ = self.GetObject(position)
-            self.layers["objects"][newPosition.x][newPosition.y] = object_
-            object_.position = newPosition
-            self.layers["objects"][position.x][position.y] = None
-            return True
-        else:
-            return False
     
     def RemoveObject(self, position:Position):
         if self.GetObject(position)!= None:
@@ -147,6 +137,28 @@ class Floor():
                 pathLenght += partialPaths[pathIndex][positionIndex]['bias']
             self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
 
+    def UpdateObject(self, position: Position, newPosition: Position):
+        if self.GetObject(newPosition) == None:
+            object_ = self.GetObject(position)
+            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["objects"][position.x][position.y] = None
+            self.pickObject(object_)
+            return True
+        else:
+            return False
+
+    def pickObject(self, object_):
+        if not (self.GetPickableObjects(object_.position) == None):
+            pickedObject = self.layers["pickableObjects"][object_.position.x][object_.position.y]
+            if isinstance(object_, Player):
+                pickedObject.ispicked(object_)
+            if isinstance(object_, Monster):
+                pickedObject.isCrushed(object_)
+
+            if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
+                self.layers["pickableObjects"][object_.position.x][object_.position.y] = None
+                self.pickableObjectGroup.remove(pickedObject)
     # -------------------------------------------------------------------------------------------------------------------
     # PATH
     # -------------------------------------------------------------------------------------------------------------------

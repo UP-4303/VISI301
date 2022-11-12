@@ -132,6 +132,7 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
     # ACTION GESTION
     # -------------------------------------------------------------------------------------------------------------------
+
     def wantToAttack(self):
         print("vous avez appuyé sur le bouton attack")
         # check if the player has already attacked during this turn
@@ -142,7 +143,6 @@ class Game:
         else:
             print("Vous avez deja attaquer vous ne pouvez plus")
             self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
-
     def wantToOpenTheBag(self):
         print("vous choisissez votre arme")
         self.bagisopen = True
@@ -174,6 +174,7 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
     # DECOUPE FONCTION UDATE
     # -------------------------------------------------------------------------------------------------------------------
+
     def dealWithWon(self,screen):
         self.draw_won(screen)
         print("vous avez gagné !")
@@ -268,7 +269,6 @@ class Game:
                 elif event.key == pygame.K_s:
                     print("you earn score")
                     self.score = self.score + 3
-
 
     def monsterTurn(self):
         for monster in self.currentFloor.monsterGroup:
