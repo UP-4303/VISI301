@@ -90,7 +90,9 @@ class Game:
 
         self.weaponTab = weapons
 
-
+    # -------------------------------------------------------------------------------------------------------------------
+    # MAIN FONCTION
+    # -------------------------------------------------------------------------------------------------------------------
 
     def update(self, screen):
         # update affichage
@@ -227,9 +229,64 @@ class Game:
 
         return running
 
-    # return the case where the mouse is
-    def MouseBoardPosition(self):
-        return self.convert_px_in_case(pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1])
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # SPAWN
+    # -------------------------------------------------------------------------------------------------------------------
+
+    # Generate a monster
+    def spawn_monster(self, position: Position, movementPoints: int = 0,
+                      weapon: Weapon = Weapon([[0]], Position(0, 0))):
+        monster = Monster(movementPoints=movementPoints, weapon=weapon)
+        self.currentFloor.SetNewObject(position, monster)
+        monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
+
+    # Generate a pickeable object
+    def spawn_pickableObject(self, position: Position, object):
+        self.currentFloor.SetNewObject(position, object)
+        object.rect.x, object.rect.y = self.convert_case_in_px(position)
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # SPRITE GESTION
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def update_position_sprite(self):
+        for monster in self.currentFloor.monsterGroup:
+            position = monster.position
+            monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
+        for player in self.currentFloor.playerGroup:
+            position = player.position
+            player.rect.x, player.rect.y = self.convert_case_in_px(position)
+        for object in self.currentFloor.pickableObjectGroup:
+            position = object.position
+            object.rect.x, object.rect.y = self.convert_case_in_px(position)
+
+
+    def init_sprite_size(self):
+
+        DEFAULT_IMAGE_SIZE = (self.larg_case, self.long_case)
+
+        for monster in self.currentFloor.monsterGroup:
+            image = monster.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+            monster.image = image
+
+        for player in self.currentFloor.playerGroup:
+            image = player.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+            player.image = image
+
+        for object in self.currentFloor.pickableObjectGroup:
+            image = object.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+            object.image = image
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # DRAW ON THE SCREEN
+    # -------------------------------------------------------------------------------------------------------------------
 
     #draw all basics elements
     def draw_everything(self, screen):
@@ -270,55 +327,6 @@ class Game:
 
         # draw the life bars next to the monstrers
         self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
-
-
-    # Generate a monster
-    def spawn_monster(self, position: Position, movementPoints: int = 0,
-                      weapon: Weapon = Weapon([[0]], Position(0, 0))):
-        monster = Monster(movementPoints=movementPoints, weapon=weapon)
-        self.currentFloor.SetNewObject(position, monster)
-        monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
-
-    def spawn_pickableObject(self, position: Position, object):
-        self.currentFloor.SetNewObject(position, object)
-        object.rect.x, object.rect.y = self.convert_case_in_px(position)
-
-
-    def update_position_sprite(self):
-        for monster in self.currentFloor.monsterGroup:
-            position = monster.position
-            monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
-        for player in self.currentFloor.playerGroup:
-            position = player.position
-            player.rect.x, player.rect.y = self.convert_case_in_px(position)
-        for object in self.currentFloor.pickableObjectGroup:
-            position = object.position
-            object.rect.x, object.rect.y = self.convert_case_in_px(position)
-
-
-
-
-    def init_sprite_size(self):
-
-        DEFAULT_IMAGE_SIZE = (self.larg_case, self.long_case)
-
-        for monster in self.currentFloor.monsterGroup:
-            image = monster.image
-            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
-
-            monster.image = image
-
-        for player in self.currentFloor.playerGroup:
-            image = player.image
-            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
-
-            player.image = image
-
-        for object in self.currentFloor.pickableObjectGroup:
-            image = object.image
-            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
-
-            object.image = image
 
     #draw players infos in the up case
     def draw_player_infos(self, screen):
@@ -493,6 +501,10 @@ class Game:
             compte_arme = compte_arme + 1
 
 
+    #-------------------------------------------------------------------------------------------------------------------
+    #CONVERSIONS AND CLICK UTILS
+    #-------------------------------------------------------------------------------------------------------------------
+
     # convert position on the screen to position en the map, -10 -10 if out of map
     def convert_px_in_case(self, px_x, px_y):
 
@@ -526,3 +538,8 @@ class Game:
         pygame.event.clear()
         event = pygame.event.wait()
         return event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]
+
+    # return the case where the mouse is
+    def MouseBoardPosition(self):
+        return self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
