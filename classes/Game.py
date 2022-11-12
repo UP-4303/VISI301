@@ -77,9 +77,12 @@ class Game:
         self.has_moved = False
         self.has_attacked = False
         self.won = False
+        self.message = " Hello world "
 
         self.bagisopen = False
         self.bag = []
+
+
 
 
         # TEST A ENLEVER
@@ -139,9 +142,11 @@ class Game:
 
                     if self.status == "PlayerTurn":
                         print("C'est au tour du joueur")
+                        self.message = " A vous de jouez"
 
                     if self.button_annuler.collidepoint(pygame.mouse.get_pos()):
                         print("Vous avez annulé l'action")
+                        self.message = " Vous avez annulé l'action"
                         self.status = "PlayerTurn"
 
                     # The player is moving
@@ -150,6 +155,7 @@ class Game:
                         self.has_moved = True
 
                         print("Le joueur a choisit un deplacement")
+                        self.message = " Vous avez choisit un deplacement"
 
                         self.status = "PlayerTurn"
 
@@ -158,17 +164,22 @@ class Game:
                         self.MouseBoardPosition()
 
                         self.has_attacked = True
+
                         print("Le joueur a choisit une attack ")
+                        self.message = " Vous avez choisit une attack"
 
                         self.status = "PlayerTurn"
                     # Detect if the player push the mouvement button
                     if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
                         print("vous avez appuyé sur le bouton mvt")
+
                         # check if the player has already moved during this turn
                         if self.has_moved == False:
+                            self.message = " Choisissez où vous voulez vous déplacer"
                             self.status = "PlayerMovement"
                         else:
                             print("Vous avez deja bougé vous ne pouvez plus")
+                            self.message = " Vous essayer de vous déplacer mais vous avez deja bougé "
 
 
                     # Detect if the player push the attack button
@@ -177,12 +188,16 @@ class Game:
                         #check if the player has already attacked during this turn
                         if self.has_attacked == False :
                             self.status = "PlayerAttack"
+                            self.message = " Choisissez où vous voulez attaquer"
+
                         else :
                             print("Vous avez deja attaquer vous ne pouvez plus")
+                            self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
 
                     # Detect if the player push the end turn button
                     if self.button_finir.collidepoint(pygame.mouse.get_pos()):
                         print("vous avez appuyé sur le bouton finir tour")
+                        self.message = " Fin de votre tour, la main est aux monstree "
                         #Put the variable back to normal
                         self.has_moved = False
                         self.has_attacked = False
@@ -340,7 +355,12 @@ class Game:
         # draw the life bars next to the monstrers
         self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
 
+        # draw the life bars next to the pickables objects
         self.currentFloor.draw_pickableObjects_lifebars(screen, self.larg_case)
+
+        # draw the message for the player
+        self.draw_message(screen)
+
 
     #draw players infos in the up case
     def draw_player_infos(self, screen):
@@ -515,6 +535,11 @@ class Game:
 
             compte_arme = compte_arme + 1
 
+    def draw_message(self, screen):
+        font_small = pygame.font.SysFont("monospace", 17, True)  # create the font style
+        message_text = font_small.render(self.message, 1,
+                                                     (255, 255, 255))  # create texte name
+        screen.blit(message_text, (70, 580))  # show the name at the tuple position
 
     #-------------------------------------------------------------------------------------------------------------------
     #CONVERSIONS AND CLICK UTILS
