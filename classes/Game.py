@@ -10,6 +10,8 @@ from classes.Size import Size
 from classes.Floor import Floor
 from classes.Position import Position
 from classes.Weapon import Weapon
+from classes.PickableObject import PickableObject
+from classes.Money import Money
 
 
 
@@ -80,6 +82,7 @@ class Game:
 
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
+        self.spawn_pickableObject(position=Position(2, 2), object= Money())
         self.current_monster = Monster()
         self.init_sprite_size()
 
@@ -248,6 +251,8 @@ class Game:
         # show monster info
         self.draw_monster_infos(screen)
 
+        # show the objects
+        self.currentFloor.pickableObjectGroup.draw(screen)
         # show monstres (maybe better in main)
         self.currentFloor.monsterGroup.draw(screen)
 
@@ -274,6 +279,11 @@ class Game:
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 
+    def spawn_pickableObject(self, position: Position, object):
+        self.currentFloor.SetNewObject(position, object)
+        object.rect.x, object.rect.y = self.convert_case_in_px(position)
+
+
     def update_position_sprite(self):
         for monster in self.currentFloor.monsterGroup:
             position = monster.position
@@ -281,6 +291,12 @@ class Game:
         for player in self.currentFloor.playerGroup:
             position = player.position
             player.rect.x, player.rect.y = self.convert_case_in_px(position)
+        for object in self.currentFloor.pickableObjectGroup:
+            position = object.position
+            object.rect.x, object.rect.y = self.convert_case_in_px(position)
+
+
+
 
     def init_sprite_size(self):
 
@@ -297,6 +313,12 @@ class Game:
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
             player.image = image
+
+        for object in self.currentFloor.pickableObjectGroup:
+            image = object.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+            object.image = image
 
     #draw players infos in the up case
     def draw_player_infos(self, screen):

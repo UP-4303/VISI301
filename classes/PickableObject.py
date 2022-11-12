@@ -1,5 +1,6 @@
 from classes.Player import Player
 from classes.StaticObject import StaticObject
+from classes.Position import Position
 
 class PickableObject(StaticObject):
 
