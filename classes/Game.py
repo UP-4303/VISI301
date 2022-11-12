@@ -85,7 +85,7 @@ class Game:
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
         self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
-        self.spawn_pickableObject(position=Position(4, 4), objectType='Money')
+        self.spawn_pickableObject(position=Position(4, 4), objectType='LifePotion')
         self.current_monster = Monster()
         self.init_sprite_size()
 
@@ -339,6 +339,8 @@ class Game:
 
         # draw the life bars next to the monstrers
         self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
+
+        self.currentFloor.draw_pickableObjects_lifebars(screen, self.larg_case)
 
     #draw players infos in the up case
     def draw_player_infos(self, screen):

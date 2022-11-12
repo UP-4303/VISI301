@@ -36,6 +36,9 @@ class Floor():
         self.monsterGroup = pygame.sprite.Group()
         self.pickableObjectGroup = pygame.sprite.Group()
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # GETTER MAP
+    # -------------------------------------------------------------------------------------------------------------------
 
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
@@ -44,9 +47,14 @@ class Floor():
         return self.layers["pickableObjects"][position.x][position.y]
 
 
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # GROUP GESTION
+    # -------------------------------------------------------------------------------------------------------------------
+
     # Ajoute un object
-    def SetNewObject(self, position:Position, object_:GenericObject):
-        if isinstance(object_, Character) :
+    def SetNewObject(self, position: Position, object_: GenericObject):
+        if isinstance(object_, Character):
             if self.GetObject(position) == None:
                 self.layers["objects"][position.x][position.y] = object_
                 object_.position = position
@@ -66,9 +74,9 @@ class Floor():
                 self.pickableObjectGroup.add(object_)
 
                 return True
-            else :
+            else:
                 return False
-    
+
     def UpdateObject(self, position:Position, newPosition:Position):
         if self.GetObject(newPosition) == None:
             object_ = self.GetObject(position)
@@ -90,6 +98,10 @@ class Floor():
             return True
         else:
             return False
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # UPDATE OBJECTS
+    # -------------------------------------------------------------------------------------------------------------------
 
     def UpdatePlayer(self, player:Player, destination:Position):
         path = self.Pathfinder(player.position, destination)
@@ -135,6 +147,9 @@ class Floor():
                 pathLenght += partialPaths[pathIndex][positionIndex]['bias']
             self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # PATH
+    # -------------------------------------------------------------------------------------------------------------------
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
@@ -209,6 +224,10 @@ class Floor():
             length += pathPoint['bias']
         return length
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # PRINT OBJECT GESTION
+    # -------------------------------------------------------------------------------------------------------------------
+
     def __str__(self):
         representation = '+'
         for _x in range(self.size.width):
@@ -234,6 +253,10 @@ class Floor():
             representation += '-'
         representation += '+'
         return representation
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # DRAW ON THE SCREEN
+    # -------------------------------------------------------------------------------------------------------------------
 
     def draw_monsters_lifebars(self, screen, larg_case ):
 
