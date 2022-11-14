@@ -77,6 +77,17 @@ class Floor():
                 return True
             else:
                 return False
+
+    def UpdateObject(self, position: Position, newPosition: Position):
+        if self.GetObject(newPosition) == None:
+            object_ = self.GetObject(position)
+            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["objects"][position.x][position.y] = None
+            self.pickObject(object_)
+            return True
+        else:
+            return False
     
     def RemoveObject(self, position:Position):
         if self.GetObject(position)!= None:
