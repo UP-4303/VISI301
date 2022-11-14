@@ -47,7 +47,17 @@ class Floor():
     def GetPickableObjects(self, position:Position):
         return self.layers["pickableObjects"][position.x][position.y]
 
+    def pickObject(self, object_):
+        if not (self.GetPickableObjects(object_.position) == None):
+            pickedObject = self.layers["pickableObjects"][object_.position.x][object_.position.y]
+            if isinstance(object_, Player):
+                pickedObject.ispicked(object_)
+            if isinstance(object_, Monster):
+                pickedObject.isCrushed(object_)
 
+            if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
+                self.layers["pickableObjects"][object_.position.x][object_.position.y] = None
+                self.pickableObjectGroup.remove(pickedObject)
 
     # -------------------------------------------------------------------------------------------------------------------
     # GROUP GESTION
