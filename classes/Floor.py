@@ -11,6 +11,9 @@ from classes.Position import Position
 from classes.Size import Size
 from classes.Vector import Vector
 from classes.Weapon import Weapon
+from classes.Character import Character
+from classes.PickableObject import PickableObject
+
 
 
 class Floor():
@@ -19,47 +22,61 @@ class Floor():
     layers:dict[str, Any]
     playerGroup:pygame.sprite.Group
     monsterGroup:pygame.sprite.Group
+    pickableObjectGroup:pygame.sprite.Group
 
     def __init__(self, name:str='Floor 0', size:Size=Size(6,6)):
         self.name = name
         self.size = size
 
         self.layers = {
-            'objects': [[None for _y in range(self.size.height)] for _x in range(self.size.width)]
+            "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
+            "pickableObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
         }
 
         self.playerGroup = pygame.sprite.Group()
         self.monsterGroup = pygame.sprite.Group()
+        self.pickableObjectGroup = pygame.sprite.Group()
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # GETTER MAP
+    # -------------------------------------------------------------------------------------------------------------------
 
     def GetObject(self, position:Position):
-        return self.layers['objects'][position.x][position.y]
+        return self.layers["objects"][position.x][position.y]
+
+    def GetPickableObjects(self, position:Position):
+        return self.layers["pickableObjects"][position.x][position.y]
 
 
-# Ajoute un object
 
-    def SetNewObject(self, position:Position, object_:GenericObject):
-        if self.GetObject(position) == None:
-            self.layers['objects'][position.x][position.y] = object_
-            object_.position = position
+    # -------------------------------------------------------------------------------------------------------------------
+    # GROUP GESTION
+    # -------------------------------------------------------------------------------------------------------------------
 
-            if isinstance(object_, Player):
-                self.playerGroup.add(object_)
-            if isinstance(object_, Monster):
-                self.monsterGroup.add(object_)
-            return True
-        else:
-            return False
-    
-    def UpdateObject(self, position:Position, newPosition:Position):
-        if self.GetObject(newPosition) == None:
-            object_ = self.GetObject(position)
-            self.layers['objects'][newPosition.x][newPosition.y] = object_
-            object_.position = newPosition
-            self.layers['objects'][position.x][position.y] = None
-            return True
-        else:
-            return False
+    # Ajoute un object
+    def SetNewObject(self, position: Position, object_: GenericObject):
+        if isinstance(object_, Character):
+            if self.GetObject(position) == None:
+                self.layers["objects"][position.x][position.y] = object_
+                object_.position = position
+
+                if isinstance(object_, Player):
+                    self.playerGroup.add(object_)
+                if isinstance(object_, Monster):
+                    self.monsterGroup.add(object_)
+                return True
+            else:
+                return False
+        elif isinstance(object_, PickableObject):
+            if self.GetPickableObjects(position) == None:
+                self.layers["pickableObjects"][position.x][position.y] = object_
+                object_.position = position
+
+                self.pickableObjectGroup.add(object_)
+
+                return True
+            else:
+                return False
     
     def RemoveObject(self, position:Position):
         if self.GetObject(position)!= None:
@@ -72,6 +89,10 @@ class Floor():
             return True
         else:
             return False
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # UPDATE OBJECTS
+    # -------------------------------------------------------------------------------------------------------------------
 
     # Update the position of the Player
     def UpdatePlayer(self, player:Player, destination:Position):
@@ -87,6 +108,14 @@ class Floor():
 
     # Search the paths and update the position of the monster
     def UpdateMonster(self, monster:Monster):
+        allTargets = []
+        for xBoard in range(self.size.width):
+            for yBoard in range(self.size.height):
+                for x,y in [(0,1),(1,0),(0,-1),(-1,0)]:
+                    position = Position(xBoard + x, yBoard + y)
+                    if position.InBoard(self.size):
+                        if isinstance(self.GetObject(position), Player):
+                            allTargets.append(Position(xBoard, yBoard))
         completePathTargets = []
         partialPathTargets = []
         pattern = monster.weapon.GetAttackPattern()
@@ -255,6 +284,10 @@ class Floor():
             length += pathPoint['bias']
         return length
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # PRINT OBJECT GESTION
+    # -------------------------------------------------------------------------------------------------------------------
+
     def __str__(self):
         representation = '+'
         for _x in range(self.size.width):
@@ -281,28 +314,42 @@ class Floor():
         representation += '+'
         return representation
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # DRAW ON THE SCREEN
+    # -------------------------------------------------------------------------------------------------------------------
+
     def draw_monsters_lifebars(self, screen, larg_case ):
 
         for monstre in self.monsterGroup :
+                self.draw_lifebar(screen, larg_case, monstre)
 
-            max_health_point = monstre.maxHealthPoints
-            health_points = monstre.healthPoints
-            ecart = 1
-            larg_one_point = (larg_case - (max_health_point * ecart)) // max_health_point
+    def draw_pickableObjects_lifebars(self, screen, larg_case ):
 
-            bar_back_color = (253, 250, 217)
-            bar_front_color = (0, 255, 0)
+        for object in self.pickableObjectGroup :
+                self.draw_lifebar(screen, larg_case, object)
 
-            for i in range(0,max_health_point):
-                if i < health_points :
-                    bar_color = bar_front_color
-                else :
-                    bar_color = bar_back_color
+    def draw_lifebar(self, screen, larg_case, object):
+        max_health_point = object.maxHealthPoints
+        health_points = object.healthPoints
+        ecart = 1
+        larg_one_point = (larg_case - (max_health_point * ecart)) // max_health_point
 
-                bar_x = monstre.rect.x + (ecart * (i)) + (larg_one_point * (i))
-                bar_back_position = [bar_x , monstre.rect.y-15, larg_one_point, 7]  # x, y, w, h
+        bar_back_color = (253, 250, 217)
+        bar_front_color = (0, 255, 0)
 
-                pygame.draw.rect(screen, bar_color, bar_back_position)
+        for i in range(0, max_health_point):
+            if i < health_points:
+                bar_color = bar_front_color
+            else:
+                bar_color = bar_back_color
+
+            bar_x = object.rect.x + (ecart * (i)) + (larg_one_point * (i))
+            bar_back_position = [bar_x, object.rect.y + 10, larg_one_point, 7]  # x, y, w, h
+
+            pygame.draw.rect(screen, bar_color, bar_back_position)
+
+
+
 
 
 class Node(Position):
