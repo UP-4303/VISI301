@@ -20,12 +20,12 @@ class Floor():
     playerGroup:pygame.sprite.Group
     monsterGroup:pygame.sprite.Group
 
-    def __init__(self, name:str="Floor 0", size:Size=Size(6,6)):
+    def __init__(self, name:str='Floor 0', size:Size=Size(6,6)):
         self.name = name
         self.size = size
 
         self.layers = {
-            "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)]
+            'objects': [[None for _y in range(self.size.height)] for _x in range(self.size.width)]
         }
 
         self.playerGroup = pygame.sprite.Group()
@@ -33,14 +33,14 @@ class Floor():
 
 
     def GetObject(self, position:Position):
-        return self.layers["objects"][position.x][position.y]
+        return self.layers['objects'][position.x][position.y]
 
 
 # Ajoute un object
 
     def SetNewObject(self, position:Position, object_:GenericObject):
         if self.GetObject(position) == None:
-            self.layers["objects"][position.x][position.y] = object_
+            self.layers['objects'][position.x][position.y] = object_
             object_.position = position
 
             if isinstance(object_, Player):
@@ -54,9 +54,9 @@ class Floor():
     def UpdateObject(self, position:Position, newPosition:Position):
         if self.GetObject(newPosition) == None:
             object_ = self.GetObject(position)
-            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            self.layers['objects'][newPosition.x][newPosition.y] = object_
             object_.position = newPosition
-            self.layers["objects"][position.x][position.y] = None
+            self.layers['objects'][position.x][position.y] = None
             return True
         else:
             return False
@@ -68,7 +68,7 @@ class Floor():
                 self.playerGroup.remove(object_)
             if isinstance(object_, Monster):
                 self.monsterGroup.remove(object_)
-            self.layers["objects"][position.x][position.y] = None
+            self.layers['objects'][position.x][position.y] = None
             return True
         else:
             return False
@@ -79,15 +79,16 @@ class Floor():
         # print(path, destination)
         sumCost = 0
         for currentNode in path:
-            sumCost += currentNode["bias"]
+            sumCost += currentNode['bias']
         if sumCost <= player.movementPoints and sumCost != 0:
-            self.UpdateObject(player.position, path[-1]["position"])
+            self.UpdateObject(player.position, path[-1]['position'])
         else:
-            print("Chemin trop long ou inexistant !")
+            print('Chemin trop long ou inexistant !')
 
     # Search the paths and update the position of the monster
     def UpdateMonster(self, monster:Monster):
-        allTargets = []
+        completePathTargets = []
+        partialPathTargets = []
         pattern = monster.weapon.GetAttackPattern()
         if pattern != {}:
             distanceMax = pattern['distance']
@@ -102,7 +103,15 @@ class Floor():
                             checkingPosition = Position(xBoard + xPattern - patternCenter[0], yBoard + yPattern - patternCenter[1])
                             if checkingPosition.InBoard(self.size):
                                 if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
-                                    allTargets.append(Position(xBoard, yBoard))
+                                    path = self.Pathfinder(monster.position,Position(xBoard, yBoard))
+                                    pathLength = 0
+                                    for node in path:
+                                        pathLength += node['bias']
+                                    target = {'position':Position(xBoard, yBoard), 'attackVector':Vector(0,0), 'path':path, 'pathLength':pathLength}
+                                    if pathLength <= monster.movementPoints:
+                                        completePathTargets.append(target)
+                                    else:
+                                        partialPathTargets.append(target)
                                     positionIsTarget = True
 
                     if distanceMax > 0 :
@@ -116,7 +125,15 @@ class Floor():
                                     checkingPosition = Position(fireAtPosition.x + xPattern - patternCenter[0], fireAtPosition.y + yPattern - patternCenter[1])
                                     if checkingPosition.InBoard(self.size):
                                         if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
-                                            allTargets.append(Position(xBoard, yBoard))
+                                            path = self.Pathfinder(monster.position,Position(xBoard, yBoard))
+                                            pathLength = 0
+                                            for node in path:
+                                                pathLength += node['bias']
+                                            target = {'position':Position(xBoard, yBoard), 'attackVector':directions[directionIndex]*distance, 'path':path, 'pathLength':pathLength}
+                                            if pathLength <= monster.movementPoints:
+                                                completePathTargets.append(target)
+                                            else:
+                                                partialPathTargets.append(target)
                                             positionIsTarget = True
                             distance += 1
                             fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
@@ -127,35 +144,43 @@ class Floor():
                                         checkingPosition = Position(fireAtPosition.x + xPattern - patternCenter[0], fireAtPosition.y + yPattern - patternCenter[1])
                                         if checkingPosition.InBoard(self.size):
                                             if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
-                                                allTargets.append(Position(xBoard, yBoard))
+                                                path = self.Pathfinder(monster.position,Position(xBoard, yBoard))
+                                                pathLength = 0
+                                                for node in path:
+                                                    pathLength += node['bias']
+                                                target = {'position':Position(xBoard, yBoard), 'attackVector':directions[directionIndex]*distance, 'path':path, 'pathLength':pathLength}
+                                                if pathLength <= monster.movementPoints:
+                                                    completePathTargets.append(target)
+                                                else:
+                                                    partialPathTargets.append(target)
+
                                                 positionIsTarget = True
                                 distance += 1
                                 fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
                             directionIndex += 1
         
-        completePaths = []
-        partialPaths = []
-        for target in allTargets:
-            path = self.Pathfinder(monster.position, target)
-            if path != []:
-                pathLenght = 0
-                for node in path:
-                    pathLenght += node['bias']
-                if pathLenght <= monster.movementPoints:
-                    completePaths.append(path)
-                elif path[0]['bias'] <= monster.movementPoints:
-                        partialPaths.append(path)
-        if completePaths != []:
-            self.UpdateObject(monster.position, completePaths[randint(0,len(completePaths)-1)][-1]["position"])
-        elif partialPaths != []:
-            pathIndex = randint(0,len(partialPaths)-1)
-            positionIndex = 0
-            pathLenght = partialPaths[pathIndex][positionIndex]['bias']
-            while pathLenght + partialPaths[pathIndex][positionIndex+1]['bias'] <= monster.movementPoints:
-                positionIndex += 1
-                pathLenght += partialPaths[pathIndex][positionIndex]['bias']
-            self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
+        if completePathTargets != []:
+            target = completePathTargets[randint(0, len(completePathTargets)-1)]
+            monster.attackVector = target['attackVector']
+            if target['path'] != []:
+                self.UpdateObject(monster.position, target['path'][-1]['position'])
 
+        elif partialPathTargets != []:
+            partialPathTargets.sort(key=lambda element: element['pathLength'])
+            maxIndex = [i for i, x in enumerate(partialPathTargets) if x == min(partialPathTargets, key=lambda element: element['pathLength'])][-1]
+            target = partialPathTargets[randint(0, maxIndex)]
+            if target['path'][0]['bias'] <= monster.movementPoints:
+                pathLength = target['path'][0]['bias']
+                pathIndex = 0
+                while pathLength + target['path'][pathIndex+1]['bias'] <= monster.movementPoints:
+                    pathLength += target['path'][pathIndex+1]['bias']
+                    pathIndex += 1
+                monster.attackVector = None
+                self.UpdateObject(monster.position, target['path'][pathIndex]['position'])
+        
+        else:
+            monster.attackVector = None
+        # print(monster.target)
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
@@ -194,8 +219,8 @@ class Floor():
         while nodesToExplore!= [] and Position(currentNode.x, currentNode.y) != targetPosition :
             currentNode = nodesToExplore.pop(-1)
             currentNode.Explore()
-            # print("current node : ", currentNode, currentNode.bias)
-            # print("To explore :", nodesToExplore)
+            # print('current node : ', currentNode, currentNode.bias)
+            # print('To explore :', nodesToExplore)
             if currentNode.gCost != inf:
                 if currentNode.x > 0:
                     addingNode = nodes[currentNode.x-1][currentNode.y]
@@ -220,7 +245,7 @@ class Floor():
         
         if Position(currentNode.x, currentNode.y) == targetPosition:
             while not(currentNode.start):
-                path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
+                path.insert(0, {'position':Position(currentNode.x, currentNode.y), 'bias':currentNode.bias})
                 currentNode = currentNode.pointer
         return path
     
@@ -243,9 +268,9 @@ class Floor():
                 object_ = self.layers['objects'][x][y]
                 if object_ is None:
                     representation += ' '
-                elif object_.name == "Bloc":
+                elif object_.name == 'Bloc':
                     representation += 'B'
-                elif object_.name == "Player":
+                elif object_.name == 'Player':
                     representation += 'P'
             representation += '|'
             representation += '\n'
