@@ -9,6 +9,9 @@ class Vector():
         self.x = x
         self.y = y
 
+    def Normalize(self):
+        return Vector(int(self.x/self.abs()), int(self.y/self.abs))
+
     def __mul__(self, multiplier:int):
         return Vector(self.x*multiplier, self.y*multiplier)
     
