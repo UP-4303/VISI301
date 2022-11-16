@@ -183,6 +183,9 @@ class Game:
         self.draw_bag(screen)
 
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                print("aurevoir")
             # Deal with click if we are in the bag
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 print("you clicked in the bag")
@@ -653,6 +656,11 @@ class Game:
             else :
 
                 x = x + ecart + taille
+
+            if self.weaponTab[arme] == self.currentweapon :
+                back_color = (217, 204, 255)
+            else :
+                back_color = (204, 255, 255)
 
             back_square_pos = [x, y, taille, taille]  # x, y, w, h
             pygame.draw.rect(screen, back_color, back_square_pos)
