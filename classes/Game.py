@@ -296,6 +296,19 @@ class Game:
                                         long_case, larg_case)
             pygame.draw.rect(screen, color, pathPointRect)
 
+    def preshot_monster_attack(self, screen):
+        for monster in self.currentFloor.monsterGroup:
+            pattern = monster.weapon.GetAttackPattern()['damages']
+            centerpattern = monster.weapon.GetAttackPattern()['center']
+
+            position = monster.position
+           # vector = monster.attackVector
+
+            print(position)
+            #print(vector)
+
+            #centre = Position(position.x + vector[0], position.y + vector[1])
+            #print("centre" + centre)
     # -------------------------------------------------------------------------------------------------------------------
     # SPAWN
     # -------------------------------------------------------------------------------------------------------------------
@@ -376,6 +389,7 @@ class Game:
 
         # show floor
         self.draw_floor(screen)
+        self.preshot_monster_attack( screen)
 
         # show player info
         self.draw_player_infos(screen)
