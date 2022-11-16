@@ -54,6 +54,7 @@ class Game:
         self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
         self.currentFloor.SetNewObject(Position(0, 0), self.player)
         self.currentweapon = self.player.weapon
+
         # boutons
         self.button_attack = pygame.Rect(710, 630, 50, 20)
         self.button_mvt = pygame.Rect(650, 630, 50, 20)
@@ -61,6 +62,8 @@ class Game:
         self.button_armes = pygame.Rect(830, 630, 50, 20)
         self.button_annuler = pygame.Rect(890, 630, 50, 20)
         self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
+
+        self.button_let_go_weapon = pygame.Rect(680, 490, 70, 30)
 
         # const needed to draw the map
         self.ecart = 3
@@ -81,7 +84,8 @@ class Game:
         self.running = True
 
         self.bagisopen = False
-        self.bag = []
+        self.bag = weapons
+        self.taillebag = 13
 
 
 
@@ -102,6 +106,7 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
 
     def update(self, screen):
+
         # update affichage et update var
         self.draw_everything(screen)
         self.running = True
@@ -190,8 +195,11 @@ class Game:
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 print("you clicked in the bag")
 
-                for arme in self.weaponTab:
-                    if self.weaponTab[arme].button.collidepoint(pygame.mouse.get_pos()):
+                if self.button_let_go_weapon.collidepoint(pygame.mouse.get_pos()):
+                    self.letGo(self.currentweapon)
+
+                for arme in self.bag:
+                    if self.bag[arme].button.collidepoint(pygame.mouse.get_pos()):
                         print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
                         self.currentweapon = self.weaponTab[arme]
 
@@ -304,7 +312,7 @@ class Game:
             position = monster.position
            # vector = monster.attackVector
 
-            print(position)
+            #print(position)
             #print(vector)
 
             #centre = Position(position.x + vector[0], position.y + vector[1])
@@ -371,6 +379,21 @@ class Game:
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
             object.image = image
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # BAG GESTION
+    # -------------------------------------------------------------------------------------------------------------------
+    def pickUp(self,weapon):
+        if (len(bag)<self.taillebag):
+            self.bag.append(weapon)
+
+    # We can let go a weapon to have more space in the bag.
+    # We will return at the basic weapon that we can not remove
+    def letGo(self, weapon):
+        if not(weapon.name=="BASIC WEAPON"):
+
+            del self.bag[weapon.name]
+            self.currentweapon = self.bag["BASIC WEAPON"]
 
     # -------------------------------------------------------------------------------------------------------------------
     # DRAW ON THE SCREEN
@@ -553,6 +576,7 @@ class Game:
     def draw_current_weapon(self, screen):
         # Font style creation
         font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_medium = pygame.font.SysFont("monospace", 17, True)  # create the font style
         font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
 
         # draw the back square
@@ -592,6 +616,11 @@ class Game:
         screen.blit(weapon_push_pattern_txt, (610, 415))
         self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['push'], 800, 415, 100,
                           self.currentweapon.GetAttackPattern()['pushCenter'], self.currentweapon.imageLink)
+
+        #draw the button to let go a weapon
+        pygame.draw.rect(screen, (153, 179, 255), self.button_let_go_weapon)
+        txt_button_let_go = font_medium.render("Lacher", 1, (255, 255, 255))
+        screen.blit(txt_button_let_go, (683, 493))
 
     #draw the pattern of attack of a weapon
     def draw_pattern(self, screen, pattern, x_pos, y_pos , size, center, imageLink):
@@ -661,7 +690,7 @@ class Game:
         x = x_start
         y = y_start
 
-        for arme in self.weaponTab :
+        for arme in self.bag :
             if (compte_arme % 4) == 0 :
                 if not (compte_arme == 0):
                     x = x_start
@@ -671,7 +700,7 @@ class Game:
 
                 x = x + ecart + taille
 
-            if self.weaponTab[arme] == self.currentweapon :
+            if self.bag[arme] == self.currentweapon :
                 back_color = (217, 204, 255)
             else :
                 back_color = (204, 255, 255)
@@ -679,14 +708,14 @@ class Game:
             back_square_pos = [x, y, taille, taille]  # x, y, w, h
             pygame.draw.rect(screen, back_color, back_square_pos)
 
-            image_arme = pygame.image.load(self.weaponTab[arme].imageLink)  # import image
+            image_arme = pygame.image.load(self.bag[arme].imageLink)  # import image
             image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
             screen.blit(image_arme, (x, y))
 
-            txt_arme = font_small.render(self.weaponTab[arme].name, 1, (255, 255, 255))
+            txt_arme = font_small.render(self.bag[arme].name, 1, (255, 255, 255))
             screen.blit(txt_arme, (x, y + taille))
 
-            self.weaponTab[arme].button = pygame.Rect(x, y, taille, taille)
+            self.bag[arme].button = pygame.Rect(x, y, taille, taille)
 
             compte_arme = compte_arme + 1
 
