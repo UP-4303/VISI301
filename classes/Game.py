@@ -181,6 +181,7 @@ class Game:
 
     def dealWithOpenBag(self, screen):
         self.draw_bag(screen)
+
         for event in pygame.event.get():
             # Deal with click if we are in the bag
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
@@ -531,10 +532,98 @@ class Game:
         won_background = pygame.image.load('assets/won.png')  # import background
         screen.blit(won_background, (0, 0))
 
-    #draw bag when is open
-    def draw_bag(self, screen):
+    #draw the current weapon when the bag is open
+    def draw_current_weapon(self, screen):
+        # Font style creation
         font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
         font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
+
+        # draw the back square
+        back_color = (204, 255, 255)
+        back_square_pos = [600, 170, 320, 360]  # x, y, w, h
+        pygame.draw.rect(screen, back_color, back_square_pos)
+
+
+        #Draw the image of the weapon
+        DEFAULT_IMAGE_SIZE = (50, 50)
+        x = 860
+        y = 180
+        image_arme = pygame.image.load(self.currentweapon.imageLink)  # import image
+        image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+        screen.blit(image_arme, (x, y))
+
+        # draw the title of the current weapon
+        weapon_name_txt = font_large.render(self.currentweapon.name, 1, (38, 0, 153))
+        screen.blit(weapon_name_txt, (610, 180))
+
+        #draw the over obstacle capacity
+        weapon_name_txt = font_small.render("Surpasse objstacle :" + str(self.currentweapon.GetAttackPattern()['overObstacles']), 1, (38, 0, 153))
+        screen.blit(weapon_name_txt, (610, 215))
+
+        # draw the distance capacity
+        weapon_name_txt = font_small.render(
+            "Distance :" + str(self.currentweapon.GetAttackPattern()['distance']), 1, (38, 0, 153))
+        screen.blit(weapon_name_txt, (610, 245))
+
+        #draw the attack pattern
+        weapon_attack_pattern_txt = font_small.render("Attack Pattern : ", 1, (38, 0, 153))
+        screen.blit(weapon_attack_pattern_txt, (610, 280))
+        self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['damages'], 800, 280, 100, self.currentweapon.GetAttackPattern()['center'], self.currentweapon.imageLink)
+
+        # draw the push pattern
+        weapon_push_pattern_txt = font_small.render("Push Pattern : ", 1, (38, 0, 153))
+        screen.blit(weapon_push_pattern_txt, (610, 415))
+        self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['push'], 800, 415, 100,
+                          self.currentweapon.GetAttackPattern()['pushCenter'], self.currentweapon.imageLink)
+
+    #draw the pattern of attack of a weapon
+    def draw_pattern(self, screen, pattern, x_pos, y_pos , size, center, imageLink):
+
+        # draw the background off the pattern
+        back_floor_color = (46, 222, 231)
+        floor_position = [x_pos, y_pos, size, size]
+        pygame.draw.rect(screen, back_floor_color, floor_position)
+
+        #define var
+        nbLigne = len(pattern)
+        nbCol = len(pattern[0])
+        ecart = 2
+        larg_case = (size - ((nbCol + 1) * ecart)) / nbCol
+        long_case = (size - ((nbLigne + 1) * ecart)) / nbLigne
+
+        couleur_case_zero = (76, 150, 255)
+        couleur_case_un = (255, 51, 51)
+
+        for l in range(0, len(pattern)):
+            ligne = pattern[l]
+            for c in range(0, len(ligne)):
+                if ligne[c] == 0 :
+                    couleur_case = couleur_case_zero
+                else :
+                    couleur_case = couleur_case_un
+
+                # find the coordinates of the cases
+                top_left_x_case = ecart + x_pos + (larg_case * l) + (ecart * l)
+                top_left_y_case = ecart + y_pos + (long_case * c) + (ecart * c)
+
+                #draw each square
+                position_case = [top_left_x_case, top_left_y_case, larg_case, long_case]
+                pygame.draw.rect(screen, couleur_case, position_case)
+
+                #Marque le centre avec image de l'arme
+                if c == center[1] and l == center[0]:
+                    image_arme = pygame.image.load(imageLink)  # import image
+                    image_arme = pygame.transform.scale(image_arme, (long_case, larg_case))
+                    screen.blit(image_arme, ( top_left_x_case, top_left_y_case))
+
+
+    #draw bag when is open
+    def draw_bag(self, screen):
+
+
+
+        font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
         #Draw the background of the bag
         bag_background = pygame.image.load('assets/inventaire.png')  # import background
         screen.blit(bag_background, (0, 0))
@@ -545,9 +634,9 @@ class Game:
         screen.blit(txt_button_quit, (500, 500))
 
         # draw the weapons
-        taille = 90
+        taille = 60
         DEFAULT_IMAGE_SIZE = (taille, taille)
-        back_color = (253, 250, 217)
+        back_color = (204, 255, 255)
         x_start = 170
         y_start = 170
         ecart = 40
@@ -556,7 +645,7 @@ class Game:
         y = y_start
 
         for arme in self.weaponTab :
-            if (compte_arme % 6) == 0 :
+            if (compte_arme % 4) == 0 :
                 if not (compte_arme == 0):
                     x = x_start
                     y = y + ecart + taille
@@ -578,6 +667,9 @@ class Game:
             self.weaponTab[arme].button = pygame.Rect(x, y, taille, taille)
 
             compte_arme = compte_arme + 1
+
+        self.draw_current_weapon(screen);
+
 
     def draw_message(self, screen):
         font_small = pygame.font.SysFont("monospace", 17, True)  # create the font style

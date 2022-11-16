@@ -53,5 +53,117 @@
                 "pushCenter":[1,1]
             }
         }
+    },
+
+    "TEST WEAPON 3":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "TEST WEAPON 4":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "TEST WEAPON 6":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "TEST WEAPON 7":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [1,1,1],
+                    [1,1,1],
+                    [1,1,0]
+                ],
+                "pushCenter":[0,1]
+            }
+        }
     }
 }
