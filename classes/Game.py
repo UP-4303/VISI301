@@ -385,7 +385,7 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
     def pickUp(self,weapon):
         if (len(bag)<self.taillebag):
-            self.bag.append(weapon)
+            self.bag[weapon.name] = weapon
 
     # We can let go a weapon to have more space in the bag.
     # We will return at the basic weapon that we can not remove
