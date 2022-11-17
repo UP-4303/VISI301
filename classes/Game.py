@@ -89,6 +89,9 @@ class Game:
         self.bag = weapons
         self.taillebag = 13
 
+        self.isAOpenableShowed = False
+        self.currentOpenable = None
+
 
 
 
@@ -287,7 +290,11 @@ class Game:
                 elif event.key == pygame.K_o:
                     self.openObject(self.player.position)
                 elif event.key == pygame.K_p:
-                    self.showInsideObject(self.player.position)
+                    self.showInsideObject(self.player.position, screen)
+                elif event.key == pygame.K_i:
+                    self.isAOpenableShowed = False
+
+
 
 
 
@@ -298,13 +305,16 @@ class Game:
         else :
             for weapon in res:
                 self.pickUp(weapon)
-    def showInsideObject(self, position):
-        res = self.currentFloor.openOpenableObject(position, self)
+        self.currentOpenable = None
+    def showInsideObject(self, position, screen):
+        res = self.currentFloor.showInsideOpenableObject(position, screen)
+
         if (res == False):
-            self.message = "Aucun objet à ouvrir à votre position"
-        else:
-            for weapon in res:
-                self.pickUp(weapon)
+            self.message = "Aucun objet à montrer à votre position"
+        else :
+            self.isAOpenableShowed = True
+            self.currentOpenable = self.currentFloor.getStaticObjects(position)
+
     def monsterTurn(self):
         for monster in self.currentFloor.monsterGroup:
             self.currentFloor.UpdateMonster(monster)
@@ -487,6 +497,9 @@ class Game:
 
         # draw the message for the player
         self.draw_message(screen)
+
+        if self.isAOpenableShowed:
+            self.currentOpenable.showInside(screen)
 
     #draw players infos in the up case
     def draw_player_infos(self, screen):
@@ -711,6 +724,7 @@ class Game:
 
         font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
         font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
+
         #Draw the background of the bag
         bag_background = pygame.image.load('assets/inventaire.png')  # import background
         screen.blit(bag_background, (0, 0))

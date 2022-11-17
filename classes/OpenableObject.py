@@ -7,6 +7,7 @@ class OpenableObject(StaticObject):
 
     def __init__(self, name:str="Static", description:str="Lorem Ipsum", imageLink:str="./assets/carreblanc.png", healthPoints:int=0, position:Position=Position(0,0)):
         super().__init__(name, description, imageLink, healthPoints, position)
+        self.isNowOpen = False
 
 
     def isOpen(self, Player):
@@ -15,6 +16,8 @@ class OpenableObject(StaticObject):
 
     def showInside(self, screen) :
         print("you want to show inside")
+
+
 
 
 
