@@ -6,9 +6,11 @@ import pygame
 
 from classes.GenericObject import GenericObject
 from classes.Monster import Monster
+from classes.MoveableObject import MoveableObject
 from classes.Player import Player
 from classes.Position import Position
 from classes.Size import Size
+from classes.StaticObject import StaticObject
 from classes.Vector import Vector
 from classes.Weapon import Weapon
 from classes.Character import Character
@@ -136,20 +138,19 @@ class Floor():
                     checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
                     if checkingPosition.InBoard(self.size):
                         checkingObject = self.GetObject(checkingPosition)
-                        if checkingObject != None:
+                        checkingPickableObject = self.GetPickableObjects(checkingPosition)
+                        if isinstance(checkingObject, MoveableObject):
                             pushedPosition = checkingPosition
                             for _ in range(pattern["push"][x][y]):
-                                if (pushedPosition + vector.Normalize()).InBoard(self.size):
+                                if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
                                     self.UpdatObject(pushedPosition, pushedPosition + vector.Normalize())
                                     pushedPosition += vector.Normalize()
-
-                        # checkingPickableObject = self.GetPickableObjects(checkingPosition)
-                        # if checkingPickableObject != None:
-                        #     pushedPickablePosition = checkingPosition
-                        #     for _ in range(pattern["push"][x][y]):
-                        #         if (pushedPickablePosition + vector.Normalize()).InBoard(self.size):
-                        #             self.UpdatePickableObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
-                        #             pushedPickablePosition += vector.Normalize()
+                        if checkingPickableObject != None:
+                            pushedPickablePosition = checkingPosition
+                            for _ in range(pattern["push"][x][y]):
+                                if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.GetPickableObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
+                                    self.UpdatePickableObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
+                                    pushedPickablePosition += vector.Normalize()
 
     # -------------------------------------------------------------------------------------------------------------------
     # UPDATE OBJECTS
