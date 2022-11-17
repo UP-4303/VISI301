@@ -281,7 +281,14 @@ class Game:
                 elif event.key == pygame.K_s:
                     print("you earn score")
                     self.score = self.score + 3
+                elif event.key == pygame.K_o:
+                    self.openObject(self.MouseBoardPosition())
 
+
+    def openObject(self, position):
+        done = self.currentFloor.openOpenableObject(position)
+        if not(done):
+            self.message = "Aucun objet à ouvrir à votre position"
     def monsterTurn(self):
         for monster in self.currentFloor.monsterGroup:
             self.currentFloor.UpdateMonster(monster)
@@ -328,7 +335,7 @@ class Game:
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 
-    # Generate a pickeable object
+    # Generate a pickeable object : money, potions
     def spawn_pickableObject(self, position: Position, objectType: str='Money'):
         if objectType == 'Money':
             object = Money()
@@ -342,6 +349,24 @@ class Game:
         self.currentFloor.SetNewObject(position, object)
         object.rect.x, object.rect.y = self.convert_case_in_px(position)
 
+    # Generate a coffre
+    def spawn_coffre(self, position: Position, object_type_inside:list):
+        insideTheBox = []
+        # Rempli le tableau du contenu du coffre
+        for ObjectType in object_type_inside:
+            if objectType == 'Money':
+                object = Money()
+            elif objectType == 'MovementPotion':
+                object = MovementPotion()
+            elif objectType == 'LifePotion':
+                object = LifePotion()
+
+
+            insideTheBox += object
+
+        coffre = Coffre(position,insideTheBox)
+        self.currentFloor.SetNewObject(position, object)
+        object.rect.x, object.rect.y = self.convert_case_in_px(position)
     # -------------------------------------------------------------------------------------------------------------------
     # SPRITE GESTION
     # -------------------------------------------------------------------------------------------------------------------
@@ -353,7 +378,7 @@ class Game:
         for player in self.currentFloor.playerGroup:
             position = player.position
             player.rect.x, player.rect.y = self.convert_case_in_px(position)
-        for object in self.currentFloor.pickableObjectGroup:
+        for object in self.currentFloor.staticObjectGroup:
             position = object.position
             object.rect.x, object.rect.y = self.convert_case_in_px(position)
 
@@ -374,7 +399,7 @@ class Game:
 
             player.image = image
 
-        for object in self.currentFloor.pickableObjectGroup:
+        for object in self.currentFloor.staticObjectGroup:
             image = object.image
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
@@ -421,7 +446,7 @@ class Game:
         self.draw_monster_infos(screen)
 
         # show the objects
-        self.currentFloor.pickableObjectGroup.draw(screen)
+        self.currentFloor.staticObjectGroup.draw(screen)
         # show monstres (maybe better in main)
         self.currentFloor.monsterGroup.draw(screen)
 
@@ -441,11 +466,10 @@ class Game:
         self.currentFloor.draw_monsters_lifebars(screen, self.larg_case)
 
         # draw the life bars next to the pickables objects
-        self.currentFloor.draw_pickableObjects_lifebars(screen, self.larg_case)
+        self.currentFloor.draw_staticObjects_lifebars(screen, self.larg_case)
 
         # draw the message for the player
         self.draw_message(screen)
-
 
     #draw players infos in the up case
     def draw_player_infos(self, screen):

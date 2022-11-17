@@ -13,8 +13,7 @@ from classes.Vector import Vector
 from classes.Weapon import Weapon
 from classes.Character import Character
 from classes.PickableObject import PickableObject
-
-
+from classes.OpenableObject import OpenableObject
 
 class Floor():
     name:str
@@ -22,7 +21,7 @@ class Floor():
     layers:dict[str, Any]
     playerGroup:pygame.sprite.Group
     monsterGroup:pygame.sprite.Group
-    pickableObjectGroup:pygame.sprite.Group
+    staticObjectGroup:pygame.sprite.Group
 
     def __init__(self, name:str='Floor 0', size:Size=Size(6,6)):
         self.name = name
@@ -30,40 +29,29 @@ class Floor():
 
         self.layers = {
             "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
-            "pickableObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
+            "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
         }
 
         self.playerGroup = pygame.sprite.Group()
         self.monsterGroup = pygame.sprite.Group()
-        self.pickableObjectGroup = pygame.sprite.Group()
+        self.staticObjectGroup = pygame.sprite.Group()
 
     # -------------------------------------------------------------------------------------------------------------------
-    # GETTER MAP
+    # GETTER  MAP
     # -------------------------------------------------------------------------------------------------------------------
 
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
 
-    def GetPickableObjects(self, position:Position):
-        return self.layers["pickableObjects"][position.x][position.y]
-
-    def pickObject(self, object_):
-        if not (self.GetPickableObjects(object_.position) == None):
-            pickedObject = self.layers["pickableObjects"][object_.position.x][object_.position.y]
-            if isinstance(object_, Player):
-                pickedObject.ispicked(object_)
-            if isinstance(object_, Monster):
-                pickedObject.isCrushed(object_)
-
-            if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
-                self.layers["pickableObjects"][object_.position.x][object_.position.y] = None
-                self.pickableObjectGroup.remove(pickedObject)
+    def getStaticObjects(self, position:Position):
+        return self.layers["staticObjects"][position.x][position.y]
 
     # -------------------------------------------------------------------------------------------------------------------
     # GROUP GESTION
     # -------------------------------------------------------------------------------------------------------------------
 
-    # Ajoute un object
+    # add an object
+
     def SetNewObject(self, position: Position, object_: GenericObject):
         if isinstance(object_, Character):
             if self.GetObject(position) == None:
@@ -77,30 +65,20 @@ class Floor():
                 return True
             else:
                 return False
-        elif isinstance(object_, PickableObject):
-            if self.GetPickableObjects(position) == None:
-                self.layers["pickableObjects"][position.x][position.y] = object_
+        elif isinstance(object_, PickableObject) or isinstance(object_, OpenableObject):
+            if self.getStaticObjects(position) == None:
+                self.layers["staticObjects"][position.x][position.y] = object_
                 object_.position = position
-
-                self.pickableObjectGroup.add(object_)
+                self.staticObjectGroup.add(object_)
 
                 return True
             else:
                 return False
 
-    def UpdateObject(self, position: Position, newPosition: Position):
-        if self.GetObject(newPosition) == None:
-            object_ = self.GetObject(position)
-            self.layers["objects"][newPosition.x][newPosition.y] = object_
-            object_.position = newPosition
-            self.layers["objects"][position.x][position.y] = None
-            self.pickObject(object_)
-            return True
-        else:
-            return False
-    
-    def RemoveObject(self, position:Position):
-        if self.GetObject(position)!= None:
+    # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
+
+    def RemoveObject(self, position: Position):
+        if self.GetObject(position) != None:
             object_ = self.GetObject(position)
             if isinstance(object_, Player):
                 self.playerGroup.remove(object_)
@@ -112,11 +90,37 @@ class Floor():
             return False
 
     # -------------------------------------------------------------------------------------------------------------------
-    # UPDATE OBJECTS
+    # INTERACTION STATIC
     # -------------------------------------------------------------------------------------------------------------------
 
-    # Update the position of the Player
-    def UpdatePlayer(self, player:Player, destination:Position):
+    #Check if there is a pickable in this case and interact with it 
+    def pickStaticObject(self, object_):
+        #Check if it's a pickable and pick it
+        if not (self.getStaticObjects(object_.position) == None):
+            pickedObject = self.layers["staticObjects"][object_.position.x][object_.position.y]
+            if isinstance(pickedObject, PickableObject):
+                if isinstance(object_, Player):
+                    pickedObject.ispicked(object_)
+                elif isinstance(object_, Monster):
+                    pickedObject.isCrushed(object_)
+                                           
+                if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
+                    self.layers["staticObjects"][object_.position.x][object_.position.y] = None
+                    self.staticObjectGroup.remove(pickedObject)
+
+    def openOpenableObject(self, position):
+        if not (self.getStaticObjects(object_.position) == None):
+            staticObject = self.layers["staticObjects"][object_.position.x][object_.position.y]
+            if isinstance(staticObject, OpenableObject):
+                staticObject.isOpen()
+                return true
+            return false
+        return false
+    # -------------------------------------------------------------------------------------------------------------------
+    # UPDATE OBJECTS AND STATICS
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def UpdatePlayer(self, player: Player, destination: Position):
         path = self.Pathfinder(player.position, destination)
         # print(path, destination)
         sumCost = 0
@@ -126,7 +130,6 @@ class Floor():
             self.UpdateObject(player.position, path[-1]['position'])
         else:
             print('Chemin trop long ou inexistant !')
-
     # Search the paths and update the position of the monster
     def UpdateMonster(self, monster:Monster):
         allTargets = []
@@ -231,6 +234,30 @@ class Floor():
         else:
             monster.attackVector = None
         # print(monster.target)
+
+    def UpdateObject(self, position: Position, newPosition: Position):
+        if self.GetObject(newPosition) == None:
+            object_ = self.GetObject(position)
+            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["objects"][position.x][position.y] = None
+            self.pickStaticObject(object_)
+            return True
+        else:
+            return False
+
+    def UpdateStaticObject(self, position: Position, newPosition: Position):
+        if self.getStaticObjects(newPosition) == None:
+            object_ = self.getStaticObjects(position)
+            self.layers["staticObjects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["staticObjects"][position.x][position.y] = None
+            return True
+        else:
+            return False
+    # -------------------------------------------------------------------------------------------------------------------
+    # USEFULL METHODS FOR MOVES CALCUL
+    # -------------------------------------------------------------------------------------------------------------------
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
@@ -344,9 +371,9 @@ class Floor():
         for monstre in self.monsterGroup :
                 self.draw_lifebar(screen, larg_case, monstre)
 
-    def draw_pickableObjects_lifebars(self, screen, larg_case ):
+    def draw_staticObjects_lifebars(self, screen, larg_case ):
 
-        for object in self.pickableObjectGroup :
+        for object in self.staticObjectGroup :
                 self.draw_lifebar(screen, larg_case, object)
 
     def draw_lifebar(self, screen, larg_case, object):
