@@ -108,14 +108,25 @@ class Floor():
                     self.layers["staticObjects"][object_.position.x][object_.position.y] = None
                     self.staticObjectGroup.remove(pickedObject)
 
-    def openOpenableObject(self, position):
-        if not (self.getStaticObjects(object_.position) == None):
-            staticObject = self.layers["staticObjects"][object_.position.x][object_.position.y]
+    def openOpenableObject(self, position, game):
+        if not (self.getStaticObjects(position) == None):
+            staticObject = self.layers["staticObjects"][position.x][position.y]
             if isinstance(staticObject, OpenableObject):
-                staticObject.isOpen()
-                return true
+                weapons = staticObject.isOpen(game.player)
+                self.staticObjectGroup.remove(staticObject)
+                return weapons
             return false
         return false
+
+    def showInsideOpenableObject(self, position, screen):
+        if not (self.getStaticObjects(position) == None):
+            staticObject = self.layers["staticObjects"][position.x][position.y]
+            if isinstance(staticObject, OpenableObject):
+                staticObject.showInside(screen)
+                return True
+        return False
+
+
     # -------------------------------------------------------------------------------------------------------------------
     # UPDATE OBJECTS AND STATICS
     # -------------------------------------------------------------------------------------------------------------------

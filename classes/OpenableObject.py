@@ -13,8 +13,9 @@ class OpenableObject(StaticObject):
         Player.score += 5
 
 
-    def showInside(self) :
+    def showInside(self, screen) :
         print("you want to show inside")
+
 
 
     def isCrushed(self, Monster):

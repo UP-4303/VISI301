@@ -14,6 +14,8 @@ from classes.PickableObject import PickableObject
 from classes.Money import Money
 from classes.MovementPotion import MovementPotion
 from classes.LifePotion import LifePotion
+from classes.Coffre import Coffre
+from classes.OpenableObject import OpenableObject
 
 
 
@@ -94,6 +96,7 @@ class Game:
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
         self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
         self.spawn_pickableObject(position=Position(4, 4), objectType='LifePotion')
+        self.spawn_coffre(position=Position(2,0),  object_type_inside= ['Money', 'Money'] )
         self.current_monster = Monster()
         self.init_sprite_size()
 
@@ -282,13 +285,26 @@ class Game:
                     print("you earn score")
                     self.score = self.score + 3
                 elif event.key == pygame.K_o:
-                    self.openObject(self.MouseBoardPosition())
+                    self.openObject(self.player.position)
+                elif event.key == pygame.K_p:
+                    self.showInsideObject(self.player.position)
+
 
 
     def openObject(self, position):
-        done = self.currentFloor.openOpenableObject(position)
-        if not(done):
+        res = self.currentFloor.openOpenableObject(position, self)
+        if (res == False):
             self.message = "Aucun objet à ouvrir à votre position"
+        else :
+            for weapon in res:
+                self.pickUp(weapon)
+    def showInsideObject(self, position):
+        res = self.currentFloor.openOpenableObject(position, self)
+        if (res == False):
+            self.message = "Aucun objet à ouvrir à votre position"
+        else:
+            for weapon in res:
+                self.pickUp(weapon)
     def monsterTurn(self):
         for monster in self.currentFloor.monsterGroup:
             self.currentFloor.UpdateMonster(monster)
@@ -353,7 +369,7 @@ class Game:
     def spawn_coffre(self, position: Position, object_type_inside:list):
         insideTheBox = []
         # Rempli le tableau du contenu du coffre
-        for ObjectType in object_type_inside:
+        for objectType in object_type_inside:
             if objectType == 'Money':
                 object = Money()
             elif objectType == 'MovementPotion':
@@ -362,11 +378,12 @@ class Game:
                 object = LifePotion()
 
 
-            insideTheBox += object
+            insideTheBox.append(object)
 
         coffre = Coffre(position,insideTheBox)
-        self.currentFloor.SetNewObject(position, object)
-        object.rect.x, object.rect.y = self.convert_case_in_px(position)
+        coffre.rect.x, coffre.rect.y = self.convert_case_in_px(position)
+        self.currentFloor.SetNewObject(position, coffre)
+
     # -------------------------------------------------------------------------------------------------------------------
     # SPRITE GESTION
     # -------------------------------------------------------------------------------------------------------------------
