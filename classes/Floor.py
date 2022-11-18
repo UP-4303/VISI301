@@ -108,7 +108,9 @@ class Floor():
                     pickedObject.ispicked(object_)
                 elif isinstance(object_, Monster):
                     pickedObject.isCrushed(object_)
-                                           
+            if isinstance(pickedObject, OpenableObject):
+                if isinstance(object_, Monster):
+                    pickedObject.isCrushed(object_)
                 if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
                     self.layers["staticObjects"][object_.position.x][object_.position.y] = None
                     self.staticObjectGroup.remove(pickedObject)
