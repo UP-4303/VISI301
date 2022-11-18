@@ -121,6 +121,7 @@ class Game:
         self.running = True
         self.won = False
         self.arrivedAtElevator = (self.player.position == self.currentFloor.elevatorUP)
+        self.currentFloor.checkEveryoneAlive()
 
 
         if self.arrivedAtElevator:

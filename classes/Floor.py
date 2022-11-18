@@ -81,7 +81,16 @@ class Floor():
                 return True
             else:
                 return False
+    def checkEveryoneAlive(self):
+        for staticObject in self.staticObjectGroup:
+            if staticObject.healthPoints <= 0 :
+                self.layers["staticObjects"][staticObject.position.x][staticObject.position.y] = None
+                self.staticObjectGroup.remove(staticObject)
 
+        for monster in self.monsterGroup :
+            if monster.healthPoints <= 0 :
+                self.layers["objects"][monster.position.x][monster.position.y] = None
+                self.monsterGroup.remove(monster)
     # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
 
     def RemoveObject(self, position: Position):
@@ -146,15 +155,19 @@ class Floor():
         #Check if it's a pickable and pick it
         if not (self.getStaticObjects(object_.position) == None):
             pickedObject = self.layers["staticObjects"][object_.position.x][object_.position.y]
+
             if isinstance(pickedObject, PickableObject):
                 if isinstance(object_, Player):
                     pickedObject.ispicked(object_)
                 elif isinstance(object_, Monster):
                     pickedObject.isCrushed(object_)
+
+
             if isinstance(pickedObject, OpenableObject):
                 if isinstance(object_, Monster):
                     pickedObject.isCrushed(object_)
-                if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
+
+            if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
                     self.layers["staticObjects"][object_.position.x][object_.position.y] = None
                     self.staticObjectGroup.remove(pickedObject)
 
