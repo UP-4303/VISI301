@@ -42,19 +42,22 @@ class Game:
         weapons = {}
         for weaponName,weaponValue in weaponsJson.items():
             weapons[weaponName] = Weapon(weaponName, './assets/weapon1.png', **weaponValue)
-        print(weapons)
+        #print(weapons)
 
         # define is the game has begin
+
         self.isplaying = False
 
-        self.floorList = [Floor()]
+        self.floorList = [Floor(name='Floor 0', size= Size(6,6),elevatorUP= Position(5,5),elevatorDOWN =Position(0,0)),
+                          Floor(name='Floor 1', size= Size(10,10),elevatorUP= Position(6,6),elevatorDOWN= Position(0,4)),
+                          Floor(name='Floor 2', size= Size(15,15),elevatorUP= Position(14,7),elevatorDOWN = Position(0,7))]
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
         self.score = 0
 
         # generate the player
         self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
-        self.currentFloor.SetNewObject(Position(0, 0), self.player)
+        self.currentFloor.SetNewObject(self.currentFloor.elevatorDOWN, self.player)
         self.currentweapon = self.player.weapon
 
         # boutons
@@ -82,7 +85,7 @@ class Game:
         self.has_moved = False
         self.has_attacked = False
         self.won = False
-        self.message = " Hello world "
+        self.message = " Welcome to a new Floor "
         self.running = True
 
         self.bagisopen = False
@@ -116,7 +119,12 @@ class Game:
         # update affichage et update var
         self.draw_everything(screen)
         self.running = True
-        self.won = (self.turn == 10)
+        self.won = False
+        self.arrivedAtElevator = (self.player.position == self.currentFloor.elevatorUP)
+
+
+        if self.arrivedAtElevator:
+            self.goToNextLevel();
 
         # deal with the bag is open
         if self.bagisopen:
@@ -295,14 +303,32 @@ class Game:
                     self.isAOpenableShowed = False
 
 
+    def goToNextLevel(self):
+        if self.currentFloorIndex < len(self.floorList)-1:
+            self.currentFloorIndex += 1
+            self.currentFloor = self.floorList[self.currentFloorIndex]
+            self.currentFloor.SetNewObject(self.currentFloor.elevatorDOWN, self.player)
+            self.larg_case = (self.large_max_grille - (
+                    (self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
+            self.long_case = (self.large_max_grille - (
+                    (self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
+            self.turn = 0
+            self.has_moved = False
+            self.has_attacked = False
+            self.message = " Welcome to a new Floor "
 
+            self.isAOpenableShowed = False
+            self.currentOpenable = None
+            self.init_sprite_size()
+        else:
+            self.won = True
 
 
     def openObject(self, position):
         res = self.currentFloor.openOpenableObject(position, self)
         if (res == False):
             self.message = "Aucun objet à ouvrir à votre position"
-        else :
+        elif not(res == None):
             for weapon in res:
                 self.pickUp(weapon)
         self.currentOpenable = None
@@ -329,13 +355,13 @@ class Game:
             color = (255, 0, 0)
         x = self.currentFloor.size.width
         y = self.currentFloor.size.height
-        larg_case = (self.large_max_grille - ((x + 1) * self.ecart)) / x
-        long_case = (self.large_max_grille - ((y + 1) * self.ecart)) / y
         for pathPoint in path:
-            pathPointRect = pygame.Rect(self.top_left_x + (pathPoint['position'].x * (self.ecart + long_case + 1)),
-                                        self.top_left_y + (pathPoint['position'].y * (self.ecart + larg_case + 1)),
-                                        long_case, larg_case)
+            pathPointRect = pygame.Rect(self.ecart + self.top_left_x + (pathPoint['position'].x * (self.ecart + self.long_case)),
+                                        self.ecart + self.top_left_y + (pathPoint['position'].y * (self.ecart + self.larg_case )),
+                                        self.long_case, self.larg_case)
             pygame.draw.rect(screen, color, pathPointRect)
+
+
 
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
@@ -614,6 +640,14 @@ class Game:
 
         for i in range(0, x):
             for j in range(0, y):
+                if (Position(i,j)==self.currentFloor.elevatorUP):
+                    couleur_case = (200, 161, 249)
+                elif (Position(i,j)==self.currentFloor.elevatorDOWN):
+                    couleur_case = (137, 118, 171)
+                else :
+                    couleur_case = (76, 150, 255)
+
+
                 top_left_x_case = self.ecart + self.top_left_x + (self.larg_case * i) + (self.ecart * i)
                 top_left_y_case = self.ecart + self.top_left_y + (self.long_case * j) + (self.ecart * j)
 

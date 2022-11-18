@@ -23,7 +23,7 @@ class Floor():
     monsterGroup:pygame.sprite.Group
     staticObjectGroup:pygame.sprite.Group
 
-    def __init__(self, name:str='Floor 0', size:Size=Size(6,6)):
+    def __init__(self, name:str='Floor 0', size:Size=Size(6,6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1) ):
         self.name = name
         self.size = size
 
@@ -32,17 +32,22 @@ class Floor():
             "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
         }
 
-        self.playerGroup = pygame.sprite.Group()
-        self.monsterGroup = pygame.sprite.Group()
-        self.staticObjectGroup = pygame.sprite.Group()
+        self.playerGroup = pygame.sprite.Group() # only one player in the group
+        self.monsterGroup = pygame.sprite.Group() #all the monsters currently on the floor
+        self.staticObjectGroup = pygame.sprite.Group() #all the openable and pickable
+
+        self.elevatorUP = elevatorUP #were we will be able to leave
+        self.elevatorDOWN = elevatorDOWN #where we landed
 
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
     # -------------------------------------------------------------------------------------------------------------------
 
+    # return the object that is a the position indicated in the Object layer
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
 
+    #return the object that is a the position indicated in the static Object layer
     def getStaticObjects(self, position:Position):
         return self.layers["staticObjects"][position.x][position.y]
 
@@ -50,7 +55,7 @@ class Floor():
     # GROUP GESTION
     # -------------------------------------------------------------------------------------------------------------------
 
-    # add an object
+    # add an object in the map at the right place, right layer
 
     def SetNewObject(self, position: Position, object_: GenericObject):
         if isinstance(object_, Character):
