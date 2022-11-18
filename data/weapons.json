@@ -1,4 +1,31 @@
 {
+    "BASIC WEAPON":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
     "TEST WEAPON":{
         "onPick":{
             "statLifeAdd":1
@@ -51,6 +78,118 @@
                     [0,1,0]
                 ],
                 "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "TEST WEAPON 1":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [1,1,1],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,1,0],
+                    [1,1,1],
+                    [0,1,0]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "TEST WEAPON 2":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [1,1,1],
+                    [0,0,0],
+                    [0,0,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,0,0],
+                    [0,0,0],
+                    [1,1,1]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "MUTANT WEAPON":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,1,0],
+                    [0,0,0],
+                    [0,1,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [0,1,0],
+                    [0,0,0],
+                    [0,1,0]
+                ],
+                "pushCenter":[1,1]
+            }
+        }
+    },
+
+    "SONIC WEAPON":{
+        "onPick":{
+            "statLifeAdd":1
+        },
+        "onDrop":{
+            "statLifeAdd":-1
+        },
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,0,0],
+                    [1,1,1],
+                    [0,0,0]
+                ],
+                "center":[1,1],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":1,
+                "push":[
+                    [1,1,1],
+                    [1,1,1],
+                    [1,1,1]
+                ],
+                "pushCenter":[0,1]
             }
         }
     }

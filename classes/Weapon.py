@@ -21,8 +21,8 @@ class Weapon(pygame.sprite.Sprite):
         for key,value in kwargs.items():
             setattr(self,key,value)
 
-    def Action(self, action, wielder):
-        actionValue = getattr(self, action, default=None)
+    def Action(self, action:str, wielder:Any):
+        actionValue = getattr(self, action, None)
         if actionValue != None:
             for key,value in actionValue.items():
                 match key:
