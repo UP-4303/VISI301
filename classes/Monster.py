@@ -8,6 +8,6 @@ class Monster(Character):
 
     def __init__(self, name:str="Monster", description:str="Lorem Ipsum", imageLink:str="./assets/monster.png", healthPoints:int=5, position: Position =Position(0,0), movementPoints:int=0, weapon:Weapon=Weapon()):
         super().__init__(name, description, imageLink, healthPoints, position, movementPoints, weapon)
-
+        self.attackVector = None
         self.rect.x = self.position.x
         self.rect.y = self.position.y

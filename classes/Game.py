@@ -23,8 +23,10 @@ class Game:
     score: int
     isplaying: bool
     floorList: list[Floor]
-    currentFloor: int
+    currentFloorIndex: int
+    currentFloor: Floor
     status: str
+    player: Player
 
     # Status :
     # PlayerTurn : Waiting for player to choose an action
@@ -33,8 +35,6 @@ class Game:
     # MonsterTurn
 
     def __init__(self):
-
-
         with open('data/weapons.json','r', encoding='utf-8') as dataFile:
             data = dataFile.read()
             weaponsJson = json.loads(data)
@@ -158,7 +158,6 @@ class Game:
         if self.has_attacked == False:
             self.status = "PlayerAttack"
             self.message = " Choisissez où vous voulez attaquer"
-
         else:
             print("Vous avez deja attaquer vous ne pouvez plus")
             self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
@@ -181,7 +180,6 @@ class Game:
         self.turn = self.turn + 1
     def wantToChoseMouvement(self):
         print("vous avez appuyé sur le bouton mvt")
-
         # check if the player has already moved during this turn
         if self.has_moved == False:
             self.message = " Choisissez où vous voulez vous déplacer"
@@ -342,6 +340,8 @@ class Game:
             self.currentOpenable = self.currentFloor.getStaticObjects(position)
 
     def monsterTurn(self):
+        for monster in self.currentFloor.monsterGroup:
+            self.currentFloor.Attack(monster, monster.attackVector)
         for monster in self.currentFloor.monsterGroup:
             self.currentFloor.UpdateMonster(monster)
         self.status = "PlayerTurn"

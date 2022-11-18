@@ -6,9 +6,11 @@ import pygame
 
 from classes.GenericObject import GenericObject
 from classes.Monster import Monster
+from classes.MoveableObject import MoveableObject
 from classes.Player import Player
 from classes.Position import Position
 from classes.Size import Size
+from classes.StaticObject import StaticObject
 from classes.Vector import Vector
 from classes.Weapon import Weapon
 from classes.Character import Character
@@ -93,6 +95,47 @@ class Floor():
             return True
         else:
             return False
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # ATTACK
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def Attack(self, object_:Character, vector:Vector|None):
+        object_.weapon.Action("onAttack", object_)
+        pattern = object_.weapon.GetAttackPattern()
+        if vector != None:
+            if pattern != {}:
+                if "damages" in pattern:
+                    for x in range(len(pattern["damages"])):
+                        for y in range(len(pattern["damages"][x])):
+                            checkingPosition = Position(x-pattern["center"][0]+object_.position.x+vector.x, y-pattern["center"][1]+object_.position.y+vector.y)
+                            if checkingPosition.InBoard(self.size):
+                                checkingObject = self.GetObject(checkingPosition)
+                                if checkingObject != None:
+                                    checkingObject.TakeDamage(pattern["damages"][x][y])
+                                checkingPickableObject = self.getStaticObjects(checkingPosition)
+                                if checkingPickableObject != None:
+                                    checkingPickableObject.TakeDamage(pattern["damages"][x][y])
+                
+                if "push" in pattern:
+                    for x in range(len(pattern["push"])):
+                        for y in range(len(pattern["push"][x])):
+                            checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
+                            if checkingPosition.InBoard(self.size):
+                                checkingObject = self.GetObject(checkingPosition)
+                                checkingPickableObject = self.getStaticObjects(checkingPosition)
+                                if isinstance(checkingObject, MoveableObject):
+                                    pushedPosition = checkingPosition
+                                    for _ in range(pattern["push"][x][y]):
+                                        if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
+                                            self.UpdateObject(pushedPosition, pushedPosition + vector.Normalize())
+                                            pushedPosition += vector.Normalize()
+                                if checkingPickableObject != None:
+                                    pushedPickablePosition = checkingPosition
+                                    for _ in range(pattern["push"][x][y]):
+                                        if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.getStaticObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
+                                            self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
+                                            pushedPickablePosition += vector.Normalize()
 
     # -------------------------------------------------------------------------------------------------------------------
     # INTERACTION STATIC
