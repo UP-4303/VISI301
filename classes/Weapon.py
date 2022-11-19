@@ -41,7 +41,11 @@ class Weapon(pygame.sprite.Sprite):
                         pattern = actionValue['pattern']
 
     def GetAttackPattern(self):
-        return getattr(self, "onAttack", None).get('pattern', {})
+        onAttack = getattr(self, 'onAttack', None)
+        if onAttack is None:
+            return {}
+        else:
+            return onAttack.get('pattern', {})
 
     def __repr__(self):
         representation:str = ""

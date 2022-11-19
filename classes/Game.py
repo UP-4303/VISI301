@@ -146,6 +146,9 @@ class Game:
         #pre shot the movement
         if self.status == "PlayerMovement":
             self.preShowMovement(screen)
+        
+        if self.status == "PlayerAttack":
+            self.preShowAttack(screen)
 
         return self.running
 
@@ -240,6 +243,7 @@ class Game:
                 # The player is moving
                 if self.status == "PlayerMovement" :
                     self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
+
                     self.has_moved = True
 
                     print("Le joueur a choisit un deplacement")
@@ -249,7 +253,7 @@ class Game:
 
                 # The player is attacking
                 if self.status == "PlayerAttack" :
-                    self.MouseBoardPosition()
+                    self.currentFloor.PlayerAttack(self.player, self.MouseBoardPosition())
 
                     self.has_attacked = True
 
@@ -361,6 +365,9 @@ class Game:
                                         self.ecart + self.top_left_y + (pathPoint['position'].y * (self.ecart + self.larg_case )),
                                         self.long_case, self.larg_case)
             pygame.draw.rect(screen, color, pathPointRect)
+
+    def preShowAttack(self, screen):
+        pass
 
 
 

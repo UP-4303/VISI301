@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import Any
+from math import sqrt
 
 class Vector():
     x:int
@@ -8,6 +9,9 @@ class Vector():
     def __init__(self, x:int, y:int):
         self.x = x
         self.y = y
+
+    def CollinearToAxis(self):
+        return self.x == 0 or self.y == 0
 
     def Normalize(self):
         if abs(self) == 0:
@@ -19,7 +23,7 @@ class Vector():
         return Vector(self.x*multiplier, self.y*multiplier)
     
     def __abs__(self):
-        return abs(self.x) + abs(self.y)
+        return sqrt((self.x**2) + (self.y**2))
 
     def __eq__(self, other:Any):
         if isinstance(other, self.__class__):

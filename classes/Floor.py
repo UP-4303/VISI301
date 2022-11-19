@@ -146,6 +146,15 @@ class Floor():
                                             self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
                                             pushedPickablePosition += vector.Normalize()
 
+    def PlayerAttack(self, player:Player, attackingPosition:Position):
+        vector = attackingPosition - player.position
+        pattern = player.weapon.GetAttackPattern()
+        if vector.CollinearToAxis():
+            if "distance" in pattern:
+                if abs(vector) <= pattern["distance"]:
+                    self.Attack(player,vector)
+
+
     # -------------------------------------------------------------------------------------------------------------------
     # INTERACTION STATIC
     # -------------------------------------------------------------------------------------------------------------------
