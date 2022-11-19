@@ -6,11 +6,16 @@ import pygame
 
 from classes.GenericObject import GenericObject
 from classes.Monster import Monster
+from classes.MoveableObject import MoveableObject
 from classes.Player import Player
 from classes.Position import Position
 from classes.Size import Size
-from classes.Weapon import *
-
+from classes.StaticObject import StaticObject
+from classes.Vector import Vector
+from classes.Weapon import Weapon
+from classes.Character import Character
+from classes.PickableObject import PickableObject
+from classes.OpenableObject import OpenableObject
 
 class Floor():
     name:str
@@ -18,71 +23,190 @@ class Floor():
     layers:dict[str, Any]
     playerGroup:pygame.sprite.Group
     monsterGroup:pygame.sprite.Group
+    staticObjectGroup:pygame.sprite.Group
 
-    def __init__(self, name:str="Floor 0", size:Size=Size(6,6)):
+    def __init__(self, name:str='Floor 0', size:Size=Size(6,6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1) ):
         self.name = name
         self.size = size
 
         self.layers = {
-            "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)]
+            "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
+            "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
         }
 
-        self.playerGroup = pygame.sprite.Group()
-        self.monsterGroup = pygame.sprite.Group()
+        self.playerGroup = pygame.sprite.Group() # only one player in the group
+        self.monsterGroup = pygame.sprite.Group() #all the monsters currently on the floor
+        self.staticObjectGroup = pygame.sprite.Group() #all the openable and pickable
 
+        self.elevatorUP = elevatorUP #were we will be able to leave
+        self.elevatorDOWN = elevatorDOWN #where we landed
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # GETTER  MAP
+    # -------------------------------------------------------------------------------------------------------------------
+
+    # return the object that is a the position indicated in the Object layer
     def GetObject(self, position:Position):
         return self.layers["objects"][position.x][position.y]
 
+    #return the object that is a the position indicated in the static Object layer
+    def getStaticObjects(self, position:Position):
+        return self.layers["staticObjects"][position.x][position.y]
 
-# Ajoute un object
+    # -------------------------------------------------------------------------------------------------------------------
+    # GROUP GESTION
+    # -------------------------------------------------------------------------------------------------------------------
 
-    def SetNewObject(self, position:Position, object_:GenericObject):
-        if self.GetObject(position) == None:
-            self.layers["objects"][position.x][position.y] = object_
-            object_.position = position
+    # add an object in the map at the right place, right layer
 
-            if isinstance(object_, Player):
-                self.playerGroup.add(object_)
-            if isinstance(object_, Monster):
-                self.monsterGroup.add(object_)
-            return True
-        else:
-            return False
-    
-    def UpdateObject(self, position:Position, newPosition:Position):
-        if self.GetObject(newPosition) == None:
-            object_ = self.GetObject(position)
-            self.layers["objects"][newPosition.x][newPosition.y] = object_
-            object_.position = newPosition
-            self.layers["objects"][position.x][position.y] = None
-            return True
-        else:
-            return False
-    
-    def RemoveObject(self, position:Position):
-        if self.GetObject(position)!= None:
+    def SetNewObject(self, position: Position, object_: GenericObject):
+        if isinstance(object_, Character):
+            if self.GetObject(position) == None:
+                self.layers["objects"][position.x][position.y] = object_
+                object_.position = position
+
+                if isinstance(object_, Player):
+                    self.playerGroup.add(object_)
+                if isinstance(object_, Monster):
+                    self.monsterGroup.add(object_)
+                return True
+            else:
+                return False
+        elif isinstance(object_, PickableObject) or isinstance(object_, OpenableObject):
+            if self.getStaticObjects(position) == None:
+                self.layers["staticObjects"][position.x][position.y] = object_
+                object_.position = position
+                self.staticObjectGroup.add(object_)
+
+                return True
+            else:
+                return False
+    def checkEveryoneAlive(self):
+        for staticObject in self.staticObjectGroup:
+            if staticObject.healthPoints <= 0 :
+                self.layers["staticObjects"][staticObject.position.x][staticObject.position.y] = None
+                self.staticObjectGroup.remove(staticObject)
+
+        for monster in self.monsterGroup :
+            if monster.healthPoints <= 0 :
+                self.layers["objects"][monster.position.x][monster.position.y] = None
+                self.monsterGroup.remove(monster)
+    # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
+
+    def RemoveObject(self, position: Position):
+        if self.GetObject(position) != None:
             object_ = self.GetObject(position)
             if isinstance(object_, Player):
                 self.playerGroup.remove(object_)
             if isinstance(object_, Monster):
                 self.monsterGroup.remove(object_)
-            self.layers["objects"][position.x][position.y] = None
+            self.layers['objects'][position.x][position.y] = None
             return True
         else:
             return False
 
-    def UpdatePlayer(self, player:Player, destination:Position):
+    # -------------------------------------------------------------------------------------------------------------------
+    # ATTACK
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def Attack(self, object_:Character, vector:Vector|None):
+        object_.weapon.Action("onAttack", object_)
+        pattern = object_.weapon.GetAttackPattern()
+        if vector != None:
+            if pattern != {}:
+                if "damages" in pattern:
+                    for x in range(len(pattern["damages"])):
+                        for y in range(len(pattern["damages"][x])):
+                            checkingPosition = Position(x-pattern["center"][0]+object_.position.x+vector.x, y-pattern["center"][1]+object_.position.y+vector.y)
+                            if checkingPosition.InBoard(self.size):
+                                checkingObject = self.GetObject(checkingPosition)
+                                if checkingObject != None:
+                                    checkingObject.TakeDamage(pattern["damages"][x][y])
+                                checkingPickableObject = self.getStaticObjects(checkingPosition)
+                                if checkingPickableObject != None:
+                                    checkingPickableObject.TakeDamage(pattern["damages"][x][y])
+                
+                if "push" in pattern:
+                    for x in range(len(pattern["push"])):
+                        for y in range(len(pattern["push"][x])):
+                            checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
+                            if checkingPosition.InBoard(self.size):
+                                checkingObject = self.GetObject(checkingPosition)
+                                checkingPickableObject = self.getStaticObjects(checkingPosition)
+                                if isinstance(checkingObject, MoveableObject):
+                                    pushedPosition = checkingPosition
+                                    for _ in range(pattern["push"][x][y]):
+                                        if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
+                                            self.UpdateObject(pushedPosition, pushedPosition + vector.Normalize())
+                                            pushedPosition += vector.Normalize()
+                                if checkingPickableObject != None:
+                                    pushedPickablePosition = checkingPosition
+                                    for _ in range(pattern["push"][x][y]):
+                                        if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.getStaticObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
+                                            self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
+                                            pushedPickablePosition += vector.Normalize()
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # INTERACTION STATIC
+    # -------------------------------------------------------------------------------------------------------------------
+
+    #Check if there is a pickable in this case and interact with it 
+    def pickStaticObject(self, object_):
+        #Check if it's a pickable and pick it
+        if not (self.getStaticObjects(object_.position) == None):
+            pickedObject = self.layers["staticObjects"][object_.position.x][object_.position.y]
+
+            if isinstance(pickedObject, PickableObject):
+                if isinstance(object_, Player):
+                    pickedObject.ispicked(object_)
+                elif isinstance(object_, Monster):
+                    pickedObject.isCrushed(object_)
+
+
+            if isinstance(pickedObject, OpenableObject):
+                if isinstance(object_, Monster):
+                    pickedObject.isCrushed(object_)
+
+            if isinstance(object_, Player) or pickedObject.healthPoints <= 0:
+                    self.layers["staticObjects"][object_.position.x][object_.position.y] = None
+                    self.staticObjectGroup.remove(pickedObject)
+
+    def openOpenableObject(self, position, game):
+        if not (self.getStaticObjects(position) == None):
+            staticObject = self.layers["staticObjects"][position.x][position.y]
+            if isinstance(staticObject, OpenableObject):
+                weapons = staticObject.isOpen(game.player)
+                self.staticObjectGroup.remove(staticObject)
+                self.layers["staticObjects"][position.x][position.y] = None
+                return weapons
+            return False
+        return False
+
+    def showInsideOpenableObject(self, position, screen):
+        if not (self.getStaticObjects(position) == None):
+            staticObject = self.layers["staticObjects"][position.x][position.y]
+            if isinstance(staticObject, OpenableObject):
+                staticObject.isNowOpen = True
+                staticObject.showInside(screen)
+                return True
+        return False
+
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # UPDATE OBJECTS AND STATICS
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def UpdatePlayer(self, player: Player, destination: Position):
         path = self.Pathfinder(player.position, destination)
         # print(path, destination)
         sumCost = 0
         for currentNode in path:
-            sumCost += currentNode["bias"]
+            sumCost += currentNode['bias']
         if sumCost <= player.movementPoints and sumCost != 0:
-            self.UpdateObject(player.position, path[-1]["position"])
+            self.UpdateObject(player.position, path[-1]['position'])
         else:
-            print("Chemin trop long ou inexistant !")
-
+            print('Chemin trop long ou inexistant !')
+    # Search the paths and update the position of the monster
     def UpdateMonster(self, monster:Monster):
         allTargets = []
         for xBoard in range(self.size.width):
@@ -92,30 +216,124 @@ class Floor():
                     if position.InBoard(self.size):
                         if isinstance(self.GetObject(position), Player):
                             allTargets.append(Position(xBoard, yBoard))
-        
-        completePaths = []
-        partialPaths = []
-        for target in allTargets:
-            path = self.Pathfinder(monster.position, target)
-            if path != []:
-                pathLenght = 0
-                for node in path:
-                    pathLenght += node['bias']
-                if pathLenght <= monster.movementPoints:
-                    completePaths.append(path)
-                elif path[0]['bias'] <= monster.movementPoints:
-                        partialPaths.append(path)
-        if completePaths != []:
-            self.UpdateObject(monster.position, completePaths[randint(0,len(completePaths)-1)][-1]["position"])
-        elif partialPaths != []:
-            pathIndex = randint(0,len(partialPaths)-1)
-            positionIndex = 0
-            pathLenght = partialPaths[pathIndex][positionIndex]['bias']
-            while pathLenght + partialPaths[pathIndex][positionIndex+1]['bias'] <= monster.movementPoints:
-                positionIndex += 1
-                pathLenght += partialPaths[pathIndex][positionIndex]['bias']
-            self.UpdateObject(monster.position, partialPaths[pathIndex][positionIndex]["position"])
+        completePathTargets = []
+        partialPathTargets = []
+        pattern = monster.weapon.GetAttackPattern()
+        if pattern != {}:
+            distanceMax = pattern['distance']
+            directions = [Vector(0,1),Vector(1,0),Vector(0,-1),Vector(-1,0)]
+            patternAttack = pattern['damages']
+            patternCenter = pattern['center']
+            for xBoard in range(self.size.width):
+                for yBoard in range(self.size.height):
+                    positionIsTarget = False
+                    for xPattern in range(len(patternAttack)):
+                        for yPattern in range(len(patternAttack[xPattern])):
+                            checkingPosition = Position(xBoard + xPattern - patternCenter[0], yBoard + yPattern - patternCenter[1])
+                            if checkingPosition.InBoard(self.size):
+                                if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
+                                    path = self.Pathfinder(monster.position,Position(xBoard, yBoard))
+                                    pathLength = 0
+                                    for node in path:
+                                        pathLength += node['bias']
+                                    target = {'position':Position(xBoard, yBoard), 'attackVector':Vector(0,0), 'path':path, 'pathLength':pathLength}
+                                    if pathLength <= monster.movementPoints:
+                                        completePathTargets.append(target)
+                                    else:
+                                        partialPathTargets.append(target)
+                                    positionIsTarget = True
 
+                    if distanceMax > 0 :
+                        directionIndex = 0
+                        while not positionIsTarget and directionIndex <= 3:
+                            distance = 1
+                            fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
+                            
+                            for xPattern in range(len(patternAttack)):
+                                for yPattern in range(len(patternAttack[xPattern])):
+                                    checkingPosition = Position(fireAtPosition.x + xPattern - patternCenter[0], fireAtPosition.y + yPattern - patternCenter[1])
+                                    if checkingPosition.InBoard(self.size):
+                                        if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
+                                            path = self.Pathfinder(monster.position,Position(xBoard, yBoard))
+                                            pathLength = 0
+                                            for node in path:
+                                                pathLength += node['bias']
+                                            target = {'position':Position(xBoard, yBoard), 'attackVector':directions[directionIndex]*distance, 'path':path, 'pathLength':pathLength}
+                                            if pathLength <= monster.movementPoints:
+                                                completePathTargets.append(target)
+                                            else:
+                                                partialPathTargets.append(target)
+                                            positionIsTarget = True
+                            distance += 1
+                            fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
+
+                            while not positionIsTarget and distance <= distanceMax and fireAtPosition.InBoard(self.size) and self.GetObject(fireAtPosition) != None:
+                                for xPattern in range(len(patternAttack)):
+                                    for yPattern in range(len(patternAttack[xPattern])):
+                                        checkingPosition = Position(fireAtPosition.x + xPattern - patternCenter[0], fireAtPosition.y + yPattern - patternCenter[1])
+                                        if checkingPosition.InBoard(self.size):
+                                            if isinstance(self.GetObject(checkingPosition), Player) and patternAttack[xPattern][yPattern] > 0:
+                                                path = self.Pathfinder(monster.position,Position(xBoard, yBoard))
+                                                pathLength = 0
+                                                for node in path:
+                                                    pathLength += node['bias']
+                                                target = {'position':Position(xBoard, yBoard), 'attackVector':directions[directionIndex]*distance, 'path':path, 'pathLength':pathLength}
+                                                if pathLength <= monster.movementPoints:
+                                                    completePathTargets.append(target)
+                                                else:
+                                                    partialPathTargets.append(target)
+
+                                                positionIsTarget = True
+                                distance += 1
+                                fireAtPosition = Position(xBoard, yBoard) + directions[directionIndex] * distance
+                            directionIndex += 1
+        
+        if completePathTargets != []:
+            target = completePathTargets[randint(0, len(completePathTargets)-1)]
+            monster.attackVector = target['attackVector']
+            if target['path'] != []:
+                self.UpdateObject(monster.position, target['path'][-1]['position'])
+
+        elif partialPathTargets != []:
+            partialPathTargets.sort(key=lambda element: element['pathLength'])
+            maxIndex = [i for i, x in enumerate(partialPathTargets) if x == min(partialPathTargets, key=lambda element: element['pathLength'])][-1]
+            target = partialPathTargets[randint(0, maxIndex)]
+            if target['path'][0]['bias'] <= monster.movementPoints:
+                pathLength = target['path'][0]['bias']
+                pathIndex = 0
+                while pathLength + target['path'][pathIndex+1]['bias'] <= monster.movementPoints:
+                    pathLength += target['path'][pathIndex+1]['bias']
+                    pathIndex += 1
+                monster.attackVector = None
+                self.UpdateObject(monster.position, target['path'][pathIndex]['position'])
+        
+        else:
+            monster.attackVector = None
+        # print(monster.target)
+
+    def UpdateObject(self, position: Position, newPosition: Position):
+        if self.GetObject(newPosition) == None:
+            object_ = self.GetObject(position)
+            self.layers["objects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["objects"][position.x][position.y] = None
+            self.pickStaticObject(object_)
+            return True
+        else:
+            return False
+
+    def UpdateStaticObject(self, position: Position, newPosition: Position):
+        if self.getStaticObjects(newPosition) == None:
+            object_ = self.getStaticObjects(position)
+            self.layers["staticObjects"][newPosition.x][newPosition.y] = object_
+            object_.position = newPosition
+            self.layers["staticObjects"][position.x][position.y] = None
+            return True
+        else:
+            return False
+    # -------------------------------------------------------------------------------------------------------------------
+    # USEFULL METHODS FOR MOVES CALCUL
+    # -------------------------------------------------------------------------------------------------------------------
 
     def Pathfinder(self, actualPosition:Position, targetPosition:Position):
         PathPoint = TypedDict('PathPoint', position=Position, bias=float)
@@ -154,8 +372,8 @@ class Floor():
         while nodesToExplore!= [] and Position(currentNode.x, currentNode.y) != targetPosition :
             currentNode = nodesToExplore.pop(-1)
             currentNode.Explore()
-            # print("current node : ", currentNode, currentNode.bias)
-            # print("To explore :", nodesToExplore)
+            # print('current node : ', currentNode, currentNode.bias)
+            # print('To explore :', nodesToExplore)
             if currentNode.gCost != inf:
                 if currentNode.x > 0:
                     addingNode = nodes[currentNode.x-1][currentNode.y]
@@ -180,7 +398,7 @@ class Floor():
         
         if Position(currentNode.x, currentNode.y) == targetPosition:
             while not(currentNode.start):
-                path.insert(0, {"position":Position(currentNode.x, currentNode.y), "bias":currentNode.bias})
+                path.insert(0, {'position':Position(currentNode.x, currentNode.y), 'bias':currentNode.bias})
                 currentNode = currentNode.pointer
         return path
     
@@ -189,6 +407,10 @@ class Floor():
         for pathPoint in path:
             length += pathPoint['bias']
         return length
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # PRINT OBJECT GESTION
+    # -------------------------------------------------------------------------------------------------------------------
 
     def __str__(self):
         representation = '+'
@@ -203,9 +425,9 @@ class Floor():
                 object_ = self.layers['objects'][x][y]
                 if object_ is None:
                     representation += ' '
-                elif object_.name == "Bloc":
+                elif object_.name == 'Bloc':
                     representation += 'B'
-                elif object_.name == "Player":
+                elif object_.name == 'Player':
                     representation += 'P'
             representation += '|'
             representation += '\n'
@@ -216,28 +438,42 @@ class Floor():
         representation += '+'
         return representation
 
+    # -------------------------------------------------------------------------------------------------------------------
+    # DRAW ON THE SCREEN
+    # -------------------------------------------------------------------------------------------------------------------
+
     def draw_monsters_lifebars(self, screen, larg_case ):
 
         for monstre in self.monsterGroup :
+                self.draw_lifebar(screen, larg_case, monstre)
 
-            max_health_point = monstre.maxHealthPoints
-            health_points = monstre.healthPoints
-            ecart = 1
-            larg_one_point = (larg_case - (max_health_point * ecart)) // max_health_point
+    def draw_staticObjects_lifebars(self, screen, larg_case ):
 
-            bar_back_color = (253, 250, 217)
-            bar_front_color = (0, 255, 0)
+        for object in self.staticObjectGroup :
+                self.draw_lifebar(screen, larg_case, object)
 
-            for i in range(0,max_health_point):
-                if i < health_points :
-                    bar_color = bar_front_color
-                else :
-                    bar_color = bar_back_color
+    def draw_lifebar(self, screen, larg_case, object):
+        max_health_point = object.maxHealthPoints
+        health_points = object.healthPoints
+        ecart = 1
+        larg_one_point = (larg_case - (max_health_point * ecart)) // max_health_point
 
-                bar_x = monstre.rect.x + (ecart * (i)) + (larg_one_point * (i))
-                bar_back_position = [bar_x , monstre.rect.y + 10, larg_one_point, 7]  # x, y, w, h
+        bar_back_color = (253, 250, 217)
+        bar_front_color = (0, 255, 0)
 
-                pygame.draw.rect(screen, bar_color, bar_back_position)
+        for i in range(0, max_health_point):
+            if i < health_points:
+                bar_color = bar_front_color
+            else:
+                bar_color = bar_back_color
+
+            bar_x = object.rect.x + (ecart * (i)) + (larg_one_point * (i))
+            bar_back_position = [bar_x, object.rect.y + 10, larg_one_point, 7]  # x, y, w, h
+
+            pygame.draw.rect(screen, bar_color, bar_back_position)
+
+
+
 
 
 class Node(Position):

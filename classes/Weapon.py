@@ -21,8 +21,8 @@ class Weapon(pygame.sprite.Sprite):
         for key,value in kwargs.items():
             setattr(self,key,value)
 
-    def Action(self, action, wielder):
-        actionValue = getattr(self, action, default=None)
+    def Action(self, action:str, wielder:Any):
+        actionValue = getattr(self, action, None)
         if actionValue != None:
             for key,value in actionValue.items():
                 match key:
@@ -39,6 +39,9 @@ class Weapon(pygame.sprite.Sprite):
                         wielder.maxHealthPoints = value
                     case "pattern":
                         pattern = actionValue['pattern']
+
+    def GetAttackPattern(self):
+        return getattr(self, "onAttack", None).get('pattern', {})
 
     def __repr__(self):
         representation:str = ""
