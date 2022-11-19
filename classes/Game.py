@@ -218,6 +218,7 @@ class Game:
                     if self.bag[arme].button.collidepoint(pygame.mouse.get_pos()):
                         print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
                         self.currentweapon = self.weaponTab[arme]
+                        self.player.weapon = self.weaponTab[arme]
 
                 # Detect if the player push the end turn button
                 if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
@@ -254,7 +255,7 @@ class Game:
                 # The player is attacking
                 if self.status == "PlayerAttack" :
                     self.currentFloor.PlayerAttack(self.player, self.MouseBoardPosition())
-
+                    self.draw_attack(self.player,self.MouseBoardPosition(), screen)
                     self.has_attacked = True
 
                     print("Le joueur a choisit une attack ")
@@ -367,23 +368,17 @@ class Game:
             pygame.draw.rect(screen, color, pathPointRect)
 
     def preShowAttack(self, screen):
-        pass
+        positionMouse = self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+        self.draw_attack(self.player, positionMouse, screen )
+
+
 
 
 
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
-            pattern = monster.weapon.GetAttackPattern()['damages']
-            centerpattern = monster.weapon.GetAttackPattern()['center']
-
             position = monster.position
-           # vector = monster.attackVector
-
-            #print(position)
-            #print(vector)
-
-            #centre = Position(position.x + vector[0], position.y + vector[1])
-            #print("centre" + centre)
+            self.draw_attack(monster, position, screen )
     # -------------------------------------------------------------------------------------------------------------------
     # SPAWN
     # -------------------------------------------------------------------------------------------------------------------
@@ -824,6 +819,36 @@ class Game:
         message_text = font_small.render(self.message, 1,
                                                      (255, 255, 255))  # create texte name
         screen.blit(message_text, (70, 580))  # show the name at the tuple position
+
+    def draw_attack(self, attaquant, positionAttack, screen):
+        vector = positionAttack - attaquant.position
+        pattern = attaquant.weapon.GetAttackPattern()
+
+        #controle structure made in PlayerAttack() in the floor
+        if vector.CollinearToAxis():
+            if "distance" in pattern:
+                if abs(vector) <= pattern["distance"]:
+                    attaquant.weapon.Action("onAttack", attaquant)
+                    pattern = attaquant.weapon.GetAttackPattern()
+                    if pattern != {}:
+                        if "damages" in pattern:
+                            for x in range(len(pattern["damages"])):
+                                for y in range(len(pattern["damages"][x])):
+                                    checkingPosition = Position(
+                                        x - pattern["center"][0] + attaquant.position.x + vector.x,
+                                        y - pattern["center"][1] + attaquant.position.y + vector.y)
+                                    if checkingPosition.InBoard(self.currentFloor.size):
+                                        if not(pattern["damages"][x][y]==0):
+                                            couleur_case = (255, 0, 0)
+                                            top_left_x_case = self.ecart + self.top_left_x + (self.larg_case * checkingPosition.x) + (
+                                                        self.ecart * checkingPosition.x)
+                                            top_left_y_case = self.ecart + self.top_left_y + (self.long_case * checkingPosition.y) + (
+                                                        self.ecart * checkingPosition.y)
+                                            position_case = [top_left_x_case, top_left_y_case, self.larg_case,
+                                                             self.long_case]
+                                            pygame.draw.rect(screen, couleur_case, position_case)
+
+
 
     #-------------------------------------------------------------------------------------------------------------------
     #CONVERSIONS AND CLICK UTILS
