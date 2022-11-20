@@ -20,7 +20,7 @@ class Coffre(OpenableObject):
             if isinstance(object_, PickableObject):
                 object_.ispicked(Player)
             elif isinstance(object_, Weapon):
-                weapons += object_
+                weapons.append(object_)
         return weapons
 
     def showInside(self, screen):

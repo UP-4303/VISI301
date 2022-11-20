@@ -245,7 +245,6 @@ class Game:
                 # The player is moving
                 if self.status == "PlayerMovement" :
                     self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
-
                     self.has_moved = True
 
                     print("Le joueur a choisit un deplacement")
@@ -469,7 +468,7 @@ class Game:
     # BAG GESTION
     # -------------------------------------------------------------------------------------------------------------------
     def pickUp(self,weapon):
-        if (len(bag)<self.taillebag):
+        if (len(self.bag)<self.taillebag):
             self.bag[weapon.name] = weapon
 
     # We can let go a weapon to have more space in the bag.
