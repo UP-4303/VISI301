@@ -16,6 +16,7 @@ from classes.MovementPotion import MovementPotion
 from classes.LifePotion import LifePotion
 from classes.Coffre import Coffre
 from classes.OpenableObject import OpenableObject
+from classes.Vector import Vector
 
 
 
@@ -94,7 +95,6 @@ class Game:
 
         self.isAOpenableShowed = False
         self.currentOpenable = None
-
 
 
 
@@ -377,6 +377,7 @@ class Game:
 
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
+            #position = monster.position + monster.attackVector
             position = monster.position
             self.draw_attack(monster, position, screen )
     # -------------------------------------------------------------------------------------------------------------------
@@ -446,7 +447,6 @@ class Game:
         for monster in self.currentFloor.monsterGroup:
             image = monster.image
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
-
             monster.image = image
 
         for player in self.currentFloor.playerGroup:
@@ -460,6 +460,7 @@ class Game:
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
             object.image = image
+
 
     # -------------------------------------------------------------------------------------------------------------------
     # BAG GESTION
@@ -824,13 +825,42 @@ class Game:
         vector = positionAttack - attaquant.position
         pattern = attaquant.weapon.GetAttackPattern()
 
+        if isinstance(attaquant, Monster):
+            couleur_case = (139, 192, 252)
+            imageImpact = pygame.transform.scale(pygame.image.load("./assets/impact.png"),
+                                                 (self.larg_case, self.long_case))
+        elif isinstance(attaquant, Player):
+            couleur_case = (249, 248, 116)
+            imageImpact = pygame.transform.scale(pygame.image.load("./assets/impact4.png"),
+                                                 (self.larg_case, self.long_case))
+
         #controle structure made in PlayerAttack() in the floor
         if vector.CollinearToAxis():
             if "distance" in pattern:
                 if abs(vector) <= pattern["distance"]:
                     attaquant.weapon.Action("onAttack", attaquant)
                     pattern = attaquant.weapon.GetAttackPattern()
+
                     if pattern != {}:
+                        if "push" in pattern:
+                            for x in range(len(pattern["push"])):
+                                for y in range(len(pattern["push"][x])):
+                                    checkingPosition = Position(
+                                        x - pattern["center"][0] + attaquant.position.x + vector.x,
+                                        y - pattern["center"][1] + attaquant.position.y + vector.y)
+                                    if checkingPosition.InBoard(self.currentFloor.size):
+                                        if not (pattern["push"][x][y] == 0):
+
+                                            top_left_x_case = self.ecart + self.top_left_x + (
+                                                        self.larg_case * checkingPosition.x) + (
+                                                                      self.ecart * checkingPosition.x)
+                                            top_left_y_case = self.ecart + self.top_left_y + (
+                                                        self.long_case * checkingPosition.y) + (
+                                                                      self.ecart * checkingPosition.y)
+                                            position_case = [top_left_x_case, top_left_y_case, self.larg_case,
+                                                             self.long_case]
+                                            pygame.draw.rect(screen, couleur_case, position_case)
+
                         if "damages" in pattern:
                             for x in range(len(pattern["damages"])):
                                 for y in range(len(pattern["damages"][x])):
@@ -839,14 +869,13 @@ class Game:
                                         y - pattern["center"][1] + attaquant.position.y + vector.y)
                                     if checkingPosition.InBoard(self.currentFloor.size):
                                         if not(pattern["damages"][x][y]==0):
-                                            couleur_case = (255, 0, 0)
+
                                             top_left_x_case = self.ecart + self.top_left_x + (self.larg_case * checkingPosition.x) + (
                                                         self.ecart * checkingPosition.x)
                                             top_left_y_case = self.ecart + self.top_left_y + (self.long_case * checkingPosition.y) + (
                                                         self.ecart * checkingPosition.y)
-                                            position_case = [top_left_x_case, top_left_y_case, self.larg_case,
-                                                             self.long_case]
-                                            pygame.draw.rect(screen, couleur_case, position_case)
+                                            screen.blit(imageImpact, (top_left_x_case, top_left_y_case))
+
 
 
 
