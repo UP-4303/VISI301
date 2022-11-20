@@ -321,8 +321,8 @@ class Floor():
         # print(monster.target)
 
     def UpdateObject(self, position: Position, newPosition: Position):
-        if self.GetObject(newPosition) == None:
-            object_ = self.GetObject(position)
+        object_ = self.GetObject(position)
+        if object_== None:
             self.layers["objects"][newPosition.x][newPosition.y] = object_
             object_.position = newPosition
             self.layers["objects"][position.x][position.y] = None

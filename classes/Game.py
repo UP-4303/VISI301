@@ -92,6 +92,7 @@ class Game:
         self.bagisopen = False
         self.bag = weapons
         self.taillebag = 13
+        self.weaponTab = weapons
 
         self.isAOpenableShowed = False
         self.currentOpenable = None
@@ -102,7 +103,7 @@ class Game:
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
         self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
         self.spawn_pickableObject(position=Position(4, 4), objectType='LifePotion')
-        self.spawn_coffre(position=Position(2,0),  object_type_inside= ['Money', 'Money'] )
+        self.spawn_coffre(position=Position(2,0),  object_type_inside= [self.weaponTab["TEST WEAPON 1"], 'Money'] )
         self.current_monster = Monster()
         self.init_sprite_size()
 
@@ -416,6 +417,8 @@ class Game:
                 object = MovementPotion()
             elif objectType == 'LifePotion':
                 object = LifePotion()
+            else:
+                object = objectType
 
 
             insideTheBox.append(object)
