@@ -110,7 +110,7 @@
         }
     },
 
-    "TEST WEAPON 2":{
+    "TEST WEAPON 3":{
         "onPick":{
             "statLifeAdd":1
         },
