@@ -42,7 +42,7 @@ class Game:
 
         weapons = {}
         for weaponName,weaponValue in weaponsJson.items():
-            weapons[weaponName] = Weapon(weaponName, './assets/weapon1.png', **weaponValue)
+            weapons[weaponName] = Weapon(weaponName, **weaponValue)
         #print(weapons)
 
         # define is the game has begin
@@ -385,8 +385,7 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
 
     # Generate a monster
-    def spawn_monster(self, position: Position, movementPoints: int = 0,
-                      weapon: Weapon = Weapon([[0]], Position(0, 0))):
+    def spawn_monster(self, position: Position, movementPoints: int = 0, weapon: Weapon = Weapon('Not A Weapon')):
         monster = Monster(movementPoints=movementPoints, weapon=weapon)
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)

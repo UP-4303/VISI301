@@ -19,8 +19,8 @@ class Weapon(pygame.sprite.Sprite):
 
         for key,value in kwargs.items():
             setattr(self,key,value)
-        if getattr(self, 'imageLink', None):
-            setattr(self, 'imageLink', '/assets/weapon1.png')
+        if getattr(self, 'imageLink', None) == None:
+            setattr(self, 'imageLink', './assets/weapon1.png')
 
     def Action(self, action:str, wielder:Any):
         actionValue = getattr(self, action, None)
