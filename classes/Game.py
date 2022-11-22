@@ -377,9 +377,10 @@ class Game:
 
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
-            #position = monster.position + monster.attackVector
-            position = monster.position
-            self.draw_attack(monster, position, screen )
+            if not(monster.attackVector==None):
+                position = monster.position + monster.attackVector
+                #position = monster.position
+                self.draw_attack(monster, position, screen )
     # -------------------------------------------------------------------------------------------------------------------
     # SPAWN
     # -------------------------------------------------------------------------------------------------------------------
@@ -848,8 +849,8 @@ class Game:
                             for x in range(len(pattern["push"])):
                                 for y in range(len(pattern["push"][x])):
                                     checkingPosition = Position(
-                                        x - pattern["center"][0] + attaquant.position.x + vector.x,
-                                        y - pattern["center"][1] + attaquant.position.y + vector.y)
+                                        x - pattern["pushCenter"][0] + attaquant.position.x + vector.x,
+                                        y - pattern["pushCenter"][1] + attaquant.position.y + vector.y)
                                     if checkingPosition.InBoard(self.currentFloor.size):
                                         if not (pattern["push"][x][y] == 0):
 
