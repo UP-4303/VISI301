@@ -112,7 +112,7 @@
         "imageLink": "./assets/weapon2.png"
     },
 
-    "TEST WEAPON 2":{
+    "TEST WEAPON 3":{
         "onPick":{
             "statLifeAdd":1
         },

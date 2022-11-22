@@ -11,15 +11,16 @@ class Weapon(pygame.sprite.Sprite):
     onAttack:dict[str,Any]
     imageLink: str
 
-    def __init__(self, name:str='Weapon', imageLink:str='./assets/weapon1.png', **kwargs):
+    def __init__(self, name:str='Weapon', **kwargs):
         #kwargs is zero, one or infinity of parameters
 
-        self.name = name
-        self.imageLink = imageLink
+        self.name = name 
         self.button = pygame.Rect(0,0,0,0)
 
         for key,value in kwargs.items():
             setattr(self,key,value)
+        if getattr(self, 'imageLink', None):
+            setattr(self, 'imageLink', '/assets/weapon1.png')
 
     def Action(self, action:str, wielder:Any):
         actionValue = getattr(self, action, None)
