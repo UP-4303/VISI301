@@ -79,7 +79,8 @@
                 ],
                 "pushCenter":[1,1]
             }
-        }
+        },
+        "imageLink": "./assets/weapon1.png"
     },
 
     "TEST WEAPON 1":{
@@ -107,7 +108,8 @@
                 ],
                 "pushCenter":[1,1]
             }
-        }
+        },
+        "imageLink": "./assets/weapon2.png"
     },
 
     "TEST WEAPON 3":{
@@ -135,7 +137,8 @@
                 ],
                 "pushCenter":[1,1]
             }
-        }
+        },
+        "imageLink": "./assets/weapon3.png"
     },
 
     "MUTANT WEAPON":{
@@ -163,7 +166,8 @@
                 ],
                 "pushCenter":[1,1]
             }
-        }
+        },
+        "imageLink": "./assets/weapon4.png"
     },
 
     "SONIC WEAPON":{
@@ -191,6 +195,7 @@
                 ],
                 "pushCenter":[0,1]
             }
-        }
+        },
+        "imageLink": "./assets/weapon1.png"
     }
 }
