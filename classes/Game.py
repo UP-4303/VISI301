@@ -371,10 +371,6 @@ class Game:
         positionMouse = self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
         self.draw_attack(self.player, positionMouse, screen )
 
-
-
-
-
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
             if not(monster.attackVector==None):
