@@ -41,6 +41,8 @@ class Floor():
         self.elevatorUP = elevatorUP #were we will be able to leave
         self.elevatorDOWN = elevatorDOWN #where we landed
 
+        self.lastMonsterAdded = Monster()
+
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
     # -------------------------------------------------------------------------------------------------------------------
@@ -69,6 +71,7 @@ class Floor():
                     self.playerGroup.add(object_)
                 if isinstance(object_, Monster):
                     self.monsterGroup.add(object_)
+                    self.lastMonsterAdded = object_
                 return True
             else:
                 return False

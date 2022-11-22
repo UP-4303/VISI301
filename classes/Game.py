@@ -104,7 +104,7 @@ class Game:
         self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
         self.spawn_pickableObject(position=Position(4, 4), objectType='LifePotion')
         self.spawn_coffre(position=Position(2,0),  object_type_inside= [self.weaponTab["TEST WEAPON 1"], 'Money'] )
-        self.current_monster = Monster()
+        self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()
 
 
