@@ -17,6 +17,8 @@ from classes.LifePotion import LifePotion
 from classes.Coffre import Coffre
 from classes.OpenableObject import OpenableObject
 from classes.Vector import Vector
+from classes.Event import Event
+from classes.EarthQuake import EarthQuake
 
 
 
@@ -97,7 +99,12 @@ class Game:
         self.isAOpenableShowed = False
         self.currentOpenable = None
 
+        #Boutique
 
+        self.boutiqueisopen = False
+        self.boutique = [EarthQuake()]
+        self.button_buy_event = pygame.Rect(680, 490, 70, 30)
+        self.currentEvent = self.boutique[0]
 
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
@@ -169,6 +176,9 @@ class Game:
     def wantToOpenTheBag(self):
         print("vous choisissez votre arme")
         self.bagisopen = True
+    def wantToOpenTheBoutique(self):
+        print("Ouvrez la boutique")
+        self.boutiqueisopen = True
     def wantToAnnul(self):
         print("Vous avez annulé l'action")
         self.message = " Vous avez annulé l'action"
@@ -227,6 +237,35 @@ class Game:
                     # Put the variable back to normal
                     self.bagisopen = False
 
+    def dealWithOpenBoutique(self, screen):
+
+        self.draw_boutique(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                print("aurevoir")
+            # Deal with click if we are in the boutique
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                print("you clicked in the boutique")
+
+                if self.button_buy_event.collidepoint(pygame.mouse.get_pos()):
+                    self.buy_event(self.currentEvent)
+
+                for event in self.boutique:
+                    if self.boutiqueisopen[event].button.collidepoint(pygame.mouse.get_pos()):
+                        print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
+                        self.currentweapon = self.weaponTab[arme]
+                        self.player.weapon = self.weaponTab[arme]
+
+                # Detect if the player push the end turn button
+                if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
+                    print("vous avez appuyé sur le bouton quitter le sac")
+                    # Put the variable back to normal
+                    self.bagisopen = False
+
+
+    def buy_event(self, event):
     def dealWithActionPannelGame(self, screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -305,6 +344,11 @@ class Game:
                     self.showInsideObject(self.player.position, screen)
                 elif event.key == pygame.K_i:
                     self.isAOpenableShowed = False
+                elif event.key == pygame.K_t: #----------------TEST--------------------
+                    seisme = EarthQuake()
+                    seisme.appendOnTheFloor(self.currentFloor)
+
+
 
 
     def goToNextLevel(self):
@@ -712,6 +756,54 @@ class Game:
         txt_button_let_go = font_medium.render("Lacher", 1, (255, 255, 255))
         screen.blit(txt_button_let_go, (683, 493))
 
+    def draw_current_event(self, screen):
+        # Font style creation
+        font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_medium = pygame.font.SysFont("monospace", 17, True)  # create the font style
+        font_small = pygame.font.SysFont("monospace", 15, True)  # create the font style
+
+        # draw the back square
+        back_color = (204, 255, 255)
+        back_square_pos = [600, 170, 320, 360]  # x, y, w, h
+        pygame.draw.rect(screen, back_color, back_square_pos)
+
+
+        #Draw the image of the weapon
+        DEFAULT_IMAGE_SIZE = (50, 50)
+        x = 860
+        y = 180
+        image_arme = pygame.image.load(self.currentweapon.imageLink)  # import image
+        image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+        screen.blit(image_arme, (x, y))
+
+        # draw the title of the current weapon
+        weapon_name_txt = font_large.render(self.currentweapon.name, 1, (38, 0, 153))
+        screen.blit(weapon_name_txt, (610, 180))
+
+        #draw the over obstacle capacity
+        weapon_name_txt = font_small.render("Surpasse objstacle :" + str(self.currentweapon.GetAttackPattern()['overObstacles']), 1, (38, 0, 153))
+        screen.blit(weapon_name_txt, (610, 215))
+
+        # draw the distance capacity
+        weapon_name_txt = font_small.render(
+            "Distance :" + str(self.currentweapon.GetAttackPattern()['distance']), 1, (38, 0, 153))
+        screen.blit(weapon_name_txt, (610, 245))
+
+        #draw the attack pattern
+        weapon_attack_pattern_txt = font_small.render("Attack Pattern : ", 1, (38, 0, 153))
+        screen.blit(weapon_attack_pattern_txt, (610, 280))
+        self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['damages'], 800, 280, 100, self.currentweapon.GetAttackPattern()['center'], self.currentweapon.imageLink)
+
+        # draw the push pattern
+        weapon_push_pattern_txt = font_small.render("Push Pattern : ", 1, (38, 0, 153))
+        screen.blit(weapon_push_pattern_txt, (610, 415))
+        self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['push'], 800, 415, 100,
+                          self.currentweapon.GetAttackPattern()['pushCenter'], self.currentweapon.imageLink)
+
+        #draw the button to let go a weapon
+        pygame.draw.rect(screen, (153, 179, 255), self.button_let_go_weapon)
+        txt_button_let_go = font_medium.render("Lacher", 1, (255, 255, 255))
+        screen.blit(txt_button_let_go, (683, 493))
     #draw the pattern of attack of a weapon
     def draw_pattern(self, screen, pattern, x_pos, y_pos , size, center, imageLink):
 
@@ -812,6 +904,61 @@ class Game:
 
         self.draw_current_weapon(screen);
 
+    def draw_boutique(self, screen):
+
+        font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
+
+        #Draw the background of the bag
+        bag_background = pygame.image.load('assets/inventaire.png')  # import background
+        screen.blit(bag_background, (0, 0))
+
+        #draw the quit button
+        pygame.draw.rect(screen, (0, 124, 124), self.quit_bag_button)
+        txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
+        screen.blit(txt_button_quit, (500, 500))
+
+        # draw the weapons
+        taille = 60
+        DEFAULT_IMAGE_SIZE = (taille, taille)
+        back_color = (204, 255, 255)
+        x_start = 170
+        y_start = 170
+        ecart = 40
+        compte_arme = 0
+        x = x_start
+        y = y_start
+
+        for arme in self.bag :
+            if (compte_arme % 4) == 0 :
+                if not (compte_arme == 0):
+                    x = x_start
+                    y = y + ecart + taille
+
+            else :
+
+                x = x + ecart + taille
+
+            if self.bag[arme] == self.currentweapon :
+                back_color = (217, 204, 255)
+            else :
+                back_color = (204, 255, 255)
+
+            back_square_pos = [x, y, taille, taille]  # x, y, w, h
+            pygame.draw.rect(screen, back_color, back_square_pos)
+
+            image_arme = pygame.image.load(self.bag[arme].imageLink)  # import image
+            image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
+            screen.blit(image_arme, (x, y))
+
+            txt_arme = font_small.render(self.bag[arme].name, 1, (255, 255, 255))
+            screen.blit(txt_arme, (x, y + taille))
+
+            self.bag[arme].button = pygame.Rect(x, y, taille, taille)
+
+            compte_arme = compte_arme + 1
+
+        self.draw_current_weapon(screen);
 
     def draw_message(self, screen):
         font_small = pygame.font.SysFont("monospace", 17, True)  # create the font style

@@ -84,6 +84,7 @@ class Floor():
                 return True
             else:
                 return False
+
     def checkEveryoneAlive(self):
         for staticObject in self.staticObjectGroup:
             if staticObject.healthPoints <= 0 :
