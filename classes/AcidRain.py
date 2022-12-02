@@ -6,7 +6,7 @@ from classes.Size import Size
 
 class AcidRain(Event):
     def __init__(self):
-        super().__init__("AcidRain", "Hurts everyone on the two left column", "./assets/acidrain.png", 5, Position(0,0) )
+        super().__init__("AcidRain", "Hurts the two left column", "./assets/acidrain.png", 5, Position(0,0) )
 
     #Make his action on the floor
     def appendOnTheFloor(self,floor: Floor):

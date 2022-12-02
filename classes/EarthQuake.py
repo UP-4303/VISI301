@@ -6,7 +6,7 @@ from classes.Size import Size
 
 class EarthQuake(Event):
     def __init__(self):
-        super().__init__("Eartquake", "Hurts everyone and everything on the map", "./assets/earthquake.png", 5, Position(0,0) )
+        super().__init__("Eartquake", "Hurts everything on the map", "./assets/earthquake.png", 5, Position(0,0) )
 
     #Make his action on the floor
     def appendOnTheFloor(self,floor: Floor):

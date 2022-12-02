@@ -947,12 +947,16 @@ class Game:
         txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
+        #draw your money
+        money_player_text = font_large.render("Money :" + str(self.player.money), 1,
+                                              (255, 255, 255))  # create texte money
+        screen.blit(money_player_text, (300, 165))  # show the money at the tuple position
         # draw the weapons
         taille = 60
         DEFAULT_IMAGE_SIZE = (taille, taille)
         back_color = (204, 255, 255)
         x_start = 170
-        y_start = 170
+        y_start = 300
         ecart = 40
         compte_event = 0
         x = x_start
