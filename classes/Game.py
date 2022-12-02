@@ -111,26 +111,17 @@ class Game:
         self.boutiqueMessage = "Bienvenue dans la boutique"
 
         # TEST A ENLEVER
-        self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
-        self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
-        self.spawn_pickableObject(position=Position(2, 3), objectType='Money')
-        self.spawn_pickableObject(position=Position(2, 4), objectType='Money')
-        self.spawn_pickableObject(position=Position(2, 1), objectType='Money')
-        self.spawn_pickableObject(position=Position(4, 4), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(0, 1), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(0, 2), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(0, 3), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(0, 4), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(4, 3), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(5, 3), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(4, 0), objectType='LifePotion')
-        self.spawn_pickableObject(position=Position(5, 2), objectType='LifePotion')
-        self.player.money += 20
 
-        self.spawn_coffre(position=Position(2,0),  object_type_inside= [self.weaponTab["TEST WEAPON 1"], 'Money'] )
+        self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
+        self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"])
+        self.spawn_pickableObject(position=Position(0,5),objectType="Money")
+        
+        self.floorList[1].SetNewObject(Position(4,4), Monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON']))
+        self.floorList[1].SetNewObject(Position(4,8), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(4,6), movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+        self.floorList[1].SetNewObject(Position(3,2), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(3,2), movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
         self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()
-
 
 
         self.weaponTab = weapons
@@ -473,8 +464,8 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
 
     # Generate a monster
-    def spawn_monster(self, position: Position, movementPoints: int = 0, weapon: Weapon = Weapon('Not A Weapon')):
-        monster = Monster(movementPoints=movementPoints, weapon=weapon)
+    def spawn_monster(self, name:str="Monster", description:str="Lorem Ipsum", imageLink:str="./assets/monster.png", healthPoints=1, position: Position=Position(0,0), movementPoints: int = 0, weapon: Weapon = Weapon('Not A Weapon')):
+        monster = Monster(name=name, description=description, imageLink=imageLink, healthPoints=healthPoints, movementPoints=movementPoints, weapon=weapon)
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
 

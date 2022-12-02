@@ -197,5 +197,20 @@
             }
         },
         "imageLink": "./assets/weapon1.png"
+    },
+
+    "Overcharging electrical sniper":{
+        "onAttack":{
+            "pattern":{
+                "damages":[[3]],
+                "center":[0,0],
+                "distance":Infinity,
+                "overObstacles":false,
+                "pushSelfForward":0,
+                "push":[[0]],
+                "pushCenter":[0,0]
+            }
+        },
+        "imageLink": "./assets/weapon5.png"
     }
 }
