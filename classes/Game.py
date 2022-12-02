@@ -19,8 +19,9 @@ from classes.OpenableObject import OpenableObject
 from classes.Vector import Vector
 from classes.Event import Event
 from classes.EarthQuake import EarthQuake
-
-
+from classes.AcidRain import AcidRain
+from classes.Innondation import Innondation
+from classes.Tornado import Tornado
 
 class Game:
     score: int
@@ -102,14 +103,29 @@ class Game:
         #Boutique
 
         self.boutiqueisopen = False
-        self.boutique = [EarthQuake()]
+        self.boutique = [EarthQuake(), AcidRain(), Innondation(), Tornado()]
         self.button_buy_event = pygame.Rect(680, 490, 70, 30)
         self.currentEvent = self.boutique[0]
+        self.quit_boutique_button = pygame.Rect(500, 500, 70, 40)
+        self.eventToExecute =  pygame.sprite.Group()
 
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
         self.spawn_pickableObject(position=Position(2, 2), objectType='Money' )
+        self.spawn_pickableObject(position=Position(2, 3), objectType='Money')
+        self.spawn_pickableObject(position=Position(2, 4), objectType='Money')
+        self.spawn_pickableObject(position=Position(2, 1), objectType='Money')
         self.spawn_pickableObject(position=Position(4, 4), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(0, 1), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(0, 2), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(0, 3), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(0, 4), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(4, 3), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(5, 3), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(4, 0), objectType='LifePotion')
+        self.spawn_pickableObject(position=Position(5, 2), objectType='LifePotion')
+        self.player.money += 20
+
         self.spawn_coffre(position=Position(2,0),  object_type_inside= [self.weaponTab["TEST WEAPON 1"], 'Money'] )
         self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()
@@ -139,6 +155,9 @@ class Game:
         if self.bagisopen:
             self.dealWithOpenBag(screen)
 
+        # deal with the boutique open
+        elif self.boutiqueisopen:
+            self.dealWithOpenBoutique(screen)
         # deal with the situation of winning
         elif self.won :
             self.dealWithWon(screen)
@@ -184,6 +203,11 @@ class Game:
         self.message = " Vous avez annulé l'action"
         self.status = "PlayerTurn"
     def wantToEndTurn(self):
+        for event in self.eventToExecute:
+            event.appendOnTheFloor(self.currentFloor)
+            self.eventToExecute.remove(event)
+
+
         print("vous avez appuyé sur le bouton finir tour")
         self.message = " Fin de votre tour, la main est aux monstree "
         # Put the variable back to normal
@@ -252,20 +276,17 @@ class Game:
                 if self.button_buy_event.collidepoint(pygame.mouse.get_pos()):
                     self.buy_event(self.currentEvent)
 
-                for event in self.boutique:
-                    if self.boutiqueisopen[event].button.collidepoint(pygame.mouse.get_pos()):
-                        print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
-                        self.currentweapon = self.weaponTab[arme]
-                        self.player.weapon = self.weaponTab[arme]
+                for i in range(0, len(self.boutique)):
+                    if self.boutique[i].button.collidepoint(pygame.mouse.get_pos()):
+                        print("Vous avez cliqué sur l'evenement : " + self.boutique[i].name)
+                        self.currentEvent= self.boutique[i]
 
-                # Detect if the player push the end turn button
-                if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton quitter le sac")
+                # Detect if the player push the quit boutique button
+                if self.quit_boutique_button.collidepoint(pygame.mouse.get_pos()):
+                    print("vous avez appuyé sur le bouton quitter la boutique")
                     # Put the variable back to normal
-                    self.bagisopen = False
+                    self.boutiqueisopen = False
 
-
-    def buy_event(self, event):
     def dealWithActionPannelGame(self, screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -336,8 +357,7 @@ class Game:
                     for player in self.currentFloor.playerGroup:
                         player.healthPoints = player.healthPoints - 1
                 elif event.key == pygame.K_s:
-                    print("you earn score")
-                    self.score = self.score + 3
+                    self.wantToOpenTheBoutique()
                 elif event.key == pygame.K_o:
                     self.openObject(self.player.position)
                 elif event.key == pygame.K_p:
@@ -347,8 +367,6 @@ class Game:
                 elif event.key == pygame.K_t: #----------------TEST--------------------
                     seisme = EarthQuake()
                     seisme.appendOnTheFloor(self.currentFloor)
-
-
 
 
     def goToNextLevel(self):
@@ -380,6 +398,21 @@ class Game:
             for weapon in res:
                 self.pickUp(weapon)
         self.currentOpenable = None
+
+    def buy_event(self, event):
+        print(self.eventToExecute.has(event))
+        print(len(self.eventToExecute) >= 3)
+        if (self.eventToExecute.has(event)):
+            print("vous avez deja acheté cet evenement")
+        elif (len(self.eventToExecute) >= 3):
+            print("Pas plus de 3 evenements par tour")
+        elif (self.player.money < event.price):
+            print("Vous n'avez pas asser d'argent")
+        else:
+            self.player.money = self.player.money - event.price
+            self.eventToExecute.add(event)
+            print(self.eventToExecute)
+
     def showInsideObject(self, position, screen):
         res = self.currentFloor.showInsideOpenableObject(position, screen)
 
@@ -569,6 +602,9 @@ class Game:
 
         # draw the message for the player
         self.draw_message(screen)
+
+        # draw the events bought
+        self.draw_events_to_execute(screen);
 
         if self.isAOpenableShowed:
             self.currentOpenable.showInside(screen)
@@ -768,42 +804,34 @@ class Game:
         pygame.draw.rect(screen, back_color, back_square_pos)
 
 
-        #Draw the image of the weapon
+        #Draw the image of the event
         DEFAULT_IMAGE_SIZE = (50, 50)
         x = 860
         y = 180
-        image_arme = pygame.image.load(self.currentweapon.imageLink)  # import image
-        image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
-        screen.blit(image_arme, (x, y))
+        image_event = pygame.image.load(self.currentEvent.imageLink)  # import image
+        image_event = pygame.transform.scale(image_event, DEFAULT_IMAGE_SIZE)
+        screen.blit(image_event, (x, y))
 
-        # draw the title of the current weapon
-        weapon_name_txt = font_large.render(self.currentweapon.name, 1, (38, 0, 153))
-        screen.blit(weapon_name_txt, (610, 180))
+        # draw the title of the current event
+        event_name_txt = font_large.render(self.currentEvent.name, 1, (38, 0, 153))
+        screen.blit(event_name_txt, (610, 180))
 
-        #draw the over obstacle capacity
-        weapon_name_txt = font_small.render("Surpasse objstacle :" + str(self.currentweapon.GetAttackPattern()['overObstacles']), 1, (38, 0, 153))
-        screen.blit(weapon_name_txt, (610, 215))
+        # draw the description of the event
+        event_description_txt = font_small.render(self.currentEvent.description, 1, (38, 0, 153))
+        screen.blit(event_description_txt, (610, 245))
 
-        # draw the distance capacity
-        weapon_name_txt = font_small.render(
-            "Distance :" + str(self.currentweapon.GetAttackPattern()['distance']), 1, (38, 0, 153))
-        screen.blit(weapon_name_txt, (610, 245))
+        #draw the pattern
+        event_action = font_small.render("Action : ", 1, (38, 0, 153))
+        screen.blit(event_action, (610, 280))
+        #+++++++++AJOUTER AFFICHAGE DE L4ACTION
+        #self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['damages'], 800, 280, 100, self.currentweapon.GetAttackPattern()['center'], self.currentweapon.imageLink)
 
-        #draw the attack pattern
-        weapon_attack_pattern_txt = font_small.render("Attack Pattern : ", 1, (38, 0, 153))
-        screen.blit(weapon_attack_pattern_txt, (610, 280))
-        self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['damages'], 800, 280, 100, self.currentweapon.GetAttackPattern()['center'], self.currentweapon.imageLink)
 
-        # draw the push pattern
-        weapon_push_pattern_txt = font_small.render("Push Pattern : ", 1, (38, 0, 153))
-        screen.blit(weapon_push_pattern_txt, (610, 415))
-        self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['push'], 800, 415, 100,
-                          self.currentweapon.GetAttackPattern()['pushCenter'], self.currentweapon.imageLink)
+        #draw the button to buy the event
+        pygame.draw.rect(screen, (153, 179, 255), self.button_buy_event)
+        txt_button_buy = font_medium.render("Buy", 1, (255, 255, 255))
+        screen.blit(txt_button_buy, (683, 493))
 
-        #draw the button to let go a weapon
-        pygame.draw.rect(screen, (153, 179, 255), self.button_let_go_weapon)
-        txt_button_let_go = font_medium.render("Lacher", 1, (255, 255, 255))
-        screen.blit(txt_button_let_go, (683, 493))
     #draw the pattern of attack of a weapon
     def draw_pattern(self, screen, pattern, x_pos, y_pos , size, center, imageLink):
 
@@ -904,17 +932,18 @@ class Game:
 
         self.draw_current_weapon(screen);
 
+    #draw boutique when is open
     def draw_boutique(self, screen):
 
         font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
         font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
 
-        #Draw the background of the bag
-        bag_background = pygame.image.load('assets/inventaire.png')  # import background
-        screen.blit(bag_background, (0, 0))
+        #Draw the background of the boutique
+        boutique_background = pygame.image.load('assets/inventaire.png')  # import background
+        screen.blit(boutique_background, (0, 0))
 
         #draw the quit button
-        pygame.draw.rect(screen, (0, 124, 124), self.quit_bag_button)
+        pygame.draw.rect(screen, (0, 124, 124), self.quit_boutique_button)
         txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
@@ -925,13 +954,14 @@ class Game:
         x_start = 170
         y_start = 170
         ecart = 40
-        compte_arme = 0
+        compte_event = 0
         x = x_start
         y = y_start
 
-        for arme in self.bag :
-            if (compte_arme % 4) == 0 :
-                if not (compte_arme == 0):
+        for i in range (0, len(self.boutique)) :
+            event = self.boutique[i]
+            if (compte_event % 4) == 0 :
+                if not (compte_event == 0):
                     x = x_start
                     y = y + ecart + taille
 
@@ -939,7 +969,7 @@ class Game:
 
                 x = x + ecart + taille
 
-            if self.bag[arme] == self.currentweapon :
+            if event == self.currentEvent :
                 back_color = (217, 204, 255)
             else :
                 back_color = (204, 255, 255)
@@ -947,18 +977,18 @@ class Game:
             back_square_pos = [x, y, taille, taille]  # x, y, w, h
             pygame.draw.rect(screen, back_color, back_square_pos)
 
-            image_arme = pygame.image.load(self.bag[arme].imageLink)  # import image
-            image_arme = pygame.transform.scale(image_arme, DEFAULT_IMAGE_SIZE)
-            screen.blit(image_arme, (x, y))
+            image_event= pygame.image.load(event.imageLink)  # import image
+            image_event = pygame.transform.scale(image_event, DEFAULT_IMAGE_SIZE)
+            screen.blit(image_event, (x, y))
 
-            txt_arme = font_small.render(self.bag[arme].name, 1, (255, 255, 255))
-            screen.blit(txt_arme, (x, y + taille))
+            txt_event = font_small.render(event.name, 1, (255, 255, 255))
+            screen.blit(txt_event, (x, y + taille))
 
-            self.bag[arme].button = pygame.Rect(x, y, taille, taille)
+            event.button = pygame.Rect(x, y, taille, taille)
 
-            compte_arme = compte_arme + 1
+            compte_event = compte_event + 1
 
-        self.draw_current_weapon(screen);
+        self.draw_current_event(screen);
 
     def draw_message(self, screen):
         font_small = pygame.font.SysFont("monospace", 17, True)  # create the font style
@@ -1021,6 +1051,34 @@ class Game:
                                                         self.ecart * checkingPosition.y)
                                             screen.blit(imageImpact, (top_left_x_case, top_left_y_case))
 
+    def draw_events_to_execute(self, screen):
+
+        font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
+        event_txt = font_small.render("Event bought:", 1, (255, 255, 255))  # create texte health
+        screen.blit(event_txt, (650, 490))  # show the health at the tuple position
+
+        taille = 50
+        DEFAULT_IMAGE_SIZE = (taille, taille)
+        back_color = (204, 255, 255)
+        x_start = 700
+        y_start = 520
+        ecart = 10
+        compte_event = 0
+        x = x_start
+        y = y_start
+
+        for event in self.eventToExecute:
+            if not(compte_event ==0):
+                x = x + ecart + taille
+
+            back_square_pos = [x, y, taille, taille]  # x, y, w, h
+            pygame.draw.rect(screen, back_color, back_square_pos)
+
+            image_event = pygame.image.load(event.imageLink)  # import image
+            image_event = pygame.transform.scale(image_event, DEFAULT_IMAGE_SIZE)
+            screen.blit(image_event, (x, y))
+
+            compte_event = compte_event + 1
 
 
 
