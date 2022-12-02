@@ -304,13 +304,21 @@ class Game:
 
                 # The player is moving
                 if self.status == "PlayerMovement" :
-                    self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
-                    self.has_moved = True
+                    path = self.currentFloor.Pathfinder(self.player.position, self.MouseBoardPosition())
+                    pathLength = self.currentFloor.PathLength(path)
+                    if pathLength <= self.player.movementPoints:
 
-                    print("Le joueur a choisit un deplacement")
-                    self.message = " Vous avez choisit un deplacement"
+                        self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
+                        self.has_moved = True
 
-                    self.status = "PlayerTurn"
+                        print("Le joueur a choisit un deplacement")
+                        self.message = " Vous avez choisit un deplacement"
+                        self.status = "PlayerTurn"
+                    else :
+                        print("Deplacement non valide, rechoisissez")
+
+
+
 
                 # The player is attacking
                 if self.status == "PlayerAttack" :
