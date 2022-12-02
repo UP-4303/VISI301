@@ -108,6 +108,7 @@ class Game:
         self.currentEvent = self.boutique[0]
         self.quit_boutique_button = pygame.Rect(500, 500, 70, 40)
         self.eventToExecute =  pygame.sprite.Group()
+        self.boutiqueMessage = "Bienvenue dans la boutique"
 
         # TEST A ENLEVER
         self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
@@ -198,6 +199,7 @@ class Game:
     def wantToOpenTheBoutique(self):
         print("Ouvrez la boutique")
         self.boutiqueisopen = True
+        self.boutiqueMessage = "Bienvenue dans la boutique"
     def wantToAnnul(self):
         print("Vous avez annulé l'action")
         self.message = " Vous avez annulé l'action"
@@ -286,6 +288,7 @@ class Game:
                     print("vous avez appuyé sur le bouton quitter la boutique")
                     # Put the variable back to normal
                     self.boutiqueisopen = False
+
 
     def dealWithActionPannelGame(self, screen):
         for event in pygame.event.get():
@@ -411,15 +414,18 @@ class Game:
         print(self.eventToExecute.has(event))
         print(len(self.eventToExecute) >= 3)
         if (self.eventToExecute.has(event)):
+            self.boutiqueMessage = "vous avez deja acheté cet evenement"
             print("vous avez deja acheté cet evenement")
         elif (len(self.eventToExecute) >= 3):
+            self.boutiqueMessage = "Pas plus de 3 evenements par tour"
             print("Pas plus de 3 evenements par tour")
         elif (self.player.money < event.price):
+            self.boutiqueMessage = "Vous n'avez pas asser d'argent"
             print("Vous n'avez pas asser d'argent")
         else:
             self.player.money = self.player.money - event.price
             self.eventToExecute.add(event)
-            print(self.eventToExecute)
+            self.boutiqueMessage = "Vous avez acheté l'évenement : " + event.name
 
     def showInsideObject(self, position, screen):
         res = self.currentFloor.showInsideOpenableObject(position, screen)
@@ -828,9 +834,13 @@ class Game:
         event_description_txt = font_small.render(self.currentEvent.description, 1, (38, 0, 153))
         screen.blit(event_description_txt, (610, 245))
 
+        # draw the pricz of the event
+        event_price_txt = font_small.render("Price : " + (str) (self.currentEvent.price), 1, (38, 0, 153))
+        screen.blit(event_price_txt, (610, 270))
+
         #draw the pattern
         event_action = font_small.render("Action : ", 1, (38, 0, 153))
-        screen.blit(event_action, (610, 280))
+        screen.blit(event_action, (610, 300))
         #+++++++++AJOUTER AFFICHAGE DE L4ACTION
         #self.draw_pattern(screen, self.currentweapon.GetAttackPattern()['damages'], 800, 280, 100, self.currentweapon.GetAttackPattern()['center'], self.currentweapon.imageLink)
 
@@ -944,6 +954,7 @@ class Game:
     def draw_boutique(self, screen):
 
         font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_medium = pygame.font.SysFont("monospace", 15, True)  # create the font style
         font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
 
         #Draw the background of the boutique
@@ -959,7 +970,12 @@ class Game:
         money_player_text = font_large.render("Money :" + str(self.player.money), 1,
                                               (255, 255, 255))  # create texte money
         screen.blit(money_player_text, (300, 165))  # show the money at the tuple position
-        # draw the weapons
+
+        #draw message
+        message_text = font_medium.render(self.boutiqueMessage, 1,(255, 255, 255))
+        screen.blit(message_text, (170, 450))
+
+        # draw the events
         taille = 60
         DEFAULT_IMAGE_SIZE = (taille, taille)
         back_color = (204, 255, 255)
