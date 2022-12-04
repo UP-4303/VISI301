@@ -4,6 +4,7 @@ import pygame
 from typing import TypedDict
 import json
 
+from classes.BlocObject import BlocObject
 from classes.Player import Player
 from classes.Monster import Monster
 from classes.Size import Size
@@ -60,7 +61,7 @@ class Game:
         self.score = 0
 
         # generate the player
-        self.player = Player(movementPoints=3, weapon=weapons['TEST WEAPON'])
+        self.player = Player(movementPoints=3, weapon=weapons['BASIC WEAPON'])
         self.currentFloor.SetNewObject(self.currentFloor.elevatorDOWN, self.player)
         self.currentweapon = self.player.weapon
 
@@ -93,7 +94,7 @@ class Game:
         self.running = True
 
         self.bagisopen = False
-        self.bag = weapons
+        self.bag = {'BASIC WEAPON':weapons['BASIC WEAPON']}
         self.taillebag = 13
         self.weaponTab = weapons
 
@@ -112,13 +113,22 @@ class Game:
 
         # TEST A ENLEVER
 
-        self.spawn_monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON'])
-        self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"])
+        self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
+        self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"])
         self.spawn_pickableObject(position=Position(0,5),objectType="Money")
         
-        self.floorList[1].SetNewObject(Position(4,4), Monster(position=Position(4, 4), movementPoints=5, weapon=weapons['TEST WEAPON']))
-        self.floorList[1].SetNewObject(Position(4,8), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(4,6), movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
-        self.floorList[1].SetNewObject(Position(3,2), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(3,2), movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+        self.floorList[1].SetNewObject(Position(4,4), Monster(position=Position(4, 4), movementPoints=5, healthPoints=7, weapon=weapons['TEST WEAPON']))
+        self.floorList[1].SetNewObject(Position(1,3), Monster(position=Position(1, 3), movementPoints=5, healthPoints=7, weapon=weapons['TEST WEAPON']))
+        self.floorList[1].SetNewObject(Position(4,8), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(4,6), movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"]))
+        self.floorList[1].SetNewObject(Position(3,2), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=5, position=Position(3,2), movementPoints=3, weapon=self.weaponTab["Overcharging electrical sniper"]))
+        self.floorList[1].SetNewObject(Position(0,3), BlocObject(position=Position(0,3), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(0,4), BlocObject(position=Position(0,4), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(0,5), BlocObject(position=Position(0,5), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(1,3), BlocObject(position=Position(1,3), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(1,5), BlocObject(position=Position(1,5), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(2,3), BlocObject(position=Position(2,3), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(2,4), BlocObject(position=Position(2,4), healthPoints=3))
+        self.floorList[1].SetNewObject(Position(2,5), BlocObject(position=Position(2,5), healthPoints=3))
 
         self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()
@@ -468,6 +478,11 @@ class Game:
         monster = Monster(name=name, description=description, imageLink=imageLink, healthPoints=healthPoints, movementPoints=movementPoints, weapon=weapon)
         self.currentFloor.SetNewObject(position, monster)
         monster.rect.x, monster.rect.y = self.convert_case_in_px(position)
+
+    def spawn_bloc(self, name:str="Bloc", description:str="Just a massive bloc. You can't go through it.", imageLink:str="./assets/wall.png", healthPoints:int=1, position:Position=Position(0,0)):
+        bloc = BlocObject(name=name, description=description, imageLink=imageLink, healthPoints=healthPoints, position=position)
+        self.currentFloor.SetNewObject(position, bloc)
+        bloc.rect.x, bloc.rect.y = self.convert_case_in_px(position)
 
     # Generate a pickeable object : money, potions
     def spawn_pickableObject(self, position: Position, objectType: str='Money'):

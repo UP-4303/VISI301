@@ -1,28 +1,14 @@
 {
     "BASIC WEAPON":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
         "onAttack":{
             "pattern":{
-                "damages":[
-                    [0,1,0],
-                    [1,1,1],
-                    [0,1,0]
-                ],
-                "center":[1,1],
-                "distance":Infinity,
+                "damages":[[1]],
+                "center":[0,0],
+                "distance":3,
                 "overObstacles":false,
-                "pushSelfForward":1,
-                "push":[
-                    [0,1,0],
-                    [1,1,1],
-                    [0,1,0]
-                ],
-                "pushCenter":[1,1]
+                "pushSelfForward":0,
+                "push":[[0]],
+                "pushCenter":[0,0]
             }
         }
     },
