@@ -53,7 +53,7 @@ class Game:
 
         self.isplaying = False
 
-        self.floorList = [Floor(name='Floor 0', size= Size(6,6),elevatorUP= Position(5,5),elevatorDOWN =Position(0,0)),
+        self.floorList = [Floor(name='Floor 0', refImg="./assets/floors/1.png"),
                           Floor(name='Floor 1', size= Size(10,10),elevatorUP= Position(6,6),elevatorDOWN= Position(0,4)),
                           Floor(name='Floor 2', size= Size(15,15),elevatorUP= Position(14,7),elevatorDOWN = Position(0,7))]
         self.currentFloorIndex = 0
@@ -80,7 +80,7 @@ class Game:
         self.top_left_x = 60
         self.top_left_y = 110
         self.large_max_grille = 450
-
+        print(self.currentFloor.size)
         self.larg_case = (self.large_max_grille - ((self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
         self.long_case = (self.large_max_grille - ((self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
 

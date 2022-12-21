@@ -3,6 +3,8 @@ from typing import Any, TypedDict
 from math import inf
 from random import randint
 import pygame
+import PIL
+from PIL import Image
 
 from classes.GenericObject import GenericObject
 from classes.Monster import Monster
@@ -16,6 +18,11 @@ from classes.Weapon import Weapon
 from classes.Character import Character
 from classes.PickableObject import PickableObject
 from classes.OpenableObject import OpenableObject
+from classes.Money import Money
+from classes.LifePotion import LifePotion
+from classes.MovementPotion import MovementPotion
+
+
 
 class Floor():
     name:str
@@ -25,23 +32,71 @@ class Floor():
     monsterGroup:pygame.sprite.Group
     staticObjectGroup:pygame.sprite.Group
 
-    def __init__(self, name:str='Floor 0', size:Size=Size(6,6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1) ):
+    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : String =""):
         self.name = name
-        self.size = size
+
+        self.playerGroup = pygame.sprite.Group()  # only one player in the group
+        self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
+        self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
+        self.lastMonsterAdded = Monster()
+
+        if (refImg == "") :
+            self.size = size
+            self.elevatorUP = elevatorUP  # were we will be able to leave
+            self.elevatorDOWN = elevatorDOWN  # where we landed
+            self.layers = {
+                "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
+                "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
+            }
+        else :
+            self.initByImage(refImg)
+
+
+
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # INIT METHODES
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def initByImage(self, img_reference):
+        im = Image.open(img_reference)
+        largeur = im.width
+        hauteur = im.height
 
         self.layers = {
-            "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
-            "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
+            "objects": [[None for _y in range(hauteur)] for _x in range(largeur)],
+            # contient les monstres et le joueur
+            "staticObjects": [[None for _y in range(hauteur)] for _x in range(largeur)]
+            # contient les objects ramassable
         }
 
-        self.playerGroup = pygame.sprite.Group() # only one player in the group
-        self.monsterGroup = pygame.sprite.Group() #all the monsters currently on the floor
-        self.staticObjectGroup = pygame.sprite.Group() #all the openable and pickable
+        self.size = Size(width=largeur, height=hauteur)
+        print(self.size)
 
-        self.elevatorUP = elevatorUP #were we will be able to leave
-        self.elevatorDOWN = elevatorDOWN #where we landed
+        for l in range(0, hauteur):
+            for c in range(0, largeur):
+                pix = im.getpixel((l,c))
+                print(pix)
 
-        self.lastMonsterAdded = Monster()
+                #Test yellow to put money
+                if (pix==(255, 237, 74, 255)):
+                    self.SetNewObject(Position(l,c), Money())
+
+                #Test green to put Life potion
+                if (pix==(61, 157, 49, 255)):
+                    self.SetNewObject(Position(l,c), LifePotion())
+
+                # Test Purple to put Movement Potion
+                if (pix==(81, 27, 123, 255)):
+                    self.SetNewObject(Position(l,c), MovementPotion())
+
+                # Test Pink to put DOWN lift
+                if (pix == (235, 160, 191, 255)):
+                    self.elevatorDOWN = Position(l,c)
+
+                # Test dark Pink to put UP lift
+                if (pix == (190, 25, 101, 255)):
+                    self.elevatorUP = Position(l, c)
 
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
@@ -60,7 +115,7 @@ class Floor():
     # -------------------------------------------------------------------------------------------------------------------
 
     # add an object in the map at the right place, right layer
-
+    # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
     def SetNewObject(self, position: Position, object_: GenericObject):
         if isinstance(object_, Character):
             if self.GetObject(position) == None:
@@ -95,7 +150,7 @@ class Floor():
             if monster.healthPoints <= 0 :
                 self.layers["objects"][monster.position.x][monster.position.y] = None
                 self.monsterGroup.remove(monster)
-    # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
+
 
     def RemoveObject(self, position: Position):
         if self.GetObject(position) != None:
