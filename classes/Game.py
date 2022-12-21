@@ -80,6 +80,9 @@ class Game:
         self.button_annuler = pygame.Rect(890, 630, 50, 20)
         self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
 
+        self.help_button = pygame.Rect(1040, 0, 40, 20)
+        self.quit_help_button = pygame.Rect(500, 500, 70, 40)
+
         self.button_let_go_weapon = pygame.Rect(680, 490, 70, 30)
 
         # const needed to draw the map
@@ -117,6 +120,20 @@ class Game:
         self.quit_boutique_button = pygame.Rect(500, 500, 70, 40)
         self.eventToExecute =  pygame.sprite.Group()
         self.boutiqueMessage = "Bienvenue dans la boutique"
+
+        # Help
+        self.helpisopen = False
+        self.help_txt = ["Keyboard shortcut to know: ",
+                         "RETURN -> End your turn",
+                         "BACKSPACE -> To annul the current action"
+                         "A -> To choose an attack",
+                         "B -> to open the bag where are the weapons",
+                         "M -> To choose a movement",
+                         "O -> to open something at your position",
+                         "P -> to show what is inside the object at your position",
+                         "I -> close the preview of what is inside an object",
+                         "S -> to open the store to buy event "]
+
 
         # TEST A ENLEVER
 
@@ -163,7 +180,8 @@ class Game:
         # deal with the bag is open
         if self.bagisopen:
             self.dealWithOpenBag(screen)
-
+        elif self.helpisopen:
+            self.dealWithOpenHelp(screen)
         # deal with the boutique open
         elif self.boutiqueisopen:
             self.dealWithOpenBoutique(screen)
@@ -204,6 +222,10 @@ class Game:
     def wantToOpenTheBag(self):
         print("choose your weapon")
         self.bagisopen = True
+
+    def wantToOpenHelp(self):
+        print("help section")
+        self.helpisopen = True
     def wantToOpenTheBoutique(self):
         print("Open the boutique")
         self.boutiqueisopen = True
@@ -271,6 +293,24 @@ class Game:
                     # Put the variable back to normal
                     self.bagisopen = False
 
+    def dealWithOpenHelp(self, screen):
+        self.draw_help(screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                print("good bye")
+
+            # Deal with click if we are in the help
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                print("you clicked in the help")
+
+
+
+                # Detect if the player push the quit button
+                if self.quit_help_button.collidepoint(pygame.mouse.get_pos()):
+                    print("you left the help")
+                    # Put the variable back to normal
+                    self.helpisopen = False
     def dealWithOpenBoutique(self, screen):
 
         self.draw_boutique(screen)
@@ -359,6 +399,10 @@ class Game:
                 if self.button_armes.collidepoint(pygame.mouse.get_pos()):
                     self.wantToOpenTheBag()
 
+                # Detect if the player push the help button
+                if self.help_button.collidepoint(pygame.mouse.get_pos()):
+                    self.wantToOpenHelp()
+
 
             elif event.type == pygame.KEYDOWN:
                 #raccourci clavier
@@ -366,16 +410,14 @@ class Game:
                     self.wantToAttack()
                 elif event.key == pygame.K_b:
                     self.wantToOpenTheBag()
+                elif event.key == pygame.K_h:
+                    self.wantToOpenHelp()
                 elif event.key == pygame.K_m:
                     self.wantToChoseMouvement()
                 elif event.key == pygame.K_RETURN and self.won == False:
                     self.wantToEndTurn()
                 elif event.key == pygame.K_BACKSPACE :
                     self.wantToAnnul()
-                elif event.key == pygame.K_q:
-                    print("Player is hit")
-                    for player in self.currentFloor.playerGroup:
-                        player.healthPoints = player.healthPoints - 1
                 elif event.key == pygame.K_s:
                     self.wantToOpenTheBoutique()
                 elif event.key == pygame.K_o:
@@ -384,10 +426,6 @@ class Game:
                     self.showInsideObject(self.player.position, screen)
                 elif event.key == pygame.K_i:
                     self.isAOpenableShowed = False
-                elif event.key == pygame.K_t: #----------------TEST--------------------
-                    seisme = EarthQuake()
-                    seisme.appendOnTheFloor(self.currentFloor)
-
 
     def goToNextLevel(self):
         if self.currentFloorIndex < len(self.floorList)-1:
@@ -408,7 +446,6 @@ class Game:
             self.init_sprite_size()
         else:
             self.won = True
-
 
     def openObject(self, position):
         res = self.currentFloor.openOpenableObject(position, self)
@@ -684,6 +721,11 @@ class Game:
         pygame.draw.rect(screen, (0, 124, 124), self.button_annuler)
         txt_button_armes = font_small.render("annul", 1, (255, 255, 255))
         screen.blit(txt_button_armes, (890, 630))
+
+        pygame.draw.rect(screen, (0, 124, 124), self.help_button)
+        txt_button_armes = font_small.render("Help", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (1040, 0))
+
 
    #draw monster info
     def draw_monster_infos(self, screen):
@@ -1032,12 +1074,39 @@ class Game:
 
         self.draw_current_event(screen);
 
+    # draw help when is open
+    def draw_help(self, screen):
+        font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_medium = pygame.font.SysFont("monospace", 15, True)  # create the font style
+        font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
+
+        # Draw the background of the boutique
+        help_background = pygame.image.load('assets/inventaire.png')  # import background
+        screen.blit(help_background, (0, 0))
+
+        # draw the quit button
+        pygame.draw.rect(screen, (0, 124, 124), self.quit_help_button)
+        txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
+        screen.blit(txt_button_quit, (500, 500))
+
+        self.draw_text(screen, self.help_txt, 20, 160, 160, 20)
+
+
+    def draw_text(self, screen, tab_txt, size, start_x, start_y, ecart):
+        font = pygame.font.SysFont("monospace", size, True)  # create the font style
+        count_line = 0
+        for l in range(0, len(tab_txt)):
+            txt_line = font.render(tab_txt[l], 1, (255, 255, 255))
+            screen.blit(txt_line, (start_x, start_y + ecart* count_line))
+            count_line += 1
+
     def draw_message(self, screen):
         font_small = pygame.font.SysFont("monospace", 17, True)  # create the font style
         message_text = font_small.render(self.message, 1,
                                                      (255, 255, 255))  # create texte name
         screen.blit(message_text, (70, 580))  # show the name at the tuple position
 
+    # draw the attack
     def draw_attack(self, attaquant, positionAttack, screen):
         vector = positionAttack - attaquant.position
         pattern = attaquant.weapon.GetAttackPattern()
