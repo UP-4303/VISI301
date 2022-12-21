@@ -1,5 +1,6 @@
 import sys
 import pygame
+import pathlib
 
 from typing import TypedDict
 import json
@@ -52,6 +53,13 @@ class Game:
         # define is the game has begin
 
         self.isplaying = False
+
+        initial_count = 0
+        for path in pathlib.Path("./assets/floors").iterdir():
+            if path.is_file():
+                initial_count += 1
+
+        print(initial_count)
 
         self.floorList = [Floor(name='Floor 0', refImg="./assets/floors/1.png"),
                           Floor(name='Floor 1', size= Size(10,10),elevatorUP= Position(6,6),elevatorDOWN= Position(0,4)),

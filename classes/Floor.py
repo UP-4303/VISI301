@@ -71,12 +71,12 @@ class Floor():
         }
 
         self.size = Size(width=largeur, height=hauteur)
-        print(self.size)
+
 
         for l in range(0, hauteur):
             for c in range(0, largeur):
                 pix = im.getpixel((l,c))
-                print(pix)
+
 
                 #Test yellow to put money
                 if (pix==(255, 237, 74, 255)):
