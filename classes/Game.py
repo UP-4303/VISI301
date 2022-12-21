@@ -85,12 +85,16 @@ class Game:
 
         self.button_let_go_weapon = pygame.Rect(680, 490, 70, 30)
 
+        replay_button = pygame.image.load('assets/Replay.png')
+        self.replay_button = pygame.transform.scale(replay_button, (400, 150))
+        self.replay_button_rect = replay_button.get_rect()
+
         # const needed to draw the map
         self.ecart = 3
         self.top_left_x = 60
         self.top_left_y = 110
         self.large_max_grille = 450
-        print(self.currentFloor.size)
+
         self.larg_case = (self.large_max_grille - ((self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
         self.long_case = (self.large_max_grille - ((self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
 
@@ -102,6 +106,7 @@ class Game:
         self.won = False
         self.message = " Welcome to a new Floor "
         self.running = True
+        self.gameOver= False
 
         self.bagisopen = False
         self.bag = {'BASIC WEAPON':weapons['BASIC WEAPON']}
@@ -135,7 +140,10 @@ class Game:
                          "S -> to open the store to buy event "]
 
 
+        self.memory = {'money': self.player.money, 'bag': self.bag, 'score': self.score}
+
         # TEST A ENLEVER
+
 
         self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
         self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"])
@@ -172,7 +180,7 @@ class Game:
         self.won = False
         self.arrivedAtElevator = (self.player.position == self.currentFloor.elevatorUP)
         self.currentFloor.checkEveryoneAlive()
-
+        self.gameOver = (self.player.healthPoints<=0)
 
         if self.arrivedAtElevator:
             self.goToNextLevel();
@@ -188,6 +196,9 @@ class Game:
         # deal with the situation of winning
         elif self.won :
             self.dealWithWon(screen)
+
+        elif self.gameOver:
+            self.dealWithGameOver(screen)
 
         # deal with the action in the pannel Game, out of the bag and not in a winning situation
         else :
@@ -259,9 +270,55 @@ class Game:
             print("you already moved you can't do it twice")
             self.message = " You already moved "
 
+    def replay(self, floorIndex):
+        self.player.healthPoints = self.player.maxHealthPoints
+        self.player.money = self.memory['money']
+        self.bag = self.memory['bag']
+        self.score= self.memory['score']
+
+
+
+        self.currentFloorIndex = floorIndex
+        self.currentFloor = self.floorList[self.currentFloorIndex]
+        self.currentFloor.replay()
+        self.currentFloor.SetNewObject(self.currentFloor.elevatorDOWN, self.player)
+        self.larg_case = (self.large_max_grille - (
+                (self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
+        self.long_case = (self.large_max_grille - (
+                (self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
+        self.turn = 0
+        self.has_moved = False
+        self.has_attacked = False
+        self.message = " Welcome to this Floor "
+        self.currentweapon = self.bag['BASIC WEAPON']
+        self.isAOpenableShowed = False
+        self.currentOpenable = None
+
+
+        self.init_sprite_size()
+
+
+
+
+
+
+
     # -------------------------------------------------------------------------------------------------------------------
     # DECOUPE FONCTION UDATE
     # -------------------------------------------------------------------------------------------------------------------
+
+    def dealWithGameOver(self, screen):
+        self.draw_gameOver(screen)
+        print("GameOver")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                print("good bye")
+                # Deal with click if we are in the Game Over
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+
+                if self.replay_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.replay(self.currentFloorIndex)
 
     def dealWithWon(self,screen):
         self.draw_won(screen)
@@ -336,7 +393,6 @@ class Game:
                     print("you left the store")
                     # Put the variable back to normal
                     self.boutiqueisopen = False
-
 
     def dealWithActionPannelGame(self, screen):
         for event in pygame.event.get():
@@ -420,6 +476,8 @@ class Game:
                     self.wantToAnnul()
                 elif event.key == pygame.K_s:
                     self.wantToOpenTheBoutique()
+                elif event.key == pygame.K_q: #-------------------------------Enlever apres test--------------------------------------------------
+                    self.player.healthPoints -=5
                 elif event.key == pygame.K_o:
                     self.openObject(self.player.position)
                 elif event.key == pygame.K_p:
@@ -439,7 +497,7 @@ class Game:
             self.turn = 0
             self.has_moved = False
             self.has_attacked = False
-            self.message = " Welcome to a new Floor "
+            self.message = " Welcome to this Floor "
 
             self.isAOpenableShowed = False
             self.currentOpenable = None
@@ -735,18 +793,16 @@ class Game:
                                                      (255, 255, 255))  # create texte name
         screen.blit(name_currentMonster_text, (650, 420))  # show the name at the tuple position
 
-        description_currentMonster_text = font_small.render("Description :" + str(self.current_monster.description), 1,
-                                                            (255, 255, 255))  # create texte description
-        screen.blit(description_currentMonster_text, (650, 440))  # show the name at the tuple position
+
 
         health_currentMonster_text = font_small.render("Health :", 1, (255, 255, 255))  # create texte health
-        screen.blit(health_currentMonster_text, (650, 460))  # show the health at the tuple position
+        screen.blit(health_currentMonster_text, (650, 450))  # show the health at the tuple position
 
         # Create player health bar
         bar_back_color = (253, 250, 217)  # couleur 46, 222, 231
         bar_color = (148, 255, 0)  # couleur 46, 222, 231
-        bar2_back_position = [750, 470, 180, 7]  # x, y, w, h
-        bar2_position = [750, 470, (self.current_monster.healthPoints / self.current_monster.maxHealthPoints) * 180,
+        bar2_back_position = [750, 460, 180, 7]  # x, y, w, h
+        bar2_position = [750, 460, (self.current_monster.healthPoints / self.current_monster.maxHealthPoints) * 180,
                          7]  # x, y, w, h
 
         # Draw player helth bar
@@ -811,6 +867,16 @@ class Game:
         # Draw won background
         won_background = pygame.image.load('assets/won.png')  # import background
         screen.blit(won_background, (0, 0))
+
+    # draw the game over screen and replay button
+    def draw_gameOver(self, screen):
+        self.replay_button_rect.x = (screen.get_width() // 2) - (self.replay_button.get_width() // 2)
+        self.replay_button_rect.y = (screen.get_height()) - (self.replay_button.get_height() + 22)
+
+        gameOver_background = pygame.image.load('assets/gameOver.png')  # import background
+        screen.blit(gameOver_background, (0, 0))
+        screen.blit(self.replay_button, self.replay_button_rect)
+
 
     #draw the current weapon when the bag is open
     def draw_current_weapon(self, screen):

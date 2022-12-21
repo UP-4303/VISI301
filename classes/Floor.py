@@ -39,6 +39,7 @@ class Floor():
         self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
         self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
         self.lastMonsterAdded = Monster()
+        self.img_reference = refImg
 
         if (refImg == "") :
             self.size = size
@@ -51,6 +52,12 @@ class Floor():
         else :
             self.initByImage(refImg)
 
+        self.memory= {'layers': self.layers,
+                    'player': self.playerGroup,
+                    'monsters': self.monsterGroup,
+                    'static': self.staticObjectGroup,
+                    'img': self.img_reference}
+
 
 
 
@@ -60,6 +67,7 @@ class Floor():
 
     def initByImage(self, img_reference):
         im = Image.open(img_reference)
+
         largeur = im.width
         hauteur = im.height
 
@@ -97,6 +105,13 @@ class Floor():
                 # Test dark Pink to put UP lift
                 if (pix == (190, 25, 101, 255)):
                     self.elevatorUP = Position(l, c)
+
+    def replay(self):
+        self.playerGroup = pygame.sprite.Group()  # only one player in the group
+        self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
+        self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
+
+        self.initByImage(self.memory['img'])
 
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
