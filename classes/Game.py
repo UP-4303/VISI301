@@ -54,16 +54,15 @@ class Game:
 
         self.isplaying = False
 
-        initial_count = 0
+        self.floorList = []
+        #initialisation of floors
+        floors_count = 0 # count the number of floors to create by counting files in assets/floors
         for path in pathlib.Path("./assets/floors").iterdir():
+            #add the floor in the list
+            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)))
             if path.is_file():
-                initial_count += 1
+                floors_count += 1
 
-        print(initial_count)
-
-        self.floorList = [Floor(name='Floor 0', refImg="./assets/floors/1.png"),
-                          Floor(name='Floor 1', size= Size(10,10),elevatorUP= Position(6,6),elevatorDOWN= Position(0,4)),
-                          Floor(name='Floor 2', size= Size(15,15),elevatorUP= Position(14,7),elevatorDOWN = Position(0,7))]
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
         self.score = 0
@@ -198,20 +197,20 @@ class Game:
         # check if the player has already attacked during this turn
         if self.has_attacked == False:
             self.status = "PlayerAttack"
-            self.message = " Choisissez où vous voulez attaquer"
+            self.message = " Choose where to attack"
         else:
             print("Vous avez deja attaquer vous ne pouvez plus")
-            self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
+            self.message = " You already attacked "
     def wantToOpenTheBag(self):
-        print("vous choisissez votre arme")
+        print("choose your weapon")
         self.bagisopen = True
     def wantToOpenTheBoutique(self):
-        print("Ouvrez la boutique")
+        print("Open the boutique")
         self.boutiqueisopen = True
-        self.boutiqueMessage = "Bienvenue dans la boutique"
+        self.boutiqueMessage = "Welcome in the store"
     def wantToAnnul(self):
         print("Vous avez annulé l'action")
-        self.message = " Vous avez annulé l'action"
+        self.message = " you cancelled the action"
         self.status = "PlayerTurn"
     def wantToEndTurn(self):
         for event in self.eventToExecute:
@@ -219,8 +218,8 @@ class Game:
             self.eventToExecute.remove(event)
 
 
-        print("vous avez appuyé sur le bouton finir tour")
-        self.message = " Fin de votre tour, la main est aux monstree "
+        print("you pressed end turn")
+        self.message = " End of your turn, monsters attacking "
         # Put the variable back to normal
         self.has_moved = False
         self.has_attacked = False
@@ -229,14 +228,14 @@ class Game:
         # increase the turn count
         self.turn = self.turn + 1
     def wantToChoseMouvement(self):
-        print("vous avez appuyé sur le bouton mvt")
+        print("you pressed mvt")
         # check if the player has already moved during this turn
         if self.has_moved == False:
-            self.message = " Choisissez où vous voulez vous déplacer"
+            self.message = " Choose where to move"
             self.status = "PlayerMovement"
         else:
-            print("Vous avez deja bougé vous ne pouvez plus")
-            self.message = " Vous essayer de vous déplacer mais vous avez deja bougé "
+            print("you already moved you can't do it twice")
+            self.message = " You already moved "
 
     # -------------------------------------------------------------------------------------------------------------------
     # DECOUPE FONCTION UDATE
@@ -244,7 +243,7 @@ class Game:
 
     def dealWithWon(self,screen):
         self.draw_won(screen)
-        print("vous avez gagné !")
+        print("You won!")
 
     def dealWithOpenBag(self, screen):
         self.draw_bag(screen)
@@ -252,7 +251,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                print("aurevoir")
+                print("good bye")
             # Deal with click if we are in the bag
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 print("you clicked in the bag")
@@ -262,13 +261,13 @@ class Game:
 
                 for arme in self.bag:
                     if self.bag[arme].button.collidepoint(pygame.mouse.get_pos()):
-                        print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
+                        print("You clicked on the weapon : " + self.weaponTab[arme].name)
                         self.currentweapon = self.weaponTab[arme]
                         self.player.weapon = self.weaponTab[arme]
 
                 # Detect if the player push the end turn button
                 if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton quitter le sac")
+                    print("you left the bag")
                     # Put the variable back to normal
                     self.bagisopen = False
 
@@ -279,7 +278,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                print("aurevoir")
+                print("Good bye")
             # Deal with click if we are in the boutique
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 print("you clicked in the boutique")
@@ -289,12 +288,12 @@ class Game:
 
                 for i in range(0, len(self.boutique)):
                     if self.boutique[i].button.collidepoint(pygame.mouse.get_pos()):
-                        print("Vous avez cliqué sur l'evenement : " + self.boutique[i].name)
+                        print("You clicked on the event: " + self.boutique[i].name)
                         self.currentEvent= self.boutique[i]
 
                 # Detect if the player push the quit boutique button
                 if self.quit_boutique_button.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton quitter la boutique")
+                    print("you left the store")
                     # Put the variable back to normal
                     self.boutiqueisopen = False
 
@@ -303,13 +302,13 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                print("aurevoir")
+                print("Goodbye")
                # Deal with click if we are in the game pannel
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 
                 if self.status == "PlayerTurn":
-                    print("C'est au tour du joueur")
-                    self.message = " A vous de jouez"
+                    print("It's player's turn")
+                    self.message = " Your turn !"
 
                 if self.button_annuler.collidepoint(pygame.mouse.get_pos()):
                     self.wantToAnnul()
@@ -323,11 +322,12 @@ class Game:
                         self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
                         self.has_moved = True
 
-                        print("Le joueur a choisit un deplacement")
-                        self.message = " Vous avez choisit un deplacement"
+                        print("You choosed a movement")
+                        self.message = " You choosed a movement"
                         self.status = "PlayerTurn"
                     else :
-                        print("Deplacement non valide, rechoisissez")
+                        print("Non valid movement, try again")
+                        self.message = " Non valid movement, try again"
 
 
 
@@ -338,8 +338,8 @@ class Game:
                     self.draw_attack(self.player,self.MouseBoardPosition(), screen)
                     self.has_attacked = True
 
-                    print("Le joueur a choisit une attack ")
-                    self.message = " Vous avez choisit une attack"
+                    print("You choosed an attack")
+                    self.message = " You choosed an attack"
 
                     self.status = "PlayerTurn"
 
@@ -413,7 +413,7 @@ class Game:
     def openObject(self, position):
         res = self.currentFloor.openOpenableObject(position, self)
         if (res == False):
-            self.message = "Aucun objet à ouvrir à votre position"
+            self.message = "Nothing to open here"
         elif not(res == None):
             for weapon in res:
                 self.pickUp(weapon)
@@ -423,24 +423,24 @@ class Game:
         print(self.eventToExecute.has(event))
         print(len(self.eventToExecute) >= 3)
         if (self.eventToExecute.has(event)):
-            self.boutiqueMessage = "vous avez deja acheté cet evenement"
-            print("vous avez deja acheté cet evenement")
+            self.boutiqueMessage = "You already bought this one"
+            print("You already bought this event")
         elif (len(self.eventToExecute) >= 3):
-            self.boutiqueMessage = "Pas plus de 3 evenements par tour"
-            print("Pas plus de 3 evenements par tour")
+            self.boutiqueMessage = "You already bought 3 events"
+            print("You already bought 3 events")
         elif (self.player.money < event.price):
-            self.boutiqueMessage = "Vous n'avez pas asser d'argent"
-            print("Vous n'avez pas asser d'argent")
+            self.boutiqueMessage = "Not enough money "
+            print("You don't have enough money to buy this")
         else:
             self.player.money = self.player.money - event.price
             self.eventToExecute.add(event)
-            self.boutiqueMessage = "Vous avez acheté l'évenement : " + event.name
+            self.boutiqueMessage = "You bought this event : " + event.name
 
     def showInsideObject(self, position, screen):
         res = self.currentFloor.showInsideOpenableObject(position, screen)
 
         if (res == False):
-            self.message = "Aucun objet à montrer à votre position"
+            self.message = "Nothing to show here"
         else :
             self.isAOpenableShowed = True
             self.currentOpenable = self.currentFloor.getStaticObjects(position)
