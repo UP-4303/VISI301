@@ -140,7 +140,7 @@ class Game:
                          "S -> to open the store to buy event "]
 
 
-        self.memory = {'money': self.player.money, 'bag': self.bag, 'score': self.score}
+
 
         # TEST A ENLEVER
 
@@ -296,12 +296,16 @@ class Game:
 
 
         self.init_sprite_size()
+        self.memorize()
 
 
 
 
-
-
+# Put the memory on date to save the state of the game
+    def memorize(self):
+        self.memory = {'money': self.player.money,
+                       'bag': self.bag,
+                       'score': self.score}
 
     # -------------------------------------------------------------------------------------------------------------------
     # DECOUPE FONCTION UDATE
@@ -504,6 +508,8 @@ class Game:
             self.init_sprite_size()
         else:
             self.won = True
+
+        self.memorize()
 
     def openObject(self, position):
         res = self.currentFloor.openOpenableObject(position, self)
