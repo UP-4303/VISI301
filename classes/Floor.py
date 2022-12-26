@@ -3,7 +3,6 @@ from typing import Any, TypedDict
 from math import inf
 from random import randint
 import pygame
-import PIL
 from PIL import Image
 
 from classes.GenericObject import GenericObject
@@ -32,7 +31,7 @@ class Floor():
     monsterGroup:pygame.sprite.Group
     staticObjectGroup:pygame.sprite.Group
 
-    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : String =""):
+    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str =""):
         self.name = name
 
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
@@ -187,6 +186,19 @@ class Floor():
         object_.weapon.Action("onAttack", object_)
         pattern = object_.weapon.GetAttackPattern()
         if vector != None:
+            print("DEBUG 1 - ", type(object_), vector)
+            if pattern["distance"] == inf:
+                print("DEBUG 2 - ", type(object_), vector)
+                normalized = vector.Normalize()
+                raycast = normalized
+                while (object_.position + raycast).InBoard(self.size) and self.GetObject(object_.position + raycast) == None:
+                    raycast += normalized
+                if (object_.position + raycast).InBoard(self.size):
+                    vector = raycast
+                else:
+                    vector = None
+                print("DEBUG 3 - ", type(object_), vector)
+        if vector != None:
             if pattern != {}:
                 if "damages" in pattern:
                     for x in range(len(pattern["damages"])):
@@ -292,6 +304,7 @@ class Floor():
             self.UpdateObject(player.position, path[-1]['position'])
         else:
             print('Chemin trop long ou inexistant !')
+
     # Search the paths and update the position of the monster
     def UpdateMonster(self, monster:Monster):
         allTargets = []
