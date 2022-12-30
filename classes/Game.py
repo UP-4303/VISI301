@@ -103,7 +103,7 @@ class Game:
 
         # var to know where we are in the game
         self.turn = 0
-        self.status = "MonsterTurn"
+        self.status = "PlayerTurn"
         self.has_moved = False
         self.has_attacked = False
         self.won = False
@@ -149,21 +149,15 @@ class Game:
 
 
         # self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
-        self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"])
-        self.spawn_pickableObject(position=Position(0,5),objectType="Money")
         
-        self.floorList[1].SetNewObject(Position(4,4), Monster(position=Position(4, 4), movementPoints=5, healthPoints=7, weapon=weapons['TEST WEAPON']))
-        self.floorList[1].SetNewObject(Position(1,3), Monster(position=Position(1, 3), movementPoints=5, healthPoints=7, weapon=weapons['TEST WEAPON']))
-        self.floorList[1].SetNewObject(Position(4,8), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(4,6), movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"]))
-        self.floorList[1].SetNewObject(Position(3,2), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=5, position=Position(3,2), movementPoints=3, weapon=self.weaponTab["Overcharging electrical sniper"]))
-        self.floorList[1].SetNewObject(Position(0,3), BlocObject(position=Position(0,3), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(0,4), BlocObject(position=Position(0,4), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(0,5), BlocObject(position=Position(0,5), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(1,3), BlocObject(position=Position(1,3), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(1,5), BlocObject(position=Position(1,5), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(2,3), BlocObject(position=Position(2,3), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(2,4), BlocObject(position=Position(2,4), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(2,5), BlocObject(position=Position(2,5), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(0,3), BlocObject(position=Position(0,3), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(0,4), BlocObject(position=Position(0,4), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(0,5), BlocObject(position=Position(0,5), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(1,3), BlocObject(position=Position(1,3), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(1,5), BlocObject(position=Position(1,5), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(2,3), BlocObject(position=Position(2,3), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(2,4), BlocObject(position=Position(2,4), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(2,5), BlocObject(position=Position(2,5), healthPoints=3))
 
         self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()

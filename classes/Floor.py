@@ -121,6 +121,54 @@ class Floor():
                 if (pix == (101, 56, 0, 255)):
                     self.spawn_random_coffre(Position(l, c))
 
+                # Test orange to put a monster type 1
+                if (pix == (255, 135, 0, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Dead Eye", description="Deadly from far away, but move slowly.",
+                                imageLink="./assets/monster9.png", healthPoints=3, position=Position(l, c),
+                                movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+                # Test dark red to put a monster type 2
+                if (pix == (142, 30, 30, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Fire drill", description="Carefull it's hot",
+                                imageLink="./assets/monster1.png", healthPoints=4, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["TEST WEAPON 1"]))
+
+                # Test cyan to put a monster type 3
+                if (pix == (0, 255, 221, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Bullet", description="weak but can attack far away",
+                                imageLink="./assets/monster4.png", healthPoints=1, position=Position(l, c),
+                                movementPoints=9, weapon=self.weaponTab["SONIC WEAPON"]))
+
+                # Test dark blue to put a monster type 4
+                if (pix == (0, 64, 255, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Bong", description="Strong boy",
+                                imageLink="./assets/monster5.png", healthPoints=6, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+                # Test magenta to put a monster type 5
+                if (pix == (184, 0, 255, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Long Harm", description="Run far far away ",
+                                imageLink="./assets/monster6.png", healthPoints=6, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+                # Test red to put a monster type 5
+                if (pix == (255, 0, 0, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Scars", description="Cut cut cut",
+                                imageLink="./assets/monster8.png", healthPoints=6, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
 
 
     def replay(self):
@@ -612,7 +660,7 @@ class Floor():
                 bar_color = bar_back_color
 
             bar_x = object.rect.x + (ecart * (i)) + (larg_one_point * (i))
-            bar_back_position = [bar_x, object.rect.y + 10, larg_one_point, 7]  # x, y, w, h
+            bar_back_position = [bar_x, object.rect.y + 16, larg_one_point, 7]  # x, y, w, h
 
             pygame.draw.rect(screen, bar_color, bar_back_position)
 
