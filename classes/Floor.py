@@ -186,20 +186,8 @@ class Floor():
         object_.weapon.Action("onAttack", object_)
         pattern = object_.weapon.GetAttackPattern()
         if vector != None:
-            print("DEBUG 1 - ", type(object_), vector)
-            if pattern["distance"] == inf:
-                print("DEBUG 2 - ", type(object_), vector)
-                normalized = vector.Normalize()
-                raycast = normalized
-                while (object_.position + raycast).InBoard(self.size) and self.GetObject(object_.position + raycast) == None:
-                    raycast += normalized
-                if (object_.position + raycast).InBoard(self.size):
-                    vector = raycast
-                else:
-                    vector = None
-                print("DEBUG 3 - ", type(object_), vector)
-        if vector != None:
             if pattern != {}:
+                # Apply damages
                 if "damages" in pattern:
                     for x in range(len(pattern["damages"])):
                         for y in range(len(pattern["damages"][x])):
@@ -212,6 +200,7 @@ class Floor():
                                 if checkingPickableObject != None:
                                     checkingPickableObject.TakeDamage(pattern["damages"][x][y])
                 
+                # Apply pushs
                 if "push" in pattern:
                     for x in range(len(pattern["push"])):
                         for y in range(len(pattern["push"][x])):
