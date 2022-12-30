@@ -148,7 +148,7 @@ class Game:
         # TEST A ENLEVER
 
 
-        self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
+        # self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
         self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"])
         self.spawn_pickableObject(position=Position(0,5),objectType="Money")
         
