@@ -1,6 +1,7 @@
 import sys
 import pygame
 import pathlib
+import random
 
 from typing import TypedDict
 import json
@@ -65,6 +66,8 @@ class Game:
 
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
+
+
         self.score = 0
 
         # generate the player
@@ -130,7 +133,7 @@ class Game:
         self.helpisopen = False
         self.help_txt = ["Keyboard shortcut to know: ",
                          "RETURN -> End your turn",
-                         "BACKSPACE -> To annul the current action"
+                         "BACKSPACE -> To annul the current action",
                          "A -> To choose an attack",
                          "B -> to open the bag where are the weapons",
                          "M -> To choose a movement",
@@ -518,6 +521,7 @@ class Game:
         elif not(res == None):
             for weapon in res:
                 self.pickUp(weapon)
+            self.isAOpenableShowed = False
         self.currentOpenable = None
 
     def buy_event(self, event):
@@ -627,6 +631,7 @@ class Game:
         coffre = Coffre(position,insideTheBox)
         coffre.rect.x, coffre.rect.y = self.convert_case_in_px(position)
         self.currentFloor.SetNewObject(position, coffre)
+
 
     # -------------------------------------------------------------------------------------------------------------------
     # SPRITE GESTION
