@@ -2,9 +2,11 @@ from __future__ import annotations
 from typing import Any, TypedDict
 from math import inf
 from random import randint
+import random
 import pygame
 from PIL import Image
-
+from typing import TypedDict
+import json
 from classes.GenericObject import GenericObject
 from classes.Monster import Monster
 from classes.MoveableObject import MoveableObject
@@ -20,6 +22,7 @@ from classes.OpenableObject import OpenableObject
 from classes.Money import Money
 from classes.LifePotion import LifePotion
 from classes.MovementPotion import MovementPotion
+from classes.Coffre import Coffre
 
 
 
@@ -33,6 +36,15 @@ class Floor():
 
     def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str =""):
         self.name = name
+
+        with open('data/weapons.json','r', encoding='utf-8') as dataFile:
+            data = dataFile.read()
+            weaponsJson = json.loads(data)
+
+        weapons = {}
+        for weaponName,weaponValue in weaponsJson.items():
+            weapons[weaponName] = Weapon(weaponName, **weaponValue)
+        self.weaponTab = weapons
 
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
         self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
@@ -105,12 +117,45 @@ class Floor():
                 if (pix == (190, 25, 101, 255)):
                     self.elevatorUP = Position(l, c)
 
+                # Test brown to put coffre
+                if (pix == (101, 56, 0, 255)):
+                    self.spawn_random_coffre(Position(l, c))
+
+
+
     def replay(self):
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
         self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
         self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
 
         self.initByImage(self.memory['img'])
+
+    def spawn_random_coffre(self, pos: Position):
+        insideTheBox = []
+        nWeapon = 0
+        object = None
+        for i in range(10):
+            randomO = random.random()
+            randomO = randomO * 4
+            randomO = int(randomO)
+            if randomO == 0:
+                object = Money()
+            elif randomO == 1:
+                object = MovementPotion()
+            elif randomO == 2:
+                object = LifePotion()
+            else:
+                nWeapon = nWeapon + 1
+
+            insideTheBox.append(object)
+
+        randomKeys = random.sample(list(self.weaponTab), nWeapon)
+        for key in randomKeys:
+            insideTheBox.append(self.weaponTab[key])
+
+        coffre = Coffre(pos, insideTheBox)
+        self.SetNewObject(pos, coffre)
+
 
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
