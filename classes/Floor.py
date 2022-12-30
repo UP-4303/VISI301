@@ -279,20 +279,8 @@ class Floor():
         object_.weapon.Action("onAttack", object_)
         pattern = object_.weapon.GetAttackPattern()
         if vector != None:
-            print("DEBUG 1 - ", type(object_), vector)
-            if pattern["distance"] == inf:
-                print("DEBUG 2 - ", type(object_), vector)
-                normalized = vector.Normalize()
-                raycast = normalized
-                while (object_.position + raycast).InBoard(self.size) and self.GetObject(object_.position + raycast) == None:
-                    raycast += normalized
-                if (object_.position + raycast).InBoard(self.size):
-                    vector = raycast
-                else:
-                    vector = None
-                print("DEBUG 3 - ", type(object_), vector)
-        if vector != None:
             if pattern != {}:
+                # Apply damages
                 if "damages" in pattern:
                     for x in range(len(pattern["damages"])):
                         for y in range(len(pattern["damages"][x])):
@@ -305,25 +293,38 @@ class Floor():
                                 if checkingPickableObject != None:
                                     checkingPickableObject.TakeDamage(pattern["damages"][x][y])
                 
+                # Apply pushs
                 if "push" in pattern:
-                    for x in range(len(pattern["push"])):
-                        for y in range(len(pattern["push"][x])):
-                            checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
-                            if checkingPosition.InBoard(self.size):
-                                checkingObject = self.GetObject(checkingPosition)
-                                checkingPickableObject = self.getStaticObjects(checkingPosition)
-                                if isinstance(checkingObject, MoveableObject):
-                                    pushedPosition = checkingPosition
-                                    for _ in range(pattern["push"][x][y]):
-                                        if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
-                                            self.UpdateObject(pushedPosition, pushedPosition + vector.Normalize())
-                                            pushedPosition += vector.Normalize()
-                                if checkingPickableObject != None:
-                                    pushedPickablePosition = checkingPosition
-                                    for _ in range(pattern["push"][x][y]):
-                                        if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.getStaticObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
-                                            self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
-                                            pushedPickablePosition += vector.Normalize()
+                    # Pushs have to be executed in a specific order, depending on direction
+                    if vector.Normalize() == Vector(0,1):
+                        xyOrder = [(x,y) for x in range(len(pattern["push"][y])) for y in range(len(pattern["push"]))]
+                    elif vector.Normalize() == Vector(0,-1):
+                        xyOrder = [(x,y) for x in range(len(pattern["push"][y])) for y in range(0, len(pattern["push"]), -1)]
+                    elif vector.Normalize() == Vector(1,0):
+                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(len(pattern["push"][0]))]
+                    elif vector.Normalize() == Vector(-1,0):
+                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(0, len(pattern["push"][0]), -1)]
+                    else:
+                        xyOrder = []
+
+                    for x,y in xyOrder:
+
+                        checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
+                        if checkingPosition.InBoard(self.size):
+                            checkingObject = self.GetObject(checkingPosition)
+                            checkingPickableObject = self.getStaticObjects(checkingPosition)
+                            if isinstance(checkingObject, MoveableObject):
+                                pushedPosition = checkingPosition
+                                for _ in range(pattern["push"][x][y]):
+                                    if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
+                                        self.UpdateObject(pushedPosition, pushedPosition + vector.Normalize())
+                                        pushedPosition += vector.Normalize()
+                            if checkingPickableObject != None:
+                                pushedPickablePosition = checkingPosition
+                                for _ in range(pattern["push"][x][y]):
+                                    if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.getStaticObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
+                                        self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
+                                        pushedPickablePosition += vector.Normalize()
 
     def PlayerAttack(self, player:Player, attackingPosition:Position):
         vector = attackingPosition - player.position

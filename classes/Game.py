@@ -5,6 +5,7 @@ import random
 
 from typing import TypedDict
 import json
+from math import inf
 
 from classes.BlocObject import BlocObject
 from classes.Player import Player
@@ -211,6 +212,7 @@ class Game:
         
         if self.status == "PlayerAttack":
             self.preShowAttack(screen)
+
 
         return self.running
 
@@ -572,7 +574,28 @@ class Game:
 
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
-            if not(monster.attackVector==None):
+            # vector and pattern are just shorthands
+            vector = monster.attackVector
+            pattern = monster.weapon.GetAttackPattern()
+
+            # Update the attack vector if infinite distance
+            if vector != None:
+                if pattern["distance"] == inf:
+                    normalized = vector.Normalize()
+                    raycast = normalized
+                    while (monster.position + raycast).InBoard(self.currentFloor.size) and self.currentFloor.GetObject(monster.position + raycast) == None:
+                        raycast += normalized
+                    if (monster.position + raycast).InBoard(self.currentFloor.size):
+                        vector = raycast
+                    else:
+                        vector = None
+
+            # Update the value
+            monster.attackVector = vector
+            # Pattern don't need to be updated, as it never changes
+            
+            # Draw if there is a vector
+            if monster.attackVector != None:
                 position = monster.position + monster.attackVector
                 #position = monster.position
                 self.draw_attack(monster, position, screen )
@@ -697,7 +720,6 @@ class Game:
 
         # show floor
         self.draw_floor(screen)
-        self.preshot_monster_attack( screen)
 
         # show player info
         self.draw_player_infos(screen)
@@ -730,6 +752,9 @@ class Game:
 
         # draw the message for the player
         self.draw_message(screen)
+
+        # draw monsters' attacks
+        self.preshot_monster_attack(screen)
 
         # draw the events bought
         self.draw_events_to_execute(screen);
