@@ -179,10 +179,12 @@ class Game:
         self.running = True
         self.won = False
         self.arrivedAtElevator = (self.player.position == self.currentFloor.elevatorUP)
+        self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
         self.currentFloor.checkEveryoneAlive()
         self.gameOver = (self.player.healthPoints<=0)
 
-        if self.arrivedAtElevator:
+        print(self.elevatorOpen)
+        if self.arrivedAtElevator and self.elevatorOpen:
             self.goToNextLevel();
 
         # deal with the bag is open

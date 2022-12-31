@@ -34,7 +34,7 @@ class Floor():
     monsterGroup:pygame.sprite.Group
     staticObjectGroup:pygame.sprite.Group
 
-    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str =""):
+    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str ="", condition : str="allMoney"):
         self.name = name
 
         with open('data/weapons.json','r', encoding='utf-8') as dataFile:
@@ -69,7 +69,7 @@ class Floor():
                     'static': self.staticObjectGroup,
                     'img': self.img_reference}
 
-
+        self.condition = "allPotionPicked"
 
 
     # -------------------------------------------------------------------------------------------------------------------
@@ -170,7 +170,6 @@ class Floor():
                                 movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
 
 
-
     def replay(self):
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
         self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
@@ -204,6 +203,24 @@ class Floor():
         coffre = Coffre(pos, insideTheBox)
         self.SetNewObject(pos, coffre)
 
+    def is_condition_fullfilled(self):
+        res = False
+
+        if ( self.condition == "allMoney"):
+            res = True
+            for obj in self.staticObjectGroup:
+                if  isinstance(obj, Money):
+                    res = False
+        elif ( self.condition == "allMonsterkilled"):
+            res = (len(self.monsterGroup)==0)
+
+        elif ( self.condition == "allPotionPicked"):
+            res = True
+            for obj in self.staticObjectGroup:
+                if  isinstance(obj, LifePotion) or isinstance(obj, MovementPotion):
+                    res = False
+
+        return res
 
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
