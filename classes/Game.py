@@ -721,6 +721,9 @@ class Game:
         # show floor
         self.draw_floor(screen)
 
+        # draw monsters' attacks
+        self.preshot_monster_attack(screen)
+
         # show player info
         self.draw_player_infos(screen)
 
@@ -753,8 +756,6 @@ class Game:
         # draw the message for the player
         self.draw_message(screen)
 
-        # draw monsters' attacks
-        self.preshot_monster_attack(screen)
 
         # draw the events bought
         self.draw_events_to_execute(screen);
