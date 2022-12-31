@@ -70,7 +70,7 @@ class Floor():
                     'img': self.img_reference
                       }
 
-        self.condition = "allPotionPicked"
+        self.condition = condition
 
 
     # -------------------------------------------------------------------------------------------------------------------
