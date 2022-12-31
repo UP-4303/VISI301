@@ -120,6 +120,8 @@ class Game:
         self.isAOpenableShowed = False
         self.currentOpenable = None
 
+        self.memorize()
+
         #Boutique
 
         self.boutiqueisopen = False
@@ -272,7 +274,7 @@ class Game:
     def replay(self, floorIndex):
         self.player.healthPoints = self.player.maxHealthPoints
         self.player.money = self.memory['money']
-        self.bag = self.memory['bag']
+        self.bag = self.copie_bag(self.memory['bag'])
         self.score= self.memory['score']
 
 
@@ -303,8 +305,15 @@ class Game:
 # Put the memory on date to save the state of the game
     def memorize(self):
         self.memory = {'money': self.player.money,
-                       'bag': self.bag,
+                       'bag': self.copie_bag(self.bag),
                        'score': self.score}
+
+    def copie_bag(self, bag):
+        newBag = bag.copy()
+        return newBag
+
+
+
 
     # -------------------------------------------------------------------------------------------------------------------
     # DECOUPE FONCTION UDATE
@@ -728,7 +737,7 @@ class Game:
         self.draw_player_infos(screen)
 
         # show monster info
-        self.draw_monster_infos(screen)
+        #self.draw_monster_infos(screen)
 
         # show the objects
         self.currentFloor.staticObjectGroup.draw(screen)
