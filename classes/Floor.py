@@ -67,7 +67,8 @@ class Floor():
                     'player': self.playerGroup,
                     'monsters': self.monsterGroup,
                     'static': self.staticObjectGroup,
-                    'img': self.img_reference}
+                    'img': self.img_reference
+                      }
 
         self.condition = "allPotionPicked"
 
@@ -219,6 +220,19 @@ class Floor():
             for obj in self.staticObjectGroup:
                 if  isinstance(obj, LifePotion) or isinstance(obj, MovementPotion):
                     res = False
+
+        return res
+
+    def condition_txt(self):
+        res=""
+        if ( self.condition == "allMoney"):
+            res = "Pick all money"
+
+        elif ( self.condition == "allMonsterkilled"):
+            res = "Kill all monsters"
+
+        elif ( self.condition == "allPotionPicked"):
+            res = "Pick all potions"
 
         return res
 

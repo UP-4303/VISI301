@@ -175,15 +175,14 @@ class Game:
     def update(self, screen):
 
         # update affichage et update var
+        self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
         self.draw_everything(screen)
         self.running = True
         self.won = False
         self.arrivedAtElevator = (self.player.position == self.currentFloor.elevatorUP)
-        self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
         self.currentFloor.checkEveryoneAlive()
         self.gameOver = (self.player.healthPoints<=0)
 
-        print(self.elevatorOpen)
         if self.arrivedAtElevator and self.elevatorOpen:
             self.goToNextLevel();
 
@@ -278,6 +277,7 @@ class Game:
         self.player.money = self.memory['money']
         self.bag = self.copie_bag(self.memory['bag'])
         self.score= self.memory['score']
+        self.player.movementPoints = self.memory['mvtPoint']
 
 
 
@@ -308,7 +308,8 @@ class Game:
     def memorize(self):
         self.memory = {'money': self.player.money,
                        'bag': self.copie_bag(self.bag),
-                       'score': self.score}
+                       'score': self.score,
+                       'mvtPoint' : self.player.movementPoints}
 
     def copie_bag(self, bag):
         newBag = bag.copy()
@@ -741,6 +742,8 @@ class Game:
         # show monster info
         #self.draw_monster_infos(screen)
 
+        # show floor infos
+        self.draw_floor_infos(screen)
         # show the objects
         self.currentFloor.staticObjectGroup.draw(screen)
         # show monstres (maybe better in main)
@@ -850,6 +853,22 @@ class Game:
         # Draw player helth bar
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
+
+    def draw_floor_infos(self, screen):
+        font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
+        name_currentFloor_text = font_small.render("Name :" + self.currentFloor.name, 1, (255, 255, 255))  # create texte name
+        screen.blit(name_currentFloor_text, (670, 400))  # show the name at the tuple position
+
+        condition_text = font_small.render("Aim :" + self.currentFloor.condition_txt(), 1, (255, 255, 255))  # create texte
+        screen.blit(condition_text, (650, 430))  # show the text at the tuple position
+
+        if self.elevatorOpen :
+            elevator_text = font_small.render("Elevator open", 1,
+                                               (0, 255, 0))  # create texte
+        else :
+            elevator_text = font_small.render("Elevator closed" , 1,
+                                              (255, 0, 0))  # create texte health
+        screen.blit(elevator_text, (650, 460))  # show the health at the tuple position
 
     def draw_weapon_info(self,screen):
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
