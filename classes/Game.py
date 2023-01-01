@@ -86,6 +86,7 @@ class Game:
 
         self.help_button = pygame.Rect(1040, 0, 40, 20)
         self.quit_help_button = pygame.Rect(500, 500, 70, 40)
+        self.help_next_button = pygame.Rect(700, 500, 70, 40)
 
         self.button_let_go_weapon = pygame.Rect(680, 490, 70, 30)
 
@@ -133,8 +134,9 @@ class Game:
         self.boutiqueMessage = "Bienvenue dans la boutique"
 
         # Help
+        self.indice_txt_help = 0
         self.helpisopen = False
-        self.help_txt = ["Keyboard shortcut to know: ",
+        self.help_txt = [["Keyboard shortcut to know: ",
                          "RETURN -> End your turn",
                          "BACKSPACE -> To annul the current action",
                          "A -> To choose an attack",
@@ -143,7 +145,25 @@ class Game:
                          "O -> to open something at your position",
                          "P -> to show what is inside the object at your position",
                          "I -> close the preview of what is inside an object",
-                         "S -> to open the store to buy event "]
+                         "S -> to open the store to buy event "],
+
+                         ["Your aim is to survive every level.",
+                          "To pass a level you have to : ",
+                          "- open the lift by fullfilling the aim",
+                          "- survive",
+                          "- go to the elevator "],
+
+                         ["you can do a lot of things on every round ",
+                          "- Choose a mouvement ",
+                          "- Choose to attack with a weapon that you picked in your bag",
+                          "- Open things if you are on it",
+                          "- Buy event in the store "],
+
+                         [" Good luck"]
+
+
+                         ]
+
 
 
 
@@ -383,6 +403,11 @@ class Game:
                     print("you left the help")
                     # Put the variable back to normal
                     self.helpisopen = False
+                    self.indice_txt_help = 0
+
+                if self.help_next_button.collidepoint(pygame.mouse.get_pos()):
+                    # change the text
+                    self.indice_txt_help = (self.indice_txt_help + 1) % len(self.help_txt)
     def dealWithOpenBoutique(self, screen):
 
         self.draw_boutique(screen)
@@ -1216,7 +1241,14 @@ class Game:
         txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
         screen.blit(txt_button_quit, (500, 500))
 
-        self.draw_text(screen, self.help_txt, 20, 160, 160, 20)
+        # draw the next button
+        pygame.draw.rect(screen, (0, 124, 124), self.help_next_button)
+        txt_button_next = font_large.render("Next", 1, (255, 255, 255))
+        screen.blit(txt_button_next, (700, 500))
+
+        self.draw_text(screen, self.help_txt[self.indice_txt_help], 20, 160, 160, 20)
+
+
 
 
     def draw_text(self, screen, tab_txt, size, start_x, start_y, ecart):
