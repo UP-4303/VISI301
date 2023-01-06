@@ -5,6 +5,7 @@ from random import randint
 import pygame
 
 from classes.GenericObject import GenericObject
+from classes.BlocObject import BlocObject
 from classes.Monster import Monster
 from classes.MoveableObject import MoveableObject
 from classes.Player import Player
@@ -62,7 +63,7 @@ class Floor():
     # add an object in the map at the right place, right layer
 
     def SetNewObject(self, position: Position, object_: GenericObject):
-        if isinstance(object_, Character):
+        if isinstance(object_, Character) or isinstance(object_, BlocObject):
             if self.GetObject(position) == None:
                 self.layers["objects"][position.x][position.y] = object_
                 object_.position = position
@@ -441,10 +442,12 @@ class Floor():
                 object_ = self.layers['objects'][x][y]
                 if object_ is None:
                     representation += ' '
-                elif object_.name == 'Bloc':
+                elif isinstance(object_, BlocObject):
                     representation += 'B'
-                elif object_.name == 'Player':
+                elif isinstance(object_, Player):
                     representation += 'P'
+                elif isinstance(object_, Monster):
+                    representation += 'M'
             representation += '|'
             representation += '\n'
 

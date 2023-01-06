@@ -171,6 +171,7 @@ class Game:
 
         if self.status == "MonsterTurn":
             self.monsterTurn()
+            #print(self.currentFloor)
 
         #pre shot the movement
         if self.status == "PlayerMovement":
