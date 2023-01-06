@@ -547,7 +547,8 @@ class Floor():
         
         else:
             monster.attackVector = None
-        # print(monster.target)
+        print(monster)
+        print(monster.target)
 
     def UpdateObject(self, position: Position, newPosition: Position):
         if self.GetObject(newPosition) == None:
