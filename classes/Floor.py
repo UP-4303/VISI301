@@ -133,15 +133,15 @@ class Floor():
                         Position(l, c),
                         Monster(name="Dead Eye", description="Deadly from far away, but move slowly.",
                                 imageLink="./assets/monster9.png", healthPoints=3, position=Position(l, c),
-                                movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"]))
+                                movementPoints=2, weapon=self.weaponTab["Sniper"]))
 
                 # Test dark red to put a monster type 2
                 if (pix == (142, 30, 30, 255)):
                     ok = self.SetNewObject(
                         Position(l, c),
                         Monster(name="Fire drill", description="Carefull it's hot",
-                                imageLink="./assets/monster1.png", healthPoints=4, position=Position(l, c),
-                                movementPoints=2, weapon=self.weaponTab["TEST WEAPON 1"]))
+                                imageLink="./assets/monster1.png", healthPoints=2, position=Position(l, c),
+                                movementPoints=1, weapon=self.weaponTab["Imploding bomb"]))
 
                 # Test cyan to put a monster type 3
                 if (pix == (0, 255, 221, 255)):
@@ -149,31 +149,31 @@ class Floor():
                         Position(l, c),
                         Monster(name="Bullet", description="weak but can attack far away",
                                 imageLink="./assets/monster4.png", healthPoints=1, position=Position(l, c),
-                                movementPoints=9, weapon=self.weaponTab["SONIC WEAPON"]))
+                                movementPoints=4, weapon=self.weaponTab["Ray gun"]))
 
                 # Test dark blue to put a monster type 4
                 if (pix == (0, 64, 255, 255)):
                     ok = self.SetNewObject(
                         Position(l, c),
                         Monster(name="Bong", description="Strong boy",
-                                imageLink="./assets/monster5.png", healthPoints=6, position=Position(l, c),
-                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+                                imageLink="./assets/monster5.png", healthPoints=8, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Shocking armor"]))
 
                 # Test magenta to put a monster type 5
                 if (pix == (184, 0, 255, 255)):
                     ok = self.SetNewObject(
                         Position(l, c),
                         Monster(name="Long Harm", description="Run far far away ",
-                                imageLink="./assets/monster6.png", healthPoints=6, position=Position(l, c),
-                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+                                imageLink="./assets/monster6.png", healthPoints=4, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Double light saber"]))
 
-                # Test red to put a monster type 5
+                # Test red to put a monster type 6
                 if (pix == (255, 0, 0, 255)):
                     ok = self.SetNewObject(
                         Position(l, c),
                         Monster(name="Scars", description="Cut cut cut",
-                                imageLink="./assets/monster8.png", healthPoints=6, position=Position(l, c),
-                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+                                imageLink="./assets/monster8.png", healthPoints=3, position=Position(l, c),
+                                movementPoints=3, weapon=self.weaponTab["Light saber"]))
 
 
     def replay(self):

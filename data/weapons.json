@@ -1,5 +1,5 @@
 {
-    "BASIC WEAPON":{
+    "Light saber":{
         "onAttack":{
             "pattern":{
                 "damages":[ [5,4,3],
@@ -7,20 +7,13 @@
                     [0,0,0]],
                 "center":[0,0],
                 "distance":3,
-                "overObstacles":false,
-                "pushSelfForward":0,
                 "push":[[0]],
                 "pushCenter":[0,0]
             }
         }
     },
-    "TEST WEAPON":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
+
+    "Grenade":{
         "onAttack":{
             "pattern":{
                 "damages":[
@@ -29,9 +22,7 @@
                     [0,1,0]
                 ],
                 "center":[1,1],
-                "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":1,
+                "distance":4,
                 "push":[
                     [0,1,0],
                     [1,1,1],
@@ -42,84 +33,54 @@
         }
     },
 
-    "TEST WEAPON 2":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
+    "Dynamite !":{
         "onAttack":{
             "pattern":{
                 "damages":[
-                    [0,1,0],
-                    [1,1,1],
-                    [0,1,0]
+                    [1,3,1],
+                    [3,3,3],
+                    [1,3,1]
                 ],
                 "center":[1,1],
-                "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":1,
+                "distance":2,
                 "push":[
-                    [0,1,0],
-                    [1,1,1],
-                    [0,1,0]
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1],
+                    [1,1,1,1,1]
                 ],
-                "pushCenter":[1,1]
+                "pushCenter":[2,2]
             }
         },
         "imageLink": "./assets/weapon1.png"
     },
 
-    "TEST WEAPON 1":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
+    "Laser gun":{
         "onAttack":{
             "pattern":{
-                "damages":[
-                    [1,1,1],
-                    [1,1,1],
-                    [0,1,0]
-                ],
-                "center":[1,1],
+                "damages":[[1]],
+                "center":[0,0],
                 "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":1,
-                "push":[
-                    [0,1,0],
-                    [1,1,1],
-                    [0,1,0]
-                ],
-                "pushCenter":[1,1]
+                "push":[[1]],
+                "pushCenter":[0,0]
             }
         },
         "imageLink": "./assets/weapon2.png"
     },
 
-    "TEST WEAPON 3":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
+    "Double light saber":{
         "onAttack":{
             "pattern":{
                 "damages":[
                     [1,1,1],
                     [0,0,0],
-                    [0,0,0]
+                    [1,1,1]
                 ],
                 "center":[1,1],
-                "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":1,
+                "distance":3,
                 "push":[
-                    [0,0,0],
+                    [1,1,1],
                     [0,0,0],
                     [1,1,1]
                 ],
@@ -129,42 +90,24 @@
         "imageLink": "./assets/weapon3.png"
     },
 
-    "MUTANT WEAPON":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
+    "Shocking armor":{
         "onAttack":{
             "pattern":{
                 "damages":[
-                    [0,1,0],
-                    [0,0,0],
-                    [0,1,0]
+                    [1,2,1],
+                    [2,0,2],
+                    [1,2,1]
                 ],
                 "center":[1,1],
-                "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":1,
-                "push":[
-                    [0,1,0],
-                    [0,0,0],
-                    [0,1,0]
-                ],
-                "pushCenter":[1,1]
+                "distance":0,
+                "push":[[0]],
+                "pushCenter":[0,0]
             }
         },
         "imageLink": "./assets/weapon4.png"
     },
 
-    "SONIC WEAPON":{
-        "onPick":{
-            "statLifeAdd":1
-        },
-        "onDrop":{
-            "statLifeAdd":-1
-        },
+    "Ray gun":{
         "onAttack":{
             "pattern":{
                 "damages":[
@@ -174,29 +117,93 @@
                 ],
                 "center":[1,1],
                 "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":1,
                 "push":[
                     [1,1,1],
                     [1,1,1],
                     [1,1,1]
                 ],
-                "pushCenter":[0,1]
+                "pushCenter":[1,1]
             }
         },
         "imageLink": "./assets/weapon1.png"
     },
 
-    "Overcharging electrical sniper":{
+    "Sniper":{
         "onAttack":{
             "pattern":{
                 "damages":[[3]],
                 "center":[0,0],
                 "distance":Infinity,
-                "overObstacles":false,
-                "pushSelfForward":0,
                 "push":[[0]],
                 "pushCenter":[0,0]
+            }
+        },
+        "imageLink": "./assets/weapon5.png"
+    },
+
+    "Imploding bomb":{
+        "onAttack":{
+            "pattern":{
+                "damages":[[5]],
+                "center":[0,0],
+                "distance":1,
+                "push":[[3]],
+                "pushCenter":[0,0]
+            }
+        },
+        "imageLink": "./assets/weapon5.png"
+    },
+
+    "Laser gatling":{
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [1,1,1,1,1],
+                    [0,0,0,0,0],
+                    [1,1,1,1,1],
+                    [0,0,0,0,0],
+                    [1,1,1,1,1]
+                ],
+                "center":[2,2],
+                "distance":3,
+                "push":[[3]],
+                "pushCenter":[0,0]
+            }
+        },
+        "imageLink": "./assets/weapon5.png"
+    },
+    
+    "Cross grenade":{
+        "onAttack":{
+            "pattern":{
+                "damages":[
+                    [0,0,1,0,0],
+                    [0,0,2,0,0],
+                    [1,2,3,2,1],
+                    [0,0,2,0,0],
+                    [0,0,1,0,0]
+                ],
+                "center":[2,2],
+                "distance":2,
+                "push":[[0]],
+                "pushCenter":[0,0]
+            }
+        },
+        "imageLink": "./assets/weapon5.png"
+    },
+
+    "Accelerator":{
+        "onAttack":{
+            "pattern":{
+                "damages":[[0]],
+                "center":[0,0],
+                "distance":1,
+                "push":[
+                    [3,3,3],
+                    [3,3,3],
+                    [3,3,3]
+                ],
+                "pushCenter":[1,1]
             }
         },
         "imageLink": "./assets/weapon5.png"
