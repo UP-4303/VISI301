@@ -70,7 +70,7 @@ class Game:
             else :
                 condition = "allMonsterkilled"
 
-            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)))
+            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)), condition=condition)
             if path.is_file():
                 floors_count += 1
 
