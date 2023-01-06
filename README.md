@@ -17,3 +17,7 @@ pip install -r requirements.txt # Installe les dépendances
 py main.py # Lance le jeu
 ```
 
+## Tutoriel
+
+Un tutoriel est présent in-game, dans le coin en haut à droite dès que vous aurez lancé la partie !  
+Il contient tout ce que vous avez besoin de savoir pour jouer.
