@@ -197,9 +197,6 @@ class Game:
 
     def update(self, screen):
 
-        print(self.currentFloor.blockGroup)
-
-
         # update affichage et update var
         self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
         self.draw_everything(screen)
@@ -1015,11 +1012,27 @@ class Game:
         couleur_case_deux = (255, 154, 0)
         couleur_case_trois = (255, 115, 0)
         couleur_case_quatre = (229, 42, 12)
-        couleur_case_cing = (174, 19, 19)
+        couleur_case_cinq = (174, 19, 19)
 
-        pygame.draw.rect(screen, couleur_case_un, (610, 180, 10, 10))
+        pygame.draw.rect(screen, couleur_case_un, (610, 240, 30, 20))
         txt = font_medium.render("1", 1, (255, 255, 255))
-        screen.blit(txt, (610, 180))
+        screen.blit(txt, (620, 240))
+
+        pygame.draw.rect(screen, couleur_case_deux, (640, 240, 30, 20))
+        txt = font_medium.render("2", 1, (255, 255, 255))
+        screen.blit(txt, (650, 240))
+
+        pygame.draw.rect(screen, couleur_case_trois, (670, 240, 30, 20))
+        txt = font_medium.render("3", 1, (255, 255, 255))
+        screen.blit(txt, (680, 240))
+
+        pygame.draw.rect(screen, couleur_case_quatre, (700, 240, 30, 20))
+        txt = font_medium.render("4", 1, (255, 255, 255))
+        screen.blit(txt, (710, 240))
+
+        pygame.draw.rect(screen, couleur_case_cinq, (730, 240, 30, 20))
+        txt = font_medium.render("5", 1, (255, 255, 255))
+        screen.blit(txt, (740, 240))
 
 
         # draw the distance capacity
