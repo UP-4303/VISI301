@@ -549,11 +549,6 @@ class Floor():
         
         else:
             monster.attackVector = None
-        print(monster)
-        print(monster.attackVector)
-        print(completePathTargets)
-        print(partialPathTargets)
-        print(target)
 
     def UpdateObject(self, position: Position, newPosition: Position):
         if self.GetObject(newPosition) == None:
