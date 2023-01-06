@@ -175,6 +175,13 @@ class Floor():
                                 imageLink="./assets/monster8.png", healthPoints=3, position=Position(l, c),
                                 movementPoints=3, weapon=self.weaponTab["Light saber"]))
 
+                # Test black to put a wall
+                if (pix == (0, 0, 0, 255)):
+                    self.SetNewObject(
+                        Position(l, c),
+                        BlocObject(position=Position(l, c), healthPoints=3)
+                    )
+
 
     def replay(self):
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
