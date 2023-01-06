@@ -538,6 +538,8 @@ class Floor():
             monster.attackVector = target['attackVector']
             if target['path'] != []:
                 self.UpdateObject(monster.position, target['path'][-1]['position'])
+            else:
+                monster.attackVector = None
 
         elif partialPathTargets != []:
             partialPathTargets.sort(key=lambda element: element['pathLength'])
@@ -554,7 +556,6 @@ class Floor():
         
         else:
             monster.attackVector = None
-        # print(monster.target)
 
     def UpdateObject(self, position: Position, newPosition: Position):
         if self.GetObject(newPosition) == None:
