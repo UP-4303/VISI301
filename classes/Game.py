@@ -474,14 +474,28 @@ class Game:
 
                 # The player is attacking
                 if self.status == "PlayerAttack" :
-                    self.currentFloor.PlayerAttack(self.player, self.MouseBoardPosition())
-                    self.draw_attack(self.player,self.MouseBoardPosition(), screen)
-                    self.has_attacked = True
+                    vector = self.MouseBoardPosition() - self.player.position
+                    pattern = self.player.weapon.GetAttackPattern()
+                    attackValid = False
+                    if vector.CollinearToAxis():
+                        if "distance" in pattern:
+                            if abs(vector) <= pattern["distance"]:
+                                attackValid = True
 
-                    print("You choosed an attack")
-                    self.message = " You choosed an attack"
+                    if (attackValid):
 
-                    self.status = "PlayerTurn"
+                        self.currentFloor.PlayerAttack(self.player, self.MouseBoardPosition())
+                        self.draw_attack(self.player,self.MouseBoardPosition(), screen)
+                        self.has_attacked = True
+
+                        print("You choosed an attack")
+                        self.message = " You choosed an attack"
+
+                        self.status = "PlayerTurn"
+                    else :
+                        print("Non valid attack, try again")
+                        self.message = " Non valid attack, try again"
+
 
                 # Detect if the player push the mouvement button
                 if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
