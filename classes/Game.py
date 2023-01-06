@@ -136,28 +136,31 @@ class Game:
         # Help
         self.indice_txt_help = 0
         self.helpisopen = False
-        self.help_txt = [["Keyboard shortcut to know: ",
-                         "RETURN -> End your turn",
-                         "BACKSPACE -> To annul the current action",
-                         "A -> To choose an attack",
-                         "B -> to open the bag where are the weapons",
-                         "M -> To choose a movement",
-                         "O -> to open something at your position",
-                         "P -> to show what is inside the object at your position",
-                         "I -> close the preview of what is inside an object",
-                         "S -> to open the store to buy event "],
+        self.help_txt = [
+                         ["Welcome to the spaceship. You are the only humain survivor in there. ",
+                          "Your aim is to survive, for that you have to join the emergency ejection ship.",
+                          "Unfortunately this is at the last level of the ship and you are only at the level 0...",
+                          "To go to the upper level you have to : ",
+                          "         - open the lift by fullfilling the aim",
+                          "         - survive",
+                          "         - go to the up elevator (represented by a pink box)"],
 
-                         ["Your aim is to survive every level.",
-                          "To pass a level you have to : ",
-                          "- open the lift by fullfilling the aim",
-                          "- survive",
-                          "- go to the elevator "],
+                         ["You can do a lot of things on every round ",
+                          "     - Choose a mouvement ",
+                          "     - Choose to attack with a weapon that you picked in your bag",
+                          "     - Open things if you are on it",
+                          "     - Buy event in the store "],
 
-                         ["you can do a lot of things on every round ",
-                          "- Choose a mouvement ",
-                          "- Choose to attack with a weapon that you picked in your bag",
-                          "- Open things if you are on it",
-                          "- Buy event in the store "],
+                          ["Keyboard shortcut to know: ",
+                             "RETURN -> End your turn",
+                             "BACKSPACE -> To annul the current action",
+                             "A -> To choose an attack",
+                             "B -> to open the bag where are the weapons",
+                             "M -> To choose a movement",
+                             "O -> to open something at your position",
+                             "P -> to show what is inside the object at your position",
+                             "I -> close the preview of what is inside an object",
+                             "S -> to open the store to buy event "],
 
                          [" Good luck"]
 
@@ -193,6 +196,9 @@ class Game:
     # -------------------------------------------------------------------------------------------------------------------
 
     def update(self, screen):
+
+        print(self.currentFloor.blockGroup)
+
 
         # update affichage et update var
         self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
@@ -702,6 +708,9 @@ class Game:
         for object in self.currentFloor.staticObjectGroup:
             position = object.position
             object.rect.x, object.rect.y = self.convert_case_in_px(position)
+        for block in self.currentFloor.blockGroup:
+            position = block.position
+            block.rect.x, block.rect.y = self.convert_case_in_px(position)
 
 
     def init_sprite_size(self):
@@ -724,6 +733,12 @@ class Game:
             image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
 
             object.image = image
+
+        for block in self.currentFloor.blockGroup:
+            image = block.image
+            image = pygame.transform.scale(image, DEFAULT_IMAGE_SIZE)
+
+            block.image = image
 
 
     # -------------------------------------------------------------------------------------------------------------------
@@ -772,9 +787,10 @@ class Game:
         self.draw_floor_infos(screen)
         # show the objects
         self.currentFloor.staticObjectGroup.draw(screen)
-        # show monstres (maybe better in main)
+        # show monstres
         self.currentFloor.monsterGroup.draw(screen)
-
+        # show the blocks
+        self.currentFloor.blockGroup.draw(screen)
         # show the player
         self.currentFloor.playerGroup.draw(screen)
 
@@ -991,13 +1007,25 @@ class Game:
         screen.blit(weapon_name_txt, (610, 180))
 
         #draw the over obstacle capacity
-        weapon_name_txt = font_small.render("Surpasse objstacle :" + str(self.currentweapon.GetAttackPattern()['overObstacles']), 1, (38, 0, 153))
-        screen.blit(weapon_name_txt, (610, 215))
+        #weapon_name_txt = font_small.render("Surpasse objstacle :" + str(self.currentweapon.GetAttackPattern()['overObstacles']), 1, (38, 0, 153))
+        #screen.blit(weapon_name_txt, (610, 215))
+
+        couleur_case_zero = (76, 150, 255)
+        couleur_case_un = (255, 195, 0)
+        couleur_case_deux = (255, 154, 0)
+        couleur_case_trois = (255, 115, 0)
+        couleur_case_quatre = (229, 42, 12)
+        couleur_case_cing = (174, 19, 19)
+
+        pygame.draw.rect(screen, couleur_case_un, (610, 180, 10, 10))
+        txt = font_medium.render("1", 1, (255, 255, 255))
+        screen.blit(txt, (610, 180))
+
 
         # draw the distance capacity
         weapon_name_txt = font_small.render(
             "Distance :" + str(self.currentweapon.GetAttackPattern()['distance']), 1, (38, 0, 153))
-        screen.blit(weapon_name_txt, (610, 245))
+        screen.blit(weapon_name_txt, (610, 215))
 
         #draw the attack pattern
         weapon_attack_pattern_txt = font_small.render("Attack Pattern : ", 1, (38, 0, 153))
@@ -1075,15 +1103,28 @@ class Game:
         long_case = (size - ((nbLigne + 1) * ecart)) / nbLigne
 
         couleur_case_zero = (76, 150, 255)
-        couleur_case_un = (255, 51, 51)
+        couleur_case_un = (255, 195, 0)
+        couleur_case_deux = (255, 154, 0)
+        couleur_case_trois = (255, 115, 0)
+        couleur_case_quatre = (229, 42, 12)
+        couleur_case_cing = (174, 19, 19)
 
         for l in range(0, len(pattern)):
             ligne = pattern[l]
             for c in range(0, len(ligne)):
                 if ligne[c] == 0 :
                     couleur_case = couleur_case_zero
-                else :
+                elif ligne[c] == 1 :
                     couleur_case = couleur_case_un
+                elif ligne[c] == 2 :
+                    couleur_case = couleur_case_deux
+                elif ligne[c] == 3 :
+                    couleur_case = couleur_case_trois
+                elif ligne[c] == 4 :
+                    couleur_case = couleur_case_quatre
+                else :
+                    couleur_case = couleur_case_cing
+
 
                 # find the coordinates of the cases
                 top_left_x_case = ecart + x_pos + (larg_case * l) + (ecart * l)
@@ -1248,8 +1289,6 @@ class Game:
         screen.blit(txt_button_next, (700, 500))
 
         self.draw_text(screen, self.help_txt[self.indice_txt_help], 20, 160, 160, 20)
-
-
 
 
     def draw_text(self, screen, tab_txt, size, start_x, start_y, ecart):

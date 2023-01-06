@@ -34,6 +34,7 @@ class Floor():
     playerGroup:pygame.sprite.Group
     monsterGroup:pygame.sprite.Group
     staticObjectGroup:pygame.sprite.Group
+    blockGroup:pygame.sprite.Group
 
     def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str ="", condition : str="allMoney"):
         self.name = name
@@ -50,6 +51,8 @@ class Floor():
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
         self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
         self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
+        self.blockGroup =  pygame.sprite.Group()
+
         self.lastMonsterAdded = Monster()
         self.img_reference = refImg
 
@@ -68,6 +71,7 @@ class Floor():
                     'player': self.playerGroup,
                     'monsters': self.monsterGroup,
                     'static': self.staticObjectGroup,
+                    'block' : self.blockGroup,
                     'img': self.img_reference
                       }
 
@@ -176,7 +180,7 @@ class Floor():
         self.playerGroup = pygame.sprite.Group()  # only one player in the group
         self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
         self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
-
+        self.blockGroup = pygame.sprite.Group()
         self.initByImage(self.memory['img'])
 
     def spawn_random_coffre(self, pos: Position):
@@ -266,6 +270,8 @@ class Floor():
                 if isinstance(object_, Monster):
                     self.monsterGroup.add(object_)
                     self.lastMonsterAdded = object_
+                if isinstance(object_, BlocObject):
+                    self.blockGroup.add(object_)
                 return True
             else:
                 return False
@@ -290,6 +296,11 @@ class Floor():
                 self.layers["objects"][monster.position.x][monster.position.y] = None
                 self.monsterGroup.remove(monster)
 
+        for block in self.blockGroup :
+            if block.healthPoints <= 0 :
+                self.layers["objects"][block.position.x][block.position.y] = None
+                self.blockGroup.remove(block)
+
 
     def RemoveObject(self, position: Position):
         if self.GetObject(position) != None:
@@ -298,6 +309,8 @@ class Floor():
                 self.playerGroup.remove(object_)
             if isinstance(object_, Monster):
                 self.monsterGroup.remove(object_)
+            if isinstance(object_, BlocObject):
+                self.blockGroup.remove(object_)
             self.layers['objects'][position.x][position.y] = None
             return True
         else:
@@ -673,6 +686,9 @@ class Floor():
 
         for monstre in self.monsterGroup :
                 self.draw_lifebar(screen, larg_case, monstre)
+
+        for block in self.blockGroup :
+            self.draw_lifebar(screen, larg_case, block)
 
     def draw_staticObjects_lifebars(self, screen, larg_case ):
 
