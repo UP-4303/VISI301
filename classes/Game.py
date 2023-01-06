@@ -61,7 +61,16 @@ class Game:
         floors_count = 0 # count the number of floors to create by counting files in assets/floors
         for path in pathlib.Path("./assets/floors").iterdir():
             #add the floor in the list
-            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)))
+            if (floors_count == 1) :
+                condition_ = "allMoney"
+            elif (floors_count== 2):
+                condition_ = "allPotionPicked"
+            elif (floors_count == 5):
+                condition_ = "survive10"
+            else :
+                condition_ = "allMonsterkilled"
+
+            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path), condition = condition_))
             if path.is_file():
                 floors_count += 1
 
@@ -84,7 +93,7 @@ class Game:
         self.button_annuler = pygame.Rect(890, 630, 50, 20)
         self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
 
-        self.help_button = pygame.Rect(1040, 0, 40, 20)
+        self.help_button = pygame.Rect(1000, 0, 80, 40)
         self.quit_help_button = pygame.Rect(500, 500, 70, 40)
         self.help_next_button = pygame.Rect(700, 500, 70, 40)
 
@@ -137,21 +146,139 @@ class Game:
         self.indice_txt_help = 0
         self.helpisopen = False
         self.help_txt = [
-                         ["Welcome to the spaceship. You are the only humain survivor in there. ",
-                          "Your aim is to survive, for that you have to join the emergency ejection ship.",
-                          "Unfortunately this is at the last level of the ship and you are only at the level 0...",
-                          "To go to the upper level you have to : ",
-                          "         - open the lift by fullfilling the aim",
-                          "         - survive",
-                          "         - go to the up elevator (represented by a pink box)"],
+                         ["",
+                          "Welcome ! ",
+                          "",
+                          "Here is the summary of what you can found is this tutorial :"
+                          "",
+                          "- Page 1 : The synopsis and aim of the game",
+                          "- Page 2 : How to move and attack",
+                          "- Page 3 and 4 : Everything about weapons",
+                          "- Page 5: Descriptions of objects you will see",
+                          "- Page 6 : How to go to the next floor",
+                          "- Page 7 : How to open trunck",
+                          "- Page 8 : How to buy events",
+                          "- Page 9 : Where do the monsters attack ? ",
+                          "- Page 10 : keyboard shortcuts to know",
+                          "- Page 11 : Good luck"],
 
-                         ["You can do a lot of things on every round ",
-                          "     - Choose a mouvement ",
+                         ["Welcome in the spaceship. You're the only humain survivor in there. ",
+                          "Your aim is to survive, for that you have to join the emergency ",
+                          "ejection ship. Unfortunately this is at the last floor of the ship ",
+                          "and you are only at the floor 0...",
+                          "So your aim is to go up and upper and finally arrived at the top. ",
+                          "",
+                          "To go to the upper level you have to : ",
+                          "         - survive",
+                          "         - open the lift by fullfilling the aim",
+                          "         - go to the up elevator (represented by a pink box)",
+                          "",
+                          "You can do a lot of things on every round ",
+                          "     - Choose a movement ",
                           "     - Choose to attack with a weapon that you picked in your bag",
                           "     - Open things if you are on it",
-                          "     - Buy event in the store "],
+                          "     - Buy event in the store ",
+                          ""
+                          ],
 
-                          ["Keyboard shortcut to know: ",
+
+                         [
+                          "HOW TO MOVE : ",
+                          "To choose a movement click on the movement button on the ",
+                          "bottom right (or M) and click on the place you want to go to",
+                          "if the way is red you don't have enough movement points",
+                          "so your movement will not be valid, you will have to ",
+                          "choose again.",
+                          "",
+                          "HOW TO ATTACK : ",
+                           "To choose an attack click on the attack button on the ",
+                          "bottom right (or A) and click on the place you want to make",
+                          "the attack if the are no impacts appearing the attack ",
+                          "is not valid, you will have to choose again"
+                          ],
+                        ["HOW TO USE YOUR WEAPON : ",
+                         "You can use your weapon when you are attacking. After",
+                         "clicking on A or on the attack button during your turn",
+                         "you are invited to choose where you want to attack",
+                         "you can't attack everywhere, you can attack horizontally",
+                         "or vertically. The number of box max between you and your",
+                         "attack is define in the propertie of the weapon. Next thing",
+                         "you have to know is that weapons have two very important ",
+                         "caracteristics : the attack pattern who shown the damages ",
+                         "caused and the push pattern who show the places where objects",
+                         "are going to be propelled away."
+                        "",
+                         "HOW TO KNOW YOUR WEAPON PROPERTIES :",
+                         "Go into your bag and look at the right pannel giving ",
+                         "some infos on your current weapon."],
+
+
+                        ["HOW TO CHANGE WEAPONS :",
+                         "To change your current weapon go in your bag by clicking on ",
+                         "the bag button or the B key and choose between the weapons ",
+                         "you have. ",
+                         "",
+                         "HOW TO GET MORE WEAPONS : ",
+                         "To have more weapons you have to open somme trunk.",
+                         "Be careful your bag has limited place, sometimes you'll have",
+                         "to drop some of your weapons to grap some more.",
+                         "The only one you can't drop if your original weapon."
+                         "",
+                         ],
+
+                        ["OBJECT THAT YOU CAN FIND ON THE MAP : ",
+                         "- Money : when you pick a coin you earn 5 local currency",
+                         "- Purple movement potion : when you pick it you earn",
+                         "one more movement point, so you can move further ",
+                         "- Green life potion : when you pick it your life is  ",
+                         "augmented.",
+                         "- Wall : can not be picked and you can't go throught them",
+                         "but you can break them",
+                         "- Trunk : countains object that you can pick up"
+                         ],
+                        ["HOW TO GO TO THE UPPER FLOOR :",
+                         "To go to the upper floor you first have to unlock the lift.",
+                         "For that you have to fill the floors aim that you can see on "
+                         "bottom right box of your pannel gaim.",
+                         "For examples the aim : kill all monsters indicate that every",
+                         "monsters have to be dead to unlock the access to the up lift.",
+                         "Once the lift is unlock you can go into it by standing on the ",
+                         "pink / light purple box. You will directly arrived at the next ",
+                         "floor. If you arrived at the last one you won the game. "
+
+                         ],
+                        ["HOW TO SEE WHAT IS IN A TRUNK : ",
+                         "To see what is is the trunk click on the P key and to close ",
+                         "that view click on the I key",
+                         "",
+                         "HOW TO OPEN A TRUNK :",
+                         "Now that you saw what is inside the trunk you can choose to ",
+                         "open it and pick up everything by clicking the O key. Be careful",
+                         "once you decided to open it everything is picked. So choose the ",
+                         "good time. Opening a trunk full of life potion when your life is ",
+                         "full or open a trunk with powerfull weapons when you don't have ",
+                         "anymore in your bag are not clever choices. ",
+                         "",
+                         "The trunk are created randomly so if you replay the game they will",
+                         "change"],
+
+
+                          [
+                            "HOW TO BUY EVENTS :",
+                            "If you want to make more attacks or if some monsters are",
+                            "not accessible you can buy events that will be played at",
+                            "the end of your turn.",
+                            "To buy them you have to click on the S key and then choose",
+                            "which one you want to buy. You can buy up to three events",
+                            "per round. The events you have bought will be visible on ",
+                            " the bottom right box of the pannel game."
+                          ],
+
+                        ["HOW TO KNOW WHERE THE MONSTER ATTACK :",
+                         "During your turn you can see buy impacts and colors where",
+                         "the monsters are going to attack next"],
+
+                        ["Keyboard shortcut to know: ",
                              "RETURN -> End your turn",
                              "BACKSPACE -> To annul the current action",
                              "A -> To choose an attack",
@@ -189,7 +316,7 @@ class Game:
     def update(self, screen):
 
         # update affichage et update var
-        self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
+        self.elevatorOpen = self.currentFloor.is_condition_fullfilled(self.turn)
         self.draw_everything(screen)
         self.running = True
         self.won = False
@@ -465,14 +592,28 @@ class Game:
 
                 # The player is attacking
                 if self.status == "PlayerAttack" :
-                    self.currentFloor.PlayerAttack(self.player, self.MouseBoardPosition())
-                    self.draw_attack(self.player,self.MouseBoardPosition(), screen)
-                    self.has_attacked = True
+                    vector = self.MouseBoardPosition() - self.player.position
+                    pattern = self.player.weapon.GetAttackPattern()
+                    attackValid = False
+                    if vector.CollinearToAxis():
+                        if "distance" in pattern:
+                            if abs(vector) <= pattern["distance"]:
+                                attackValid = True
 
-                    print("You choosed an attack")
-                    self.message = " You choosed an attack"
+                    if (attackValid):
 
-                    self.status = "PlayerTurn"
+                        self.currentFloor.PlayerAttack(self.player, self.MouseBoardPosition())
+                        self.draw_attack(self.player,self.MouseBoardPosition(), screen)
+                        self.has_attacked = True
+
+                        print("You choosed an attack")
+                        self.message = " You choosed an attack"
+
+                        self.status = "PlayerTurn"
+                    else :
+                        print("Non valid attack, try again")
+                        self.message = " Non valid attack, try again"
+
 
                 # Detect if the player push the mouvement button
                 if self.button_mvt.collidepoint(pygame.mouse.get_pos()):
@@ -752,12 +893,12 @@ class Game:
     def draw_everything(self, screen):
         # show the score on the screen
         font = pygame.font.SysFont("monospace", 25, True)  # create the font style
-        score_text = font.render("Score :" + str(self.score), 1, (255, 255, 255))  # create texte
-        screen.blit(score_text, (640, 60))  # show the score at the tuple position
+        #score_text = font.render("Score :" + str(self.score), 1, (255, 255, 255))  # create texte
+        #screen.blit(score_text, (640, 60))  # show the score at the tuple position
 
         # show the number of the turn
         turn_text = font.render("Turn :" + str(self.turn), 1, (255, 255, 255))  # create texte
-        screen.blit(turn_text, (640, 100))  # show the turn at the tuple position
+        screen.blit(turn_text, (640, 60))  # show the turn at the tuple position
 
         # show floor
         self.draw_floor(screen)
@@ -857,9 +998,11 @@ class Game:
         txt_button_armes = font_small.render("annul", 1, (255, 255, 255))
         screen.blit(txt_button_armes, (890, 630))
 
+        font_big = pygame.font.SysFont("monospace", 25, True)  # create the font style
+
         pygame.draw.rect(screen, (0, 124, 124), self.help_button)
-        txt_button_armes = font_small.render("Help", 1, (255, 255, 255))
-        screen.blit(txt_button_armes, (1040, 0))
+        txt_button_armes = font_big.render("Tuto", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (1010, 7))
 
 
    #draw monster info
