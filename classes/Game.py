@@ -816,6 +816,8 @@ class Game:
         if self.isAOpenableShowed:
             self.currentOpenable.showInside(screen)
 
+        self.draw_attack_color_code( screen)
+
     #draw players infos in the up case
     def draw_player_infos(self, screen):
 
@@ -1325,13 +1327,29 @@ class Game:
 
         if isinstance(attaquant, Monster):
             couleur_case = (139, 192, 252)
-            imageImpact = pygame.transform.scale(pygame.image.load("./assets/impact.png"),
+            imageImpact1 = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_1.png"),
                                                  (self.larg_case, self.long_case))
+            imageImpact2 = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_2.png"),
+                                                 (self.larg_case, self.long_case))
+            imageImpact3 = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_3.png"),
+                                                  (self.larg_case, self.long_case))
+            imageImpact4 = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_4.png"),
+                                                  (self.larg_case, self.long_case))
+            imageImpact5 = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_5.png"),
+                                                  (self.larg_case, self.long_case))
+
         elif isinstance(attaquant, Player):
             couleur_case = (249, 248, 116)
-            imageImpact = pygame.transform.scale(pygame.image.load("./assets/impact4.png"),
-                                                 (self.larg_case, self.long_case))
-
+            imageImpact1 = pygame.transform.scale(pygame.image.load("./assets/impact_player_1.png"),
+                                                  (self.larg_case, self.long_case))
+            imageImpact2 = pygame.transform.scale(pygame.image.load("./assets/impact_player_2.png"),
+                                                  (self.larg_case, self.long_case))
+            imageImpact3 = pygame.transform.scale(pygame.image.load("./assets/impact_player_3.png"),
+                                                  (self.larg_case, self.long_case))
+            imageImpact4 = pygame.transform.scale(pygame.image.load("./assets/impact_player_4.png"),
+                                                  (self.larg_case, self.long_case))
+            imageImpact5 = pygame.transform.scale(pygame.image.load("./assets/impact_player_5.png"),
+                                                  (self.larg_case, self.long_case))
         #controle structure made in PlayerAttack() in the floor
         if vector.CollinearToAxis():
             if "distance" in pattern:
@@ -1367,6 +1385,16 @@ class Game:
                                         y - pattern["center"][1] + attaquant.position.y + vector.y)
                                     if checkingPosition.InBoard(self.currentFloor.size):
                                         if not(pattern["damages"][x][y]==0):
+                                            if (pattern["damages"][x][y]==1) :
+                                                imageImpact = imageImpact1
+                                            elif (pattern["damages"][x][y]==2) :
+                                                imageImpact = imageImpact2
+                                            elif (pattern["damages"][x][y]==3) :
+                                                imageImpact = imageImpact3
+                                            elif (pattern["damages"][x][y]==4) :
+                                                imageImpact = imageImpact4
+                                            elif (pattern["damages"][x][y]==5) :
+                                                imageImpact = imageImpact5
 
                                             top_left_x_case = self.ecart + self.top_left_x + (self.larg_case * checkingPosition.x) + (
                                                         self.ecart * checkingPosition.x)
@@ -1403,6 +1431,44 @@ class Game:
 
             compte_event = compte_event + 1
 
+    def draw_attack_color_code(self, screen):
+
+        font_medium = pygame.font.SysFont("monospace", 17, True)  # create the font style
+        x = 90
+        y = 70
+        taille = (40, 40)
+        imageImpact1M = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_1.png"),
+                                               taille)
+        imageImpact2M = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_2.png"),
+                                               taille)
+        imageImpact3M = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_3.png"),
+                                               taille)
+        imageImpact4M = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_4.png"),
+                                               taille)
+        imageImpact5M = pygame.transform.scale(pygame.image.load("./assets/impact_monstre_5.png"),
+                                               taille)
+        imageImpact1P = pygame.transform.scale(pygame.image.load("./assets/impact_player_1.png"),
+                                               taille)
+
+        imageImpact2P = pygame.transform.scale(pygame.image.load("./assets/impact_player_2.png"),
+                                               taille)
+
+        imageImpact3P = pygame.transform.scale(pygame.image.load("./assets/impact_player_3.png"),
+                                               taille)
+
+        imageImpact4P = pygame.transform.scale(pygame.image.load("./assets/impact_player_4.png"),
+                                               taille)
+
+        imageImpact5P = pygame.transform.scale(pygame.image.load("./assets/impact_player_5.png"),
+                                               taille)
+
+        tab = [imageImpact1P, imageImpact2P, imageImpact3P, imageImpact4P, imageImpact5P, imageImpact1M, imageImpact2M,
+               imageImpact3M, imageImpact4M, imageImpact5M]
+
+        for i in range(len(tab)):
+            screen.blit(tab[i], (x + 40 * i, y))
+            txt = font_medium.render(str((i % 5) + 1), 1, (255, 255, 255))
+            screen.blit(txt, (x + 40 * i, y + 20))
 
 
     #-------------------------------------------------------------------------------------------------------------------
@@ -1446,4 +1512,5 @@ class Game:
     # return the case where the mouse is
     def MouseBoardPosition(self):
         return self.convert_px_in_case(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+
 
