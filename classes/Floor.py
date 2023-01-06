@@ -342,13 +342,13 @@ class Floor():
                 if "push" in pattern:
                     # Pushs have to be executed in a specific order, depending on direction
                     if vector.Normalize() == Vector(0,1):
-                        xyOrder = [(x,y) for x in range(len(pattern["push"][y])) for y in range(len(pattern["push"]))]
+                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(len(pattern["push"][y]))]
                     elif vector.Normalize() == Vector(0,-1):
-                        xyOrder = [(x,y) for x in range(len(pattern["push"][y])) for y in range(0, len(pattern["push"]), -1)]
+                        xyOrder = [(x,y) for y in range(len(pattern["push"])-1, -1, -1) for x in range(len(pattern["push"][y]))]
                     elif vector.Normalize() == Vector(1,0):
-                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(len(pattern["push"][0]))]
+                        xyOrder = [(x,y) for x in range(len(pattern["push"][0])) for y in range(len(pattern["push"]))]
                     elif vector.Normalize() == Vector(-1,0):
-                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(0, len(pattern["push"][0]), -1)]
+                        xyOrder = [(x,y) for x in range(len(pattern["push"][0])-1, -1, -1) for y in range(len(pattern["push"]))]
                     else:
                         xyOrder = []
 

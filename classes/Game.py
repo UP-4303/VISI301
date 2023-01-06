@@ -320,7 +320,7 @@ class Game:
         self.has_moved = False
         self.has_attacked = False
         self.message = " Welcome to this Floor "
-        self.currentweapon = self.bag['BASIC WEAPON']
+        self.currentweapon = self.bag['Light saber']
         self.isAOpenableShowed = False
         self.currentOpenable = None
 
