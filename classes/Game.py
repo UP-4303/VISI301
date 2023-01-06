@@ -751,10 +751,10 @@ class Game:
     # We can let go a weapon to have more space in the bag.
     # We will return at the basic weapon that we can not remove
     def letGo(self, weapon):
-        if not(weapon.name=="BASIC WEAPON"):
+        if not(weapon.name=="Light saber"):
 
             del self.bag[weapon.name]
-            self.currentweapon = self.bag["BASIC WEAPON"]
+            self.currentweapon = self.bag["Light saber"]
 
     # -------------------------------------------------------------------------------------------------------------------
     # DRAW ON THE SCREEN
