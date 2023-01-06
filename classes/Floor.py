@@ -2,8 +2,11 @@ from __future__ import annotations
 from typing import Any, TypedDict
 from math import inf
 from random import randint
+import random
 import pygame
-
+from PIL import Image
+from typing import TypedDict
+import json
 from classes.GenericObject import GenericObject
 from classes.BlocObject import BlocObject
 from classes.Monster import Monster
@@ -17,6 +20,12 @@ from classes.Weapon import Weapon
 from classes.Character import Character
 from classes.PickableObject import PickableObject
 from classes.OpenableObject import OpenableObject
+from classes.Money import Money
+from classes.LifePotion import LifePotion
+from classes.MovementPotion import MovementPotion
+from classes.Coffre import Coffre
+
+
 
 class Floor():
     name:str
@@ -26,23 +35,207 @@ class Floor():
     monsterGroup:pygame.sprite.Group
     staticObjectGroup:pygame.sprite.Group
 
-    def __init__(self, name:str='Floor 0', size:Size=Size(6,6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1) ):
+    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str ="", condition : str="allMoney"):
         self.name = name
-        self.size = size
+
+        with open('data/weapons.json','r', encoding='utf-8') as dataFile:
+            data = dataFile.read()
+            weaponsJson = json.loads(data)
+
+        weapons = {}
+        for weaponName,weaponValue in weaponsJson.items():
+            weapons[weaponName] = Weapon(weaponName, **weaponValue)
+        self.weaponTab = weapons
+
+        self.playerGroup = pygame.sprite.Group()  # only one player in the group
+        self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
+        self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
+        self.lastMonsterAdded = Monster()
+        self.img_reference = refImg
+
+        if (refImg == "") :
+            self.size = size
+            self.elevatorUP = elevatorUP  # were we will be able to leave
+            self.elevatorDOWN = elevatorDOWN  # where we landed
+            self.layers = {
+                "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
+                "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
+            }
+        else :
+            self.initByImage(refImg)
+
+        self.memory= {'layers': self.layers,
+                    'player': self.playerGroup,
+                    'monsters': self.monsterGroup,
+                    'static': self.staticObjectGroup,
+                    'img': self.img_reference
+                      }
+
+        self.condition = condition
+
+
+    # -------------------------------------------------------------------------------------------------------------------
+    # INIT METHODES
+    # -------------------------------------------------------------------------------------------------------------------
+
+    def initByImage(self, img_reference):
+        im = Image.open(img_reference)
+
+        largeur = im.width
+        hauteur = im.height
 
         self.layers = {
-            "objects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] , # contient les monstres et le joueur
-            "staticObjects": [[None for _y in range(self.size.height)] for _x in range(self.size.width)] # contient les objects ramassable
+            "objects": [[None for _y in range(hauteur)] for _x in range(largeur)],
+            # contient les monstres et le joueur
+            "staticObjects": [[None for _y in range(hauteur)] for _x in range(largeur)]
+            # contient les objects ramassable
         }
 
-        self.playerGroup = pygame.sprite.Group() # only one player in the group
-        self.monsterGroup = pygame.sprite.Group() #all the monsters currently on the floor
-        self.staticObjectGroup = pygame.sprite.Group() #all the openable and pickable
+        self.size = Size(width=largeur, height=hauteur)
 
-        self.elevatorUP = elevatorUP #were we will be able to leave
-        self.elevatorDOWN = elevatorDOWN #where we landed
 
-        self.lastMonsterAdded = Monster()
+        for l in range(0, hauteur):
+            for c in range(0, largeur):
+                pix = im.getpixel((l,c))
+
+
+                #Test yellow to put money
+                if (pix==(255, 237, 74, 255)):
+                    self.SetNewObject(Position(l,c), Money())
+
+                #Test green to put Life potion
+                if (pix==(61, 157, 49, 255)):
+                    self.SetNewObject(Position(l,c), LifePotion())
+
+                # Test Purple to put Movement Potion
+                if (pix==(81, 27, 123, 255)):
+                    self.SetNewObject(Position(l,c), MovementPotion())
+
+                # Test Pink to put DOWN lift
+                if (pix == (235, 160, 191, 255)):
+                    self.elevatorDOWN = Position(l,c)
+
+                # Test dark Pink to put UP lift
+                if (pix == (190, 25, 101, 255)):
+                    self.elevatorUP = Position(l, c)
+
+                # Test brown to put coffre
+                if (pix == (101, 56, 0, 255)):
+                    self.spawn_random_coffre(Position(l, c))
+
+                # Test orange to put a monster type 1
+                if (pix == (255, 135, 0, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Dead Eye", description="Deadly from far away, but move slowly.",
+                                imageLink="./assets/monster9.png", healthPoints=3, position=Position(l, c),
+                                movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+                # Test dark red to put a monster type 2
+                if (pix == (142, 30, 30, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Fire drill", description="Carefull it's hot",
+                                imageLink="./assets/monster1.png", healthPoints=4, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["TEST WEAPON 1"]))
+
+                # Test cyan to put a monster type 3
+                if (pix == (0, 255, 221, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Bullet", description="weak but can attack far away",
+                                imageLink="./assets/monster4.png", healthPoints=1, position=Position(l, c),
+                                movementPoints=9, weapon=self.weaponTab["SONIC WEAPON"]))
+
+                # Test dark blue to put a monster type 4
+                if (pix == (0, 64, 255, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Bong", description="Strong boy",
+                                imageLink="./assets/monster5.png", healthPoints=6, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+                # Test magenta to put a monster type 5
+                if (pix == (184, 0, 255, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Long Harm", description="Run far far away ",
+                                imageLink="./assets/monster6.png", healthPoints=6, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+                # Test red to put a monster type 5
+                if (pix == (255, 0, 0, 255)):
+                    ok = self.SetNewObject(
+                        Position(l, c),
+                        Monster(name="Scars", description="Cut cut cut",
+                                imageLink="./assets/monster8.png", healthPoints=6, position=Position(l, c),
+                                movementPoints=2, weapon=self.weaponTab["Overcharging electrical sniper"]))
+
+
+    def replay(self):
+        self.playerGroup = pygame.sprite.Group()  # only one player in the group
+        self.monsterGroup = pygame.sprite.Group()  # all the monsters currently on the floor
+        self.staticObjectGroup = pygame.sprite.Group()  # all the openable and pickable
+
+        self.initByImage(self.memory['img'])
+
+    def spawn_random_coffre(self, pos: Position):
+        insideTheBox = []
+        nWeapon = 0
+        object = None
+        for i in range(10):
+            randomO = random.random()
+            randomO = randomO * 4
+            randomO = int(randomO)
+            if randomO == 0:
+                object = Money()
+            elif randomO == 1:
+                object = MovementPotion()
+            elif randomO == 2:
+                object = LifePotion()
+            else:
+                nWeapon = nWeapon + 1
+
+            insideTheBox.append(object)
+
+        randomKeys = random.sample(list(self.weaponTab), nWeapon)
+        for key in randomKeys:
+            insideTheBox.append(self.weaponTab[key])
+
+        coffre = Coffre(pos, insideTheBox)
+        self.SetNewObject(pos, coffre)
+
+    def is_condition_fullfilled(self):
+        res = False
+
+        if ( self.condition == "allMoney"):
+            res = True
+            for obj in self.staticObjectGroup:
+                if  isinstance(obj, Money):
+                    res = False
+        elif ( self.condition == "allMonsterkilled"):
+            res = (len(self.monsterGroup)==0)
+
+        elif ( self.condition == "allPotionPicked"):
+            res = True
+            for obj in self.staticObjectGroup:
+                if  isinstance(obj, LifePotion) or isinstance(obj, MovementPotion):
+                    res = False
+
+        return res
+
+    def condition_txt(self):
+        res=""
+        if ( self.condition == "allMoney"):
+            res = "Pick all money"
+
+        elif ( self.condition == "allMonsterkilled"):
+            res = "Kill all monsters"
+
+        elif ( self.condition == "allPotionPicked"):
+            res = "Pick all potions"
+
+        return res
 
     # -------------------------------------------------------------------------------------------------------------------
     # GETTER  MAP
@@ -61,7 +254,7 @@ class Floor():
     # -------------------------------------------------------------------------------------------------------------------
 
     # add an object in the map at the right place, right layer
-
+    # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
     def SetNewObject(self, position: Position, object_: GenericObject):
         if isinstance(object_, Character) or isinstance(object_, BlocObject):
             if self.GetObject(position) == None:
@@ -96,7 +289,7 @@ class Floor():
             if monster.healthPoints <= 0 :
                 self.layers["objects"][monster.position.x][monster.position.y] = None
                 self.monsterGroup.remove(monster)
-    # Put an object in the floor at the position given.Return True if everything went ok, false if it went wrong
+
 
     def RemoveObject(self, position: Position):
         if self.GetObject(position) != None:
@@ -119,6 +312,7 @@ class Floor():
         pattern = object_.weapon.GetAttackPattern()
         if vector != None:
             if pattern != {}:
+                # Apply damages
                 if "damages" in pattern:
                     for x in range(len(pattern["damages"])):
                         for y in range(len(pattern["damages"][x])):
@@ -131,25 +325,38 @@ class Floor():
                                 if checkingPickableObject != None:
                                     checkingPickableObject.TakeDamage(pattern["damages"][x][y])
                 
+                # Apply pushs
                 if "push" in pattern:
-                    for x in range(len(pattern["push"])):
-                        for y in range(len(pattern["push"][x])):
-                            checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
-                            if checkingPosition.InBoard(self.size):
-                                checkingObject = self.GetObject(checkingPosition)
-                                checkingPickableObject = self.getStaticObjects(checkingPosition)
-                                if isinstance(checkingObject, MoveableObject):
-                                    pushedPosition = checkingPosition
-                                    for _ in range(pattern["push"][x][y]):
-                                        if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
-                                            self.UpdateObject(pushedPosition, pushedPosition + vector.Normalize())
-                                            pushedPosition += vector.Normalize()
-                                if checkingPickableObject != None:
-                                    pushedPickablePosition = checkingPosition
-                                    for _ in range(pattern["push"][x][y]):
-                                        if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.getStaticObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
-                                            self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
-                                            pushedPickablePosition += vector.Normalize()
+                    # Pushs have to be executed in a specific order, depending on direction
+                    if vector.Normalize() == Vector(0,1):
+                        xyOrder = [(x,y) for x in range(len(pattern["push"][y])) for y in range(len(pattern["push"]))]
+                    elif vector.Normalize() == Vector(0,-1):
+                        xyOrder = [(x,y) for x in range(len(pattern["push"][y])) for y in range(0, len(pattern["push"]), -1)]
+                    elif vector.Normalize() == Vector(1,0):
+                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(len(pattern["push"][0]))]
+                    elif vector.Normalize() == Vector(-1,0):
+                        xyOrder = [(x,y) for y in range(len(pattern["push"])) for x in range(0, len(pattern["push"][0]), -1)]
+                    else:
+                        xyOrder = []
+
+                    for x,y in xyOrder:
+
+                        checkingPosition = Position(x-pattern["pushCenter"][0]+object_.position.x+vector.x, y-pattern["pushCenter"][1]+object_.position.y+vector.y)
+                        if checkingPosition.InBoard(self.size):
+                            checkingObject = self.GetObject(checkingPosition)
+                            checkingPickableObject = self.getStaticObjects(checkingPosition)
+                            if isinstance(checkingObject, MoveableObject):
+                                pushedPosition = checkingPosition
+                                for _ in range(pattern["push"][x][y]):
+                                    if (pushedPosition + vector.Normalize()).InBoard(self.size) and self.GetObject(pushedPosition + vector.Normalize()) == None:
+                                        self.UpdateObject(pushedPosition, pushedPosition + vector.Normalize())
+                                        pushedPosition += vector.Normalize()
+                            if checkingPickableObject != None:
+                                pushedPickablePosition = checkingPosition
+                                for _ in range(pattern["push"][x][y]):
+                                    if (pushedPickablePosition + vector.Normalize()).InBoard(self.size) and self.getStaticObjects(pushedPickablePosition + vector.Normalize()) == None and not(isinstance(self.GetObject(pushedPickablePosition + vector.Normalize()), StaticObject)):
+                                        self.UpdateStaticObject(pushedPickablePosition, pushedPickablePosition + vector.Normalize())
+                                        pushedPickablePosition += vector.Normalize()
 
     def PlayerAttack(self, player:Player, attackingPosition:Position):
         vector = attackingPosition - player.position
@@ -223,6 +430,7 @@ class Floor():
             self.UpdateObject(player.position, path[-1]['position'])
         else:
             print('Chemin trop long ou inexistant !')
+
     # Search the paths and update the position of the monster
     def UpdateMonster(self, monster:Monster):
         allTargets = []
@@ -487,7 +695,7 @@ class Floor():
                 bar_color = bar_back_color
 
             bar_x = object.rect.x + (ecart * (i)) + (larg_one_point * (i))
-            bar_back_position = [bar_x, object.rect.y + 10, larg_one_point, 7]  # x, y, w, h
+            bar_back_position = [bar_x, object.rect.y + 16, larg_one_point, 7]  # x, y, w, h
 
             pygame.draw.rect(screen, bar_color, bar_back_position)
 

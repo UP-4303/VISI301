@@ -1,8 +1,11 @@
 import sys
 import pygame
+import pathlib
+import random
 
 from typing import TypedDict
 import json
+from math import inf
 
 from classes.BlocObject import BlocObject
 from classes.Player import Player
@@ -53,11 +56,19 @@ class Game:
 
         self.isplaying = False
 
-        self.floorList = [Floor(name='Floor 0', size= Size(6,6),elevatorUP= Position(5,5),elevatorDOWN =Position(0,0)),
-                          Floor(name='Floor 1', size= Size(10,10),elevatorUP= Position(6,6),elevatorDOWN= Position(0,4)),
-                          Floor(name='Floor 2', size= Size(15,15),elevatorUP= Position(14,7),elevatorDOWN = Position(0,7))]
+        self.floorList = []
+        #initialisation of floors
+        floors_count = 0 # count the number of floors to create by counting files in assets/floors
+        for path in pathlib.Path("./assets/floors").iterdir():
+            #add the floor in the list
+            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)))
+            if path.is_file():
+                floors_count += 1
+
         self.currentFloorIndex = 0
         self.currentFloor = self.floorList[self.currentFloorIndex]
+
+
         self.score = 0
 
         # generate the player
@@ -73,7 +84,15 @@ class Game:
         self.button_annuler = pygame.Rect(890, 630, 50, 20)
         self.quit_bag_button = pygame.Rect(500, 500, 70, 40)
 
+        self.help_button = pygame.Rect(1040, 0, 40, 20)
+        self.quit_help_button = pygame.Rect(500, 500, 70, 40)
+        self.help_next_button = pygame.Rect(700, 500, 70, 40)
+
         self.button_let_go_weapon = pygame.Rect(680, 490, 70, 30)
+
+        replay_button = pygame.image.load('assets/Replay.png')
+        self.replay_button = pygame.transform.scale(replay_button, (400, 150))
+        self.replay_button_rect = replay_button.get_rect()
 
         # const needed to draw the map
         self.ecart = 3
@@ -86,12 +105,13 @@ class Game:
 
         # var to know where we are in the game
         self.turn = 0
-        self.status = "MonsterTurn"
+        self.status = "PlayerTurn"
         self.has_moved = False
         self.has_attacked = False
         self.won = False
         self.message = " Welcome to a new Floor "
         self.running = True
+        self.gameOver= False
 
         self.bagisopen = False
         self.bag = {'BASIC WEAPON':weapons['BASIC WEAPON']}
@@ -100,6 +120,8 @@ class Game:
 
         self.isAOpenableShowed = False
         self.currentOpenable = None
+
+        self.memorize()
 
         #Boutique
 
@@ -111,24 +133,54 @@ class Game:
         self.eventToExecute =  pygame.sprite.Group()
         self.boutiqueMessage = "Bienvenue dans la boutique"
 
+        # Help
+        self.indice_txt_help = 0
+        self.helpisopen = False
+        self.help_txt = [["Keyboard shortcut to know: ",
+                         "RETURN -> End your turn",
+                         "BACKSPACE -> To annul the current action",
+                         "A -> To choose an attack",
+                         "B -> to open the bag where are the weapons",
+                         "M -> To choose a movement",
+                         "O -> to open something at your position",
+                         "P -> to show what is inside the object at your position",
+                         "I -> close the preview of what is inside an object",
+                         "S -> to open the store to buy event "],
+
+                         ["Your aim is to survive every level.",
+                          "To pass a level you have to : ",
+                          "- open the lift by fullfilling the aim",
+                          "- survive",
+                          "- go to the elevator "],
+
+                         ["you can do a lot of things on every round ",
+                          "- Choose a mouvement ",
+                          "- Choose to attack with a weapon that you picked in your bag",
+                          "- Open things if you are on it",
+                          "- Buy event in the store "],
+
+                         [" Good luck"]
+
+
+                         ]
+
+
+
+
+
         # TEST A ENLEVER
 
-        self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
-        self.spawn_monster(position=Position(4,2), name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"])
-        self.spawn_pickableObject(position=Position(0,5),objectType="Money")
+
+        # self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
         
-        self.floorList[1].SetNewObject(Position(4,4), Monster(position=Position(4, 4), movementPoints=5, healthPoints=7, weapon=weapons['TEST WEAPON']))
-        self.floorList[1].SetNewObject(Position(1,3), Monster(position=Position(1, 3), movementPoints=5, healthPoints=7, weapon=weapons['TEST WEAPON']))
-        self.floorList[1].SetNewObject(Position(4,8), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=3, position=Position(4,6), movementPoints=4, weapon=self.weaponTab["Overcharging electrical sniper"]))
-        self.floorList[1].SetNewObject(Position(3,2), Monster(name="Dead Eye", description="Deadly from far away, but move slowly.", imageLink="./assets/monster9.png", healthPoints=5, position=Position(3,2), movementPoints=3, weapon=self.weaponTab["Overcharging electrical sniper"]))
-        self.floorList[1].SetNewObject(Position(0,3), BlocObject(position=Position(0,3), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(0,4), BlocObject(position=Position(0,4), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(0,5), BlocObject(position=Position(0,5), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(1,3), BlocObject(position=Position(1,3), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(1,5), BlocObject(position=Position(1,5), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(2,3), BlocObject(position=Position(2,3), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(2,4), BlocObject(position=Position(2,4), healthPoints=3))
-        self.floorList[1].SetNewObject(Position(2,5), BlocObject(position=Position(2,5), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(0,3), BlocObject(position=Position(0,3), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(0,4), BlocObject(position=Position(0,4), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(0,5), BlocObject(position=Position(0,5), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(1,3), BlocObject(position=Position(1,3), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(1,5), BlocObject(position=Position(1,5), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(2,3), BlocObject(position=Position(2,3), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(2,4), BlocObject(position=Position(2,4), healthPoints=3))
+        self.floorList[0].SetNewObject(Position(2,5), BlocObject(position=Position(2,5), healthPoints=3))
 
         self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()
@@ -143,26 +195,31 @@ class Game:
     def update(self, screen):
 
         # update affichage et update var
+        self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
         self.draw_everything(screen)
         self.running = True
         self.won = False
         self.arrivedAtElevator = (self.player.position == self.currentFloor.elevatorUP)
         self.currentFloor.checkEveryoneAlive()
+        self.gameOver = (self.player.healthPoints<=0)
 
-
-        if self.arrivedAtElevator:
+        if self.arrivedAtElevator and self.elevatorOpen:
             self.goToNextLevel();
 
         # deal with the bag is open
         if self.bagisopen:
             self.dealWithOpenBag(screen)
-
+        elif self.helpisopen:
+            self.dealWithOpenHelp(screen)
         # deal with the boutique open
         elif self.boutiqueisopen:
             self.dealWithOpenBoutique(screen)
         # deal with the situation of winning
         elif self.won :
             self.dealWithWon(screen)
+
+        elif self.gameOver:
+            self.dealWithGameOver(screen)
 
         # deal with the action in the pannel Game, out of the bag and not in a winning situation
         else :
@@ -180,6 +237,7 @@ class Game:
         if self.status == "PlayerAttack":
             self.preShowAttack(screen)
 
+
         return self.running
 
     # -------------------------------------------------------------------------------------------------------------------
@@ -191,20 +249,24 @@ class Game:
         # check if the player has already attacked during this turn
         if self.has_attacked == False:
             self.status = "PlayerAttack"
-            self.message = " Choisissez où vous voulez attaquer"
+            self.message = " Choose where to attack"
         else:
             print("Vous avez deja attaquer vous ne pouvez plus")
-            self.message = " Vous essayer d'attaquer mais vous avez déjà attaqué "
+            self.message = " You already attacked "
     def wantToOpenTheBag(self):
-        print("vous choisissez votre arme")
+        print("choose your weapon")
         self.bagisopen = True
+
+    def wantToOpenHelp(self):
+        print("help section")
+        self.helpisopen = True
     def wantToOpenTheBoutique(self):
-        print("Ouvrez la boutique")
+        print("Open the boutique")
         self.boutiqueisopen = True
-        self.boutiqueMessage = "Bienvenue dans la boutique"
+        self.boutiqueMessage = "Welcome in the store"
     def wantToAnnul(self):
         print("Vous avez annulé l'action")
-        self.message = " Vous avez annulé l'action"
+        self.message = " you cancelled the action"
         self.status = "PlayerTurn"
     def wantToEndTurn(self):
         for event in self.eventToExecute:
@@ -212,8 +274,8 @@ class Game:
             self.eventToExecute.remove(event)
 
 
-        print("vous avez appuyé sur le bouton finir tour")
-        self.message = " Fin de votre tour, la main est aux monstree "
+        print("you pressed end turn")
+        self.message = " End of your turn, monsters attacking "
         # Put the variable back to normal
         self.has_moved = False
         self.has_attacked = False
@@ -222,22 +284,81 @@ class Game:
         # increase the turn count
         self.turn = self.turn + 1
     def wantToChoseMouvement(self):
-        print("vous avez appuyé sur le bouton mvt")
+        print("you pressed mvt")
         # check if the player has already moved during this turn
         if self.has_moved == False:
-            self.message = " Choisissez où vous voulez vous déplacer"
+            self.message = " Choose where to move"
             self.status = "PlayerMovement"
         else:
-            print("Vous avez deja bougé vous ne pouvez plus")
-            self.message = " Vous essayer de vous déplacer mais vous avez deja bougé "
+            print("you already moved you can't do it twice")
+            self.message = " You already moved "
+
+    def replay(self, floorIndex):
+        self.player.healthPoints = self.player.maxHealthPoints
+        self.player.money = self.memory['money']
+        self.bag = self.copie_bag(self.memory['bag'])
+        self.score= self.memory['score']
+        self.player.movementPoints = self.memory['mvtPoint']
+
+
+
+        self.currentFloorIndex = floorIndex
+        self.currentFloor = self.floorList[self.currentFloorIndex]
+        self.currentFloor.replay()
+        self.currentFloor.SetNewObject(self.currentFloor.elevatorDOWN, self.player)
+        self.larg_case = (self.large_max_grille - (
+                (self.currentFloor.size.width + 1) * self.ecart)) / self.currentFloor.size.width
+        self.long_case = (self.large_max_grille - (
+                (self.currentFloor.size.height + 1) * self.ecart)) / self.currentFloor.size.height
+        self.turn = 0
+        self.has_moved = False
+        self.has_attacked = False
+        self.message = " Welcome to this Floor "
+        self.currentweapon = self.bag['BASIC WEAPON']
+        self.isAOpenableShowed = False
+        self.currentOpenable = None
+
+
+        self.init_sprite_size()
+        self.memorize()
+
+
+
+
+# Put the memory on date to save the state of the game
+    def memorize(self):
+        self.memory = {'money': self.player.money,
+                       'bag': self.copie_bag(self.bag),
+                       'score': self.score,
+                       'mvtPoint' : self.player.movementPoints}
+
+    def copie_bag(self, bag):
+        newBag = bag.copy()
+        return newBag
+
+
+
 
     # -------------------------------------------------------------------------------------------------------------------
     # DECOUPE FONCTION UDATE
     # -------------------------------------------------------------------------------------------------------------------
 
+    def dealWithGameOver(self, screen):
+        self.draw_gameOver(screen)
+        print("GameOver")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                print("good bye")
+                # Deal with click if we are in the Game Over
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+
+                if self.replay_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.replay(self.currentFloorIndex)
+
     def dealWithWon(self,screen):
         self.draw_won(screen)
-        print("vous avez gagné !")
+        print("You won!")
 
     def dealWithOpenBag(self, screen):
         self.draw_bag(screen)
@@ -245,7 +366,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                print("aurevoir")
+                print("good bye")
             # Deal with click if we are in the bag
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 print("you clicked in the bag")
@@ -255,16 +376,39 @@ class Game:
 
                 for arme in self.bag:
                     if self.bag[arme].button.collidepoint(pygame.mouse.get_pos()):
-                        print("Vous avez cliqué sur l'arme : " + self.weaponTab[arme].name)
+                        print("You clicked on the weapon : " + self.weaponTab[arme].name)
                         self.currentweapon = self.weaponTab[arme]
                         self.player.weapon = self.weaponTab[arme]
 
                 # Detect if the player push the end turn button
                 if self.quit_bag_button.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton quitter le sac")
+                    print("you left the bag")
                     # Put the variable back to normal
                     self.bagisopen = False
 
+    def dealWithOpenHelp(self, screen):
+        self.draw_help(screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                print("good bye")
+
+            # Deal with click if we are in the help
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                print("you clicked in the help")
+
+
+
+                # Detect if the player push the quit button
+                if self.quit_help_button.collidepoint(pygame.mouse.get_pos()):
+                    print("you left the help")
+                    # Put the variable back to normal
+                    self.helpisopen = False
+                    self.indice_txt_help = 0
+
+                if self.help_next_button.collidepoint(pygame.mouse.get_pos()):
+                    # change the text
+                    self.indice_txt_help = (self.indice_txt_help + 1) % len(self.help_txt)
     def dealWithOpenBoutique(self, screen):
 
         self.draw_boutique(screen)
@@ -272,7 +416,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                print("aurevoir")
+                print("Good bye")
             # Deal with click if we are in the boutique
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 print("you clicked in the boutique")
@@ -282,27 +426,26 @@ class Game:
 
                 for i in range(0, len(self.boutique)):
                     if self.boutique[i].button.collidepoint(pygame.mouse.get_pos()):
-                        print("Vous avez cliqué sur l'evenement : " + self.boutique[i].name)
+                        print("You clicked on the event: " + self.boutique[i].name)
                         self.currentEvent= self.boutique[i]
 
                 # Detect if the player push the quit boutique button
                 if self.quit_boutique_button.collidepoint(pygame.mouse.get_pos()):
-                    print("vous avez appuyé sur le bouton quitter la boutique")
+                    print("you left the store")
                     # Put the variable back to normal
                     self.boutiqueisopen = False
-
 
     def dealWithActionPannelGame(self, screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                print("aurevoir")
+                print("Goodbye")
                # Deal with click if we are in the game pannel
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
 
                 if self.status == "PlayerTurn":
-                    print("C'est au tour du joueur")
-                    self.message = " A vous de jouez"
+                    print("It's player's turn")
+                    self.message = " Your turn !"
 
                 if self.button_annuler.collidepoint(pygame.mouse.get_pos()):
                     self.wantToAnnul()
@@ -316,11 +459,12 @@ class Game:
                         self.currentFloor.UpdatePlayer(self.player, self.MouseBoardPosition())
                         self.has_moved = True
 
-                        print("Le joueur a choisit un deplacement")
-                        self.message = " Vous avez choisit un deplacement"
+                        print("You choosed a movement")
+                        self.message = " You choosed a movement"
                         self.status = "PlayerTurn"
                     else :
-                        print("Deplacement non valide, rechoisissez")
+                        print("Non valid movement, try again")
+                        self.message = " Non valid movement, try again"
 
 
 
@@ -331,8 +475,8 @@ class Game:
                     self.draw_attack(self.player,self.MouseBoardPosition(), screen)
                     self.has_attacked = True
 
-                    print("Le joueur a choisit une attack ")
-                    self.message = " Vous avez choisit une attack"
+                    print("You choosed an attack")
+                    self.message = " You choosed an attack"
 
                     self.status = "PlayerTurn"
 
@@ -352,6 +496,10 @@ class Game:
                 if self.button_armes.collidepoint(pygame.mouse.get_pos()):
                     self.wantToOpenTheBag()
 
+                # Detect if the player push the help button
+                if self.help_button.collidepoint(pygame.mouse.get_pos()):
+                    self.wantToOpenHelp()
+
 
             elif event.type == pygame.KEYDOWN:
                 #raccourci clavier
@@ -359,28 +507,24 @@ class Game:
                     self.wantToAttack()
                 elif event.key == pygame.K_b:
                     self.wantToOpenTheBag()
+                elif event.key == pygame.K_h:
+                    self.wantToOpenHelp()
                 elif event.key == pygame.K_m:
                     self.wantToChoseMouvement()
                 elif event.key == pygame.K_RETURN and self.won == False:
                     self.wantToEndTurn()
                 elif event.key == pygame.K_BACKSPACE :
                     self.wantToAnnul()
-                elif event.key == pygame.K_q:
-                    print("Player is hit")
-                    for player in self.currentFloor.playerGroup:
-                        player.healthPoints = player.healthPoints - 1
                 elif event.key == pygame.K_s:
                     self.wantToOpenTheBoutique()
+                elif event.key == pygame.K_q: #-------------------------------Enlever apres test--------------------------------------------------
+                    self.player.healthPoints -=5
                 elif event.key == pygame.K_o:
                     self.openObject(self.player.position)
                 elif event.key == pygame.K_p:
                     self.showInsideObject(self.player.position, screen)
                 elif event.key == pygame.K_i:
                     self.isAOpenableShowed = False
-                elif event.key == pygame.K_t: #----------------TEST--------------------
-                    seisme = EarthQuake()
-                    seisme.appendOnTheFloor(self.currentFloor)
-
 
     def goToNextLevel(self):
         if self.currentFloorIndex < len(self.floorList)-1:
@@ -394,7 +538,7 @@ class Game:
             self.turn = 0
             self.has_moved = False
             self.has_attacked = False
-            self.message = " Welcome to a new Floor "
+            self.message = " Welcome to this Floor "
 
             self.isAOpenableShowed = False
             self.currentOpenable = None
@@ -402,38 +546,40 @@ class Game:
         else:
             self.won = True
 
+        self.memorize()
 
     def openObject(self, position):
         res = self.currentFloor.openOpenableObject(position, self)
         if (res == False):
-            self.message = "Aucun objet à ouvrir à votre position"
+            self.message = "Nothing to open here"
         elif not(res == None):
             for weapon in res:
                 self.pickUp(weapon)
+            self.isAOpenableShowed = False
         self.currentOpenable = None
 
     def buy_event(self, event):
         print(self.eventToExecute.has(event))
         print(len(self.eventToExecute) >= 3)
         if (self.eventToExecute.has(event)):
-            self.boutiqueMessage = "vous avez deja acheté cet evenement"
-            print("vous avez deja acheté cet evenement")
+            self.boutiqueMessage = "You already bought this one"
+            print("You already bought this event")
         elif (len(self.eventToExecute) >= 3):
-            self.boutiqueMessage = "Pas plus de 3 evenements par tour"
-            print("Pas plus de 3 evenements par tour")
+            self.boutiqueMessage = "You already bought 3 events"
+            print("You already bought 3 events")
         elif (self.player.money < event.price):
-            self.boutiqueMessage = "Vous n'avez pas asser d'argent"
-            print("Vous n'avez pas asser d'argent")
+            self.boutiqueMessage = "Not enough money "
+            print("You don't have enough money to buy this")
         else:
             self.player.money = self.player.money - event.price
             self.eventToExecute.add(event)
-            self.boutiqueMessage = "Vous avez acheté l'évenement : " + event.name
+            self.boutiqueMessage = "You bought this event : " + event.name
 
     def showInsideObject(self, position, screen):
         res = self.currentFloor.showInsideOpenableObject(position, screen)
 
         if (res == False):
-            self.message = "Aucun objet à montrer à votre position"
+            self.message = "Nothing to show here"
         else :
             self.isAOpenableShowed = True
             self.currentOpenable = self.currentFloor.getStaticObjects(position)
@@ -466,7 +612,28 @@ class Game:
 
     def preshot_monster_attack(self, screen):
         for monster in self.currentFloor.monsterGroup:
-            if not(monster.attackVector==None):
+            # vector and pattern are just shorthands
+            vector = monster.attackVector
+            pattern = monster.weapon.GetAttackPattern()
+
+            # Update the attack vector if infinite distance
+            if vector != None:
+                if pattern["distance"] == inf:
+                    normalized = vector.Normalize()
+                    raycast = normalized
+                    while (monster.position + raycast).InBoard(self.currentFloor.size) and self.currentFloor.GetObject(monster.position + raycast) == None:
+                        raycast += normalized
+                    if (monster.position + raycast).InBoard(self.currentFloor.size):
+                        vector = raycast
+                    else:
+                        vector = None
+
+            # Update the value
+            monster.attackVector = vector
+            # Pattern don't need to be updated, as it never changes
+            
+            # Draw if there is a vector
+            if monster.attackVector != None:
                 position = monster.position + monster.attackVector
                 #position = monster.position
                 self.draw_attack(monster, position, screen )
@@ -519,6 +686,7 @@ class Game:
         coffre = Coffre(position,insideTheBox)
         coffre.rect.x, coffre.rect.y = self.convert_case_in_px(position)
         self.currentFloor.SetNewObject(position, coffre)
+
 
     # -------------------------------------------------------------------------------------------------------------------
     # SPRITE GESTION
@@ -590,14 +758,18 @@ class Game:
 
         # show floor
         self.draw_floor(screen)
-        self.preshot_monster_attack( screen)
+
+        # draw monsters' attacks
+        self.preshot_monster_attack(screen)
 
         # show player info
         self.draw_player_infos(screen)
 
         # show monster info
-        self.draw_monster_infos(screen)
+        #self.draw_monster_infos(screen)
 
+        # show floor infos
+        self.draw_floor_infos(screen)
         # show the objects
         self.currentFloor.staticObjectGroup.draw(screen)
         # show monstres (maybe better in main)
@@ -623,6 +795,7 @@ class Game:
 
         # draw the message for the player
         self.draw_message(screen)
+
 
         # draw the events bought
         self.draw_events_to_execute(screen);
@@ -678,6 +851,11 @@ class Game:
         txt_button_armes = font_small.render("annul", 1, (255, 255, 255))
         screen.blit(txt_button_armes, (890, 630))
 
+        pygame.draw.rect(screen, (0, 124, 124), self.help_button)
+        txt_button_armes = font_small.render("Help", 1, (255, 255, 255))
+        screen.blit(txt_button_armes, (1040, 0))
+
+
    #draw monster info
     def draw_monster_infos(self, screen):
         # show monster info
@@ -686,23 +864,37 @@ class Game:
                                                      (255, 255, 255))  # create texte name
         screen.blit(name_currentMonster_text, (650, 420))  # show the name at the tuple position
 
-        description_currentMonster_text = font_small.render("Description :" + str(self.current_monster.description), 1,
-                                                            (255, 255, 255))  # create texte description
-        screen.blit(description_currentMonster_text, (650, 440))  # show the name at the tuple position
+
 
         health_currentMonster_text = font_small.render("Health :", 1, (255, 255, 255))  # create texte health
-        screen.blit(health_currentMonster_text, (650, 460))  # show the health at the tuple position
+        screen.blit(health_currentMonster_text, (650, 450))  # show the health at the tuple position
 
         # Create player health bar
         bar_back_color = (253, 250, 217)  # couleur 46, 222, 231
         bar_color = (148, 255, 0)  # couleur 46, 222, 231
-        bar2_back_position = [750, 470, 180, 7]  # x, y, w, h
-        bar2_position = [750, 470, (self.current_monster.healthPoints / self.current_monster.maxHealthPoints) * 180,
+        bar2_back_position = [750, 460, 180, 7]  # x, y, w, h
+        bar2_position = [750, 460, (self.current_monster.healthPoints / self.current_monster.maxHealthPoints) * 180,
                          7]  # x, y, w, h
 
         # Draw player helth bar
         pygame.draw.rect(screen, bar_back_color, bar2_back_position)
         pygame.draw.rect(screen, bar_color, bar2_position)
+
+    def draw_floor_infos(self, screen):
+        font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
+        name_currentFloor_text = font_small.render("Name :" + self.currentFloor.name, 1, (255, 255, 255))  # create texte name
+        screen.blit(name_currentFloor_text, (670, 400))  # show the name at the tuple position
+
+        condition_text = font_small.render("Aim :" + self.currentFloor.condition_txt(), 1, (255, 255, 255))  # create texte
+        screen.blit(condition_text, (650, 430))  # show the text at the tuple position
+
+        if self.elevatorOpen :
+            elevator_text = font_small.render("Elevator open", 1,
+                                               (0, 255, 0))  # create texte
+        else :
+            elevator_text = font_small.render("Elevator closed" , 1,
+                                              (255, 0, 0))  # create texte health
+        screen.blit(elevator_text, (650, 460))  # show the health at the tuple position
 
     def draw_weapon_info(self,screen):
         font_small = pygame.font.SysFont("monospace", 20, True)  # create the font style
@@ -762,6 +954,16 @@ class Game:
         # Draw won background
         won_background = pygame.image.load('assets/won.png')  # import background
         screen.blit(won_background, (0, 0))
+
+    # draw the game over screen and replay button
+    def draw_gameOver(self, screen):
+        self.replay_button_rect.x = (screen.get_width() // 2) - (self.replay_button.get_width() // 2)
+        self.replay_button_rect.y = (screen.get_height()) - (self.replay_button.get_height() + 22)
+
+        gameOver_background = pygame.image.load('assets/gameOver.png')  # import background
+        screen.blit(gameOver_background, (0, 0))
+        screen.blit(self.replay_button, self.replay_button_rect)
+
 
     #draw the current weapon when the bag is open
     def draw_current_weapon(self, screen):
@@ -1025,12 +1227,46 @@ class Game:
 
         self.draw_current_event(screen);
 
+    # draw help when is open
+    def draw_help(self, screen):
+        font_large = pygame.font.SysFont("monospace", 25, True)  # create the font style
+        font_medium = pygame.font.SysFont("monospace", 15, True)  # create the font style
+        font_small = pygame.font.SysFont("monospace", 10, True)  # create the font style
+
+        # Draw the background of the boutique
+        help_background = pygame.image.load('assets/inventaire.png')  # import background
+        screen.blit(help_background, (0, 0))
+
+        # draw the quit button
+        pygame.draw.rect(screen, (0, 124, 124), self.quit_help_button)
+        txt_button_quit = font_large.render("Quit", 1, (255, 255, 255))
+        screen.blit(txt_button_quit, (500, 500))
+
+        # draw the next button
+        pygame.draw.rect(screen, (0, 124, 124), self.help_next_button)
+        txt_button_next = font_large.render("Next", 1, (255, 255, 255))
+        screen.blit(txt_button_next, (700, 500))
+
+        self.draw_text(screen, self.help_txt[self.indice_txt_help], 20, 160, 160, 20)
+
+
+
+
+    def draw_text(self, screen, tab_txt, size, start_x, start_y, ecart):
+        font = pygame.font.SysFont("monospace", size, True)  # create the font style
+        count_line = 0
+        for l in range(0, len(tab_txt)):
+            txt_line = font.render(tab_txt[l], 1, (255, 255, 255))
+            screen.blit(txt_line, (start_x, start_y + ecart* count_line))
+            count_line += 1
+
     def draw_message(self, screen):
         font_small = pygame.font.SysFont("monospace", 17, True)  # create the font style
         message_text = font_small.render(self.message, 1,
                                                      (255, 255, 255))  # create texte name
         screen.blit(message_text, (70, 580))  # show the name at the tuple position
 
+    # draw the attack
     def draw_attack(self, attaquant, positionAttack, screen):
         vector = positionAttack - attaquant.position
         pattern = attaquant.weapon.GetAttackPattern()
