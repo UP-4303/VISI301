@@ -61,6 +61,15 @@ class Game:
         floors_count = 0 # count the number of floors to create by counting files in assets/floors
         for path in pathlib.Path("./assets/floors").iterdir():
             #add the floor in the list
+            if (floors_count == 1) :
+                condition = "allMoney"
+            elif (floors_count== 2):
+                condition = "allPotionPicked"
+            elif (floors_count == 5):
+                condition = "survive10"
+            else :
+                condition = "allMonsterkilled"
+
             self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)))
             if path.is_file():
                 floors_count += 1
@@ -316,7 +325,7 @@ class Game:
     def update(self, screen):
 
         # update affichage et update var
-        self.elevatorOpen = self.currentFloor.is_condition_fullfilled()
+        self.elevatorOpen = self.currentFloor.is_condition_fullfilled(self.turn)
         self.draw_everything(screen)
         self.running = True
         self.won = False

@@ -36,7 +36,7 @@ class Floor():
     staticObjectGroup:pygame.sprite.Group
     blockGroup:pygame.sprite.Group
 
-    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str ="", condition : str="allMoney"):
+    def __init__(self, name:str='Floor 0', size:Size=Size(height=6,width=6),elevatorUP: Position =Position(1,3),elevatorDOWN: Position =Position(0,1), refImg : str ="", condition : str="allMonsterkilled"):
         self.name = name
 
         with open('data/weapons.json','r', encoding='utf-8') as dataFile:
@@ -216,7 +216,7 @@ class Floor():
         coffre = Coffre(pos, insideTheBox)
         self.SetNewObject(pos, coffre)
 
-    def is_condition_fullfilled(self):
+    def is_condition_fullfilled(self, turnCount):
         res = False
 
         if ( self.condition == "allMoney"):
@@ -232,6 +232,8 @@ class Floor():
             for obj in self.staticObjectGroup:
                 if  isinstance(obj, LifePotion) or isinstance(obj, MovementPotion):
                     res = False
+        elif (self.condition == "survive10"):
+            res = (turnCount>= 10)
 
         return res
 
@@ -245,6 +247,8 @@ class Floor():
 
         elif ( self.condition == "allPotionPicked"):
             res = "Pick all potions"
+        elif (self.condition == "survive10"):
+            res = "Survive 10 turn"
 
         return res
 
