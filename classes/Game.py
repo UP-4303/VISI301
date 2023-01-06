@@ -62,15 +62,15 @@ class Game:
         for path in pathlib.Path("./assets/floors").iterdir():
             #add the floor in the list
             if (floors_count == 1) :
-                condition = "allMoney"
+                condition_ = "allMoney"
             elif (floors_count== 2):
-                condition = "allPotionPicked"
+                condition_ = "allPotionPicked"
             elif (floors_count == 5):
-                condition = "survive10"
+                condition_ = "survive10"
             else :
-                condition = "allMonsterkilled"
+                condition_ = "allMonsterkilled"
 
-            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path)), condition=condition)
+            self.floorList.append(Floor(name='Floor ' + str(floors_count ), refImg="./"+ str(path), condition = condition_))
             if path.is_file():
                 floors_count += 1
 
