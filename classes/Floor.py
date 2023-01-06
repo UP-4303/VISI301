@@ -194,7 +194,7 @@ class Floor():
         insideTheBox = []
         nWeapon = 0
         object = None
-        for i in range(10):
+        for i in range(6):
             randomO = random.random()
             randomO = randomO * 4
             randomO = int(randomO)

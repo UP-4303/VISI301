@@ -6,7 +6,7 @@ from classes.Size import Size
 
 class Innondation(Event):
     def __init__(self):
-        super().__init__("Innondation", "Hurts everything on the border", "./assets/water.png", 5, Position(0,0) )
+        super().__init__("Innondation", "Hurts everything on the border", "./assets/water.png", 10, Position(0,0) )
 
     #Make his action on the floor
     def appendOnTheFloor(self,floor: Floor):
