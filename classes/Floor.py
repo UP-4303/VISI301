@@ -117,6 +117,7 @@ class Floor():
 
                 # Test Pink to put DOWN lift
                 if (pix == (235, 160, 191, 255)):
+                    print("OK")
                     self.elevatorDOWN = Position(l,c)
 
                 # Test dark Pink to put UP lift
