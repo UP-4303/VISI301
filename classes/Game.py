@@ -175,15 +175,6 @@ class Game:
 
 
         # self.spawn_monster(position=Position(4, 4), movementPoints=5, healthPoints=5, weapon=self.weaponTab['TEST WEAPON'])
-        
-        self.floorList[0].SetNewObject(Position(0,3), BlocObject(position=Position(0,3), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(0,4), BlocObject(position=Position(0,4), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(0,5), BlocObject(position=Position(0,5), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(1,3), BlocObject(position=Position(1,3), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(1,5), BlocObject(position=Position(1,5), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(2,3), BlocObject(position=Position(2,3), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(2,4), BlocObject(position=Position(2,4), healthPoints=3))
-        self.floorList[0].SetNewObject(Position(2,5), BlocObject(position=Position(2,5), healthPoints=3))
 
         self.current_monster = self.currentFloor.lastMonsterAdded
         self.init_sprite_size()
