@@ -72,7 +72,7 @@ class Game:
         self.score = 0
 
         # generate the player
-        self.player = Player(movementPoints=3, weapon=weapons['BASIC WEAPON'])
+        self.player = Player(movementPoints=3, weapon=weapons['Light saber'])
         self.currentFloor.SetNewObject(self.currentFloor.elevatorDOWN, self.player)
         self.currentweapon = self.player.weapon
 
@@ -114,7 +114,7 @@ class Game:
         self.gameOver= False
 
         self.bagisopen = False
-        self.bag = {'BASIC WEAPON':weapons['BASIC WEAPON']}
+        self.bag = {'Light saber':weapons['Light saber']}
         self.taillebag = 13
         self.weaponTab = weapons
 
