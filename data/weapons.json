@@ -4,7 +4,7 @@
             "pattern":{
                 "damages":[[1]],
                 "center":[0,0],
-                "distance":3,
+                "distance":1,
                 "push":[[0]],
                 "pushCenter":[0,0]
             }
