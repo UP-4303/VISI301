@@ -67,7 +67,7 @@
         "imageLink": "./assets/weapon2.png"
     },
 
-    "Double light saber":{
+    "Double saber":{
         "onAttack":{
             "pattern":{
                 "damages":[

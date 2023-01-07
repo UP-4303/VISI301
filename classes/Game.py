@@ -61,11 +61,11 @@ class Game:
         floors_count = 0 # count the number of floors to create by counting files in assets/floors
         for path in pathlib.Path("./assets/floors").iterdir():
             #add the floor in the list
-            if (floors_count == 1) :
+            if (floors_count == 1 or floors_count== 3 or floors_count== 4) :
                 condition_ = "allMoney"
-            elif (floors_count== 2):
+            elif (floors_count== 0 or floors_count==5  or floors_count== 6):
                 condition_ = "allPotionPicked"
-            elif (floors_count == 5):
+            elif (floors_count == 7):
                 condition_ = "survive10"
             else :
                 condition_ = "allMonsterkilled"
@@ -178,7 +178,8 @@ class Game:
                           "     - Choose to attack with a weapon that you picked in your bag",
                           "     - Open things if you are on it",
                           "     - Buy event in the store ",
-                          ""
+                          "",
+                          " DO NOT FORGET TO END THE TURN : RETURN KEY OR END BUTTON"
                           ],
 
 
@@ -194,7 +195,9 @@ class Game:
                            "To choose an attack click on the attack button on the ",
                           "bottom right (or A) and click on the place you want to make",
                           "the attack if the are no impacts appearing the attack ",
-                          "is not valid, you will have to choose again"
+                          "is not valid, you will have to choose again",
+                             "",
+                             " DO NOT FORGET TO END THE TURN : RETURN KEY OR END BUTTON"
                           ],
                         ["HOW TO USE YOUR WEAPON : ",
                          "You can use your weapon when you are attacking. After",
@@ -238,7 +241,7 @@ class Game:
                          ],
                         ["HOW TO GO TO THE UPPER FLOOR :",
                          "To go to the upper floor you first have to unlock the lift.",
-                         "For that you have to fill the floors aim that you can see on "
+                         "For that you have to fill the floors aim that you can see on ",
                          "bottom right box of your pannel gaim.",
                          "For examples the aim : kill all monsters indicate that every",
                          "monsters have to be dead to unlock the access to the up lift.",
@@ -271,7 +274,9 @@ class Game:
                             "To buy them you have to click on the S key and then choose",
                             "which one you want to buy. You can buy up to three events",
                             "per round. The events you have bought will be visible on ",
-                            " the bottom right box of the pannel game."
+                            " the bottom right box of the pannel game.",
+                              "",
+                              " DO NOT FORGET TO END THE TURN : RETURN KEY OR END BUTTON"
                           ],
 
                         ["HOW TO KNOW WHERE THE MONSTER ATTACK :",
@@ -419,7 +424,10 @@ class Game:
         self.player.money = self.memory['money']
         self.bag = self.copie_bag(self.memory['bag'])
         self.score= self.memory['score']
-        self.player.movementPoints = self.memory['mvtPoint']
+        if (self.memory['mvtPoint'] >4):
+            self.player.movementPoints = 4
+        else :
+            self.player.movementPoints = self.memory['mvtPoint']
 
 
 
@@ -674,6 +682,10 @@ class Game:
             self.has_moved = False
             self.has_attacked = False
             self.message = " Welcome to this Floor "
+
+            if (self.player.movementPoints > 4):
+                self.player.movementPoints = 4
+
 
             self.isAOpenableShowed = False
             self.currentOpenable = None
